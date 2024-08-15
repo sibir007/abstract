@@ -592,7 +592,7 @@ ZERO-FILL RIGHT SHIFT(правый сдвиг с заполнением нуля
 
 ### Функции
 
-let userName = 'Вася';
+    let userName = 'Вася';
 
     function showMessage() {
       userName = "Петя"; // (1) изменяем значение внешней переменной
@@ -810,3 +810,203 @@ Function Expression
       return result; // если мы используем фигурные скобки, то нам нужно явно указать "return"
     };
     alert( sum(1, 2) ); // 3
+
+## Качество кода
+
+### Комментарии
+
+однострочный
+
+        // однострочный
+
+многострочный
+
+        /* 
+        многострочный 
+        многострочный 
+        многострочный 
+        многострочный 
+        */
+
+документирование
+
+        /**
+        * Возвращает x, возведённое в n-ную степень.
+        *
+        * @param {number} x Возводимое в степень число.
+        * @param {number} n Степень, должна быть натуральным числом.
+        * @return {number} x, возведённое в n-ную степень.
+        */
+        function pow(x, n) {
+          ...
+        }
+
+## Объекты: основы
+
+### Литералы и свойства
+
+        let user = new Object(); // синтаксис "конструктор объекта"
+        let user = {};  // синтаксис "литерал объекта"
+
+        let user = {
+          name: "John",
+          age: 30,
+          "likes birds": true,  // имя свойства из нескольких слов должно быть в кавычках
+        };
+        // получаем свойства объекта:
+        alert( user.name ); // John
+        alert( user.age ); // 30
+
+можно добавить свойство после создания
+
+        user.isAdmin = true;
+        
+        delete user.age;
+
+Квадратные скобки
+
+        // присваивание значения свойству
+        user["likes birds"] = true;
+
+        // получение значения свойства
+        alert(user["likes birds"]); // true
+
+        // удаление свойства
+        delete user["likes birds"];
+
+        
+        let key = prompt("Что вы хотите узнать о пользователе?", "name");
+
+        // доступ к свойству через переменную
+        alert( user[key] ); // John (если ввели "name")
+
+        alert( user.key ); // undefined
+
+        let fruit = prompt("Какой фрукт купить?", "apple");
+
+Вычисляемые свойства
+
+        let bag = {
+          [fruit]: 5, // имя свойства будет взято из переменной fruit
+        };
+        alert( bag.apple ); // 5, если fruit="apple"
+
+        let fruit = 'apple';
+        let bag = {
+          [fruit + 'Computers']: 5 // bag.appleComputers = 5
+        };
+
+Свойство из переменной
+
+        function makeUser(name, age) {
+          return {
+            name: name,
+            age: age
+            // ...другие свойства
+          };
+        }
+        let user = makeUser("John", 30);
+        alert(user.name); // John
+
+        function makeUser(name, age) {
+          return {
+            name, // то же самое, что и name: name
+            age   // то же самое, что и age: age
+            // ...
+          };
+        }
+
+Ограничения на имена свойств
+
+        // эти имена свойств допустимы
+        let obj = {
+          for: 1,
+          let: 2,
+          return: 3
+        };
+        alert( obj.for + obj.let + obj.return );  // 6
+
+        let obj = {
+          0: "Тест" // то же самое что и "0": "Тест", преобразуется в строку
+        };
+        // обе функции alert выведут одно и то же свойство (число 0 преобразуется в строку "0")
+        alert( obj["0"] ); // Тест
+        alert( obj[0] ); // Тест (то же свойство)
+
+        let obj = {};
+        obj.__proto__ = 5; // присвоим число
+        alert(obj.__proto__); // [object Object], значение - это объект, т.е. не то, что мы ожидали
+
+### Проверка существования свойства, оператор «in»
+
+        let user = {};
+        alert( user.noSuchProperty === undefined ); // true означает "свойства нет"
+
+        let user = { name: "John", age: 30 };
+        alert( "age" in user ); // true, user.age существует
+        alert( "blabla" in user ); // false, user.blabla не существует
+
+        let obj = {
+          test: undefined
+        };
+        alert( obj.test ); //  выведет undefined, значит свойство не существует?
+        alert( "test" in obj ); // true, свойство существует!
+
+### Цикл "for..in"
+
+        let user = {
+          name: "John",
+          age: 30,
+          isAdmin: true
+        };
+
+        for (let key in user) {
+          // ключи
+          alert( key );  // name, age, isAdmin
+          // значения ключей
+          alert( user[key] ); // John, 30, true
+        }
+
+### Упорядочение свойств объекта
+
+свойства упорядочены особым образом: свойства с целочисленными ключами сортируются по возрастанию, остальные располагаются в порядке создания. Термин «целочисленное свойство» означает строку, которая может быть преобразована в целое число и обратно без изменений.
+
+        // Math.trunc - встроенная функция, которая удаляет десятичную часть
+        alert( String(Math.trunc(Number("49"))) ); // "49", то же самое ⇒ свойство целочисленное
+        alert( String(Math.trunc(Number("+49"))) ); // "49", не то же самое, что "+49" ⇒ свойство не целочисленное
+        alert( String(Math.trunc(Number("1.2"))) ); // "1", не то же самое, что "1.2" ⇒ свойство не целочисленное
+
+        let codes = {
+          "49": "Германия",
+          "41": "Швейцария",
+          "44": "Великобритания",
+          // ..,
+          "1": "США"
+        };
+        for (let code in codes) {
+          alert(code); // 1, 41, 44, 49
+        }
+
+        let user = {
+          name: "John",
+          surname: "Smith"
+        };
+        user.age = 25; // добавим ещё одно свойство
+        // не целочисленные свойства перечислены в порядке создания
+        for (let prop in user) {
+          alert( prop ); // name, surname, age
+        }
+
+        let codes = {
+          "+49": "Германия",
+          "+41": "Швейцария",
+          "+44": "Великобритания",
+          // ..,
+          "+1": "США"
+        };
+        for (let code in codes) {
+          alert( +code ); // 49, 41, 44, 1
+        }
+
+### Копирование объектов и ссылки
+
