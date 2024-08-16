@@ -1010,3 +1010,212 @@ Function Expression
 
 ### Копирование объектов и ссылки
 
+        let message = "Привет!";
+        let phrase = message; // копируется значение
+
+        let user = { name: "John" };
+        let admin = user; // копируется ссылка
+
+#### Сравнение по ссылке
+
+        let a = {};
+        let b = a; // копирование по ссылке
+        alert( a == b ); // true, обе переменные ссылаются на один и тот же объект
+        alert( a === b ); // true
+
+        let a = {};
+        let b = {}; // два независимых объекта
+        alert( a == b ); // false
+
+#### Клонирование и объединение, Object.assign
+
+        let user = {
+          name: "John",
+          age: 30
+        };
+        let clone = {}; // новый пустой объект
+        // давайте скопируем все свойства user в него
+        for (let key in user) {
+          clone[key] = user[key];
+        }
+        // теперь clone это полностью независимый объект с тем же содержимым
+        clone.name = "Pete"; // изменим в нём данные
+        alert( user.name ); // все ещё John в первоначальном объекте
+
+        let user = { name: "John" };
+        let permissions1 = { canView: true };
+        let permissions2 = { canEdit: true };
+        // копируем все свойства из permissions1 и permissions2 в user
+        Object.assign(user, permissions1, permissions2);
+        // теперь user = { name: "John", canView: true, canEdit: true }
+
+        let user = {
+          name: "John",
+          age: 30
+        };
+        let clone = Object.assign({}, user);
+
+#### Вложенное клонирование
+
+Чтобы выполнить глубокое клонирование, нужно использовать рекурсию - готовая реализация: _.cloneDeep(obj) из библиотеки JavaScript lodash.
+
+Также мы можем использовать глобальный метод structuredClone(), который позволяет сделать полную копию объекта.
+
+### Сборка мусора
+
+### Методы объекта, "this"
+
+#### Сокращённая запись метода
+
+    // эти объекты делают одно и то же
+    user = {
+      sayHi: function() {
+        alert("Привет");
+      }
+    };
+    // сокращённая запись выглядит лучше, не так ли?
+    user = {
+      sayHi() { // то же самое, что и "sayHi: function(){...}"
+        alert("Привет");
+      }
+    };
+
+#### «this» не является фиксированным
+
+    let user = { name: "John" };
+    let admin = { name: "Admin" };
+    function sayHi() {
+      alert( this.name );
+    }
+    // используем одну и ту же функцию в двух объектах
+    user.f = sayHi;
+    admin.f = sayHi;
+    // эти вызовы имеют  разное значение this
+    // "this" внутри функции - это объект "перед точкой"
+    user.f(); // John  (this == user)
+    admin.f(); // Admin  (this == admin)
+    admin['f'](); // Admin (нет разницы между использованием точки или квадратных скобок для доступа к объекту)
+
+В строгом режиме ("use strict") в таком коде значением this будет являться undefined. Если мы попытаемся получить доступ к this.name – это вызовет ошибку.
+
+В нестрогом режиме значением this в таком случае будет глобальный объект .
+
+    function sayHi() {
+      alert(this);
+    }
+    sayHi(); // undefined
+
+#### У стрелочных функций нет «this»
+
+    let user = {
+      firstName: "Ilya",
+      sayHi() {
+        let arrow = () => alert(this.firstName);
+        arrow();
+      }
+    };
+    user.sayHi(); // Ilya
+
+
+    Функции, которые находятся в свойствах объекта, называются «методами».
+    Методы позволяют объектам «действовать»: object.doSomething().
+    Методы могут ссылаться на объект через this.
+
+#### Итого
+
+Значение this определяется во время исполнения кода.
+При объявлении любой функции в ней можно использовать this, но этот this не имеет значения до тех пор, пока функция не будет вызвана.
+Функция может быть скопирована между объектами (из одного объекта в другой).
+Когда функция вызывается синтаксисом «метода» – object.method(), значением this во время вызова является object.
+
+### Конструктор, оператор "new"
+
+    let user = new User; // <-- без скобок
+    // то же, что и
+    let user = new User();
+
+#### Функция-конструктор
+
+    function User(name) {
+      // this = {};  (неявно)
+      // добавляет свойства к this
+      this.name = name;
+      this.isAdmin = false;
+      // return this;  (неявно)
+    }
+    let user = new User("Jack")
+
+    // создаём функцию и сразу же вызываем её с помощью new
+    let user = new function() {
+      this.name = "John";
+      this.isAdmin = false;
+      // ...другой код для создания пользователя
+      // возможна любая сложная логика и инструкции
+      // локальные переменные и так далее
+    };
+
+#### Проверка на вызов в режиме конструктора: new.target
+
+    function User() {
+      alert(new.target);
+    }
+    // без "new":
+    User(); // undefined
+    // с "new":
+    new User(); // function User { ... }
+
+    function User(name) {
+      if (!new.target) { // в случае, если вы вызвали меня без оператора new
+        return new User(name); // ...я добавлю new за вас
+      }
+      this.name = name;
+    }
+    let john = User("John"); // переадресовывает вызов на new User
+    alert(john.name); // John
+
+#### Возврат значения из конструктора, return
+
+    function BigUser() {
+      this.name = "John";
+      return { name: "Godzilla" };  // <-- возвращает этот объект
+    }
+    alert( new BigUser().name );  // Godzilla, получили этот объект
+
+    // return с объектом возвращает этот объект, во всех остальных случаях возвращается this
+    function SmallUser() {
+      this.name = "John";
+      return 'some string'; // <-- возвращает this
+    }
+    alert( new SmallUser().name );  // John
+
+#### Создание методов в конструкторе
+
+    function User(name) {
+      this.name = name;
+
+      this.sayHi = function() {
+        alert( "Меня зовут: " + this.name );
+      };
+    }
+
+    let john = new User("John");
+
+    john.sayHi(); // Меня зовут: John
+
+    /*
+    john = {
+      name: "John",
+      sayHi: function() { ... }
+    }
+    */
+
+#### Итого
+
+Функции-конструкторы или просто конструкторы, являются обычными функциями, но существует общепринятое соглашение именовать их с заглавной буквы.
+Функции-конструкторы следует вызывать только с помощью new. Такой вызов подразумевает создание пустого this в начале и возврат заполненного в конце.
+
+Мы можем использовать конструкторы для создания множества похожих объектов.
+
+JavaScript предоставляет функции-конструкторы для множества встроенных объектов языка: таких как Date, Set, и других, которые нам ещё предстоит изучить.
+
+https://learn.javascript.ru/task/calculator-constructor
