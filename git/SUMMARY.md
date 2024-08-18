@@ -146,3 +146,12 @@ If your current branch is set up to track a remote branch, you can use the `git 
 
 `$ git remote show origin`
 
+#### Renaming and Removing Remotes
+
+`$ git remote rename pb paul`
+
+`$ git remote remove paul`
+
+### 2.6 Git Basics - Tagging
+
+<https://git-scm.com/book/en/v2/Git-Basics-Tagging>
