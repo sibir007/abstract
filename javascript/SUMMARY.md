@@ -1705,13 +1705,13 @@ Symbol.toPrimitive
 
 #### Неточные вычисления
 
-alert( 1e500 ); // Infinity
-alert( 0.1 + 0.2 == 0.3 ); // false
-alert( 0.1 + 0.2 ); // 0.30000000000000004
+      alert( 1e500 ); // Infinity
+      alert( 0.1 + 0.2 == 0.3 ); // false
+      alert( 0.1 + 0.2 ); // 0.30000000000000004
 
-alert(0.1.toString(2)); // 0.0001100110011001100110011001100110011001100110011001101
-alert(0.2.toString(2)); // 0.001100110011001100110011001100110011001100110011001101
-alert((0.1 + 0.2).toString(2)); // 0.0100110011001100110011001100110011001100110011001101
+      alert(0.1.toString(2)); // 0.0001100110011001100110011001100110011001100110011001101
+      alert(0.2.toString(2)); // 0.001100110011001100110011001100110011001100110011001101
+      alert((0.1 + 0.2).toString(2)); // 0.0100110011001100110011001100110011001100110011001101
 
 Деление на 10 гарантированно хорошо работает в десятичной системе, но деление на 3 – нет. По той же причине и в двоичной системе счисления, деление на 2 обязательно сработает, а 1/10 становится бесконечной дробью.
 
@@ -1811,4 +1811,182 @@ alert((0.1 + 0.2).toString(2)); // 0.0100110011001100110011001100110011001100110
 
       alert( Math.pow(2, 10) ); // 2 в степени 10 = 1024
 
-<https://learn.javascript.ru/task/sum-interface>
+### Строки
+
+#### Кавычки
+
+      let single = 'single-quoted';
+      let double = "double-quoted";
+      let backticks = `backticks ${single} ${double}`;
+
+      let guestList = `Guests: // многострочная строка
+       * John
+       * Pete
+       * Mary
+      `;
+      alert(guestList); // список гостей, состоящий из нескольких строк
+
+#### Спецсимволы
+
+// перевод строки добавлен с помощью символа перевода строки
+let str1 = "Hello\nWorld";
+// многострочная строка, созданная с использованием обратных кавычек
+let str2 = `Hello
+World`;
+alert(str1 == str2); // true
+
+|Символ| 	Описание|
+|:-:|:-:|
+|\n| 	Перевод строки|
+|\r| 	В текстовых файлах Windows для перевода строки используется комбинация символов \r\n, а на других ОС это просто \n. Это так по историческим причинам, ПО под Windows обычно понимает и просто \n.|
+|\', \", \`| 	Кавычки|
+|\\ | 	Обратный слеш|
+|\t | 	Знак табуляции
+|\b, \f, \v| 	Backspace, Form Feed и Vertical Tab — оставлены для обратной совместимости, сейчас не используются.
+
+#### Длина строки
+
+      alert( `My\n`.length ); // 3 числовое свойство, а не функция, добавлять скобки не нужно
+
+#### Доступ к символам
+
+      let str = `Hello`;
+
+      // получаем первый символ
+      alert( str[0] ); // H
+      alert( str.at(0) ); // H
+
+      // получаем последний символ
+      alert( str[str.length - 1] ); // o
+      alert( str.at(-1) ); // o
+
+      for (let char of "Hello") {
+        alert(char); // H,e,l,l,o (char — сначала "H", потом "e", потом "l" и т.д.)
+      }
+
+#### Строки неизменяемы
+
+      let str = 'Hi';
+      str[0] = 'h'; // ошибка
+      alert( str[0] ); // не работает
+
+      let str = 'Hi';
+      str = 'h' + str[1]; // заменяем строку
+      alert( str ); // hi
+
+#### Изменение регистра
+
+      alert( 'Interface'.toUpperCase() ); // INTERFACE
+      alert( 'Interface'.toLowerCase() ); // interface
+      alert( 'Interface'[0].toLowerCase() ); // 'i'
+
+#### Поиск подстроки
+
+##### str.indexOf
+
+      let str = 'Widget with id';
+      alert( str.indexOf('Widget') ); // 0, потому что подстрока 'Widget' найдена в начале
+      alert( str.indexOf('widget') ); // -1, совпадений нет, поиск чувствителен к регистру
+      alert( str.indexOf("id") ); // 1, подстрока "id" найдена на позиции 1 (..idget with id)
+
+      let str = 'Widget with id';
+      alert( str.indexOf('id', 2) ) // 12 - поиск с позиции 2
+
+все вхождения подстроки
+
+      let str = 'Ослик Иа-Иа посмотрел на виадук';
+      let target = 'Иа'; // цель поиска
+      let pos = -1;
+      while ((pos = str.indexOf(target, pos + 1)) != -1) {
+        alert( pos );
+      }
+
+      let str = "Widget with id";
+      if (str.indexOf("Widget") != -1) {
+          alert("Совпадение есть");
+      }
+
+      str.lastIndexOf(substr, position) // последнее вхождение
+
+##### includes, startsWith, endsWith
+
+      alert( "Widget with id".includes("Widget") ); // true
+      alert( "Hello".includes("Bye") ); // false
+      alert( "Midget".includes("id") ); // true
+      alert( "Midget".includes("id", 3) ); // false, поиск начат с позиции 3
+      alert( "Widget".startsWith("Wid") ); // true, "Wid" — начало "Widget"
+      alert( "Widget".endsWith("get") ); // true, "get" — окончание "Widget"
+
+#### Получение подстроки
+
+##### str.slice(start [, end])
+
+      let str = "stringify";
+      // 'strin', символы от 0 до 5 (не включая 5)
+      alert( str.slice(0, 5) );
+      // 's', от 0 до 1, не включая 1, т. е. только один символ на позиции 0
+      alert( str.slice(0, 1) );
+
+      let str = "stringify";
+      alert( str.slice(2) ); // ringify, с позиции 2 и до конца
+
+      let str = "stringify";
+      // начинаем с позиции 4 справа, а заканчиваем на позиции 1 справа
+      alert( str.slice(-4, -1) ); // gif
+
+##### str.substring(start [, end])
+
+      let str = "stringify";
+
+      // для substring эти два примера — одинаковы
+      alert( str.substring(2, 6) ); // "ring"
+      alert( str.substring(6, 2) ); // "ring"
+
+      // …но не для slice:
+      alert( str.slice(2, 6) ); // "ring" (то же самое)
+      alert( str.slice(6, 2) ); // "" (пустая строка)
+
+##### str.substr(start [, length])
+
+      let str = "stringify";
+      // ring, получаем 4 символа, начиная с позиции 2
+      alert( str.substr(2, 4) );
+
+#### Сравнение строк
+
+строки сравниваются посимвольно в алфавитном порядке.
+
+      alert( 'a' > 'Z' ); // true
+      alert( 'Österreich' > 'Zealand' ); // true
+
+##### str.codePointAt(pos)
+
+      // одна и та же буква в нижнем и верхнем регистре
+      // будет иметь разные коды
+      alert( "z".codePointAt(0) ); // 122
+      alert( "Z".codePointAt(0) ); // 90
+
+##### String.fromCodePoint(code)
+
+      let str = '';
+
+      for (let i = 65; i <= 220; i++) {
+        str += String.fromCodePoint(i);
+      }
+      alert( str );
+      // ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
+      // ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜ
+
+#### Правильное сравнение
+
+Вызов str.localeCompare(str2) возвращает число, которое показывает, какая строка больше в соответствии с правилами языка:
+
+- Отрицательное число, если str меньше str2.
+- Положительное число, если str больше str2.
+- 0, если строки равны.
+
+Например:
+
+      alert( 'Österreich'.localeCompare('Zealand') ); // -1
+
+<https://learn.javascript.ru/string#tasks>
