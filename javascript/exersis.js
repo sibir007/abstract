@@ -1,27 +1,33 @@
-console.log(`isFinite(NaN) ${isFinite(NaN)}`);
-console.log(`isFinite(null) ${isFinite(null)}`);
-console.log(`isFinite('str') ${isFinite('str')}`);
-// console.log(isFinite(15));
-console.log(`isFinite('15') ${isFinite('15')}`);
-console.log(`isFinite(' ') ${isFinite(' ')}`);
+style = ['Джаж', 'Блюз'];
+console.log(style)
+style.push('РР');
+console.log(style)
+style[Math.floor(style.length/2)] = 'Classic';
+console.log(style)
+console.log(style.shift())
+style.unshift('Rep', 'Reggi')
+console.log(style)
 
-console.log('--------------------');
+let arr = ["a", "b"];
 
-console.log(Number.isFinite(NaN));
-console.log(Number.isFinite(null));
-console.log(Number.isFinite('str'));
-// console.log(Number.isFinite(15));
-console.log(Number.isFinite(+'15'));
-console.log(Number.isFinite(+''));
-console.log(Number(' '));
+arr.push(function() {
+  console.log( this );
+})
 
-function checkNum() {
+arr[2](); // a,b,function(){...}
+
+function sumInput() {
+    rezArr = []
     while (true) {
-        rez = prompt('enter num:');
-        if (rez === null) continue;
-        if (String(rez).trim() == '') continue;
-        if (Number.isFinite(+rez)) break;
+        rez = prompt('enter num:', '');
+        if (rez == null || +rez == NaN || rez == '') break;
+        rezArr.push(+rez);
     }
+    rezSum = 0;
+    for (const num of rezArr) {
+        rezSum += num
+    }
+    console.log(rezSum)
 }
 
-checkNum()
+sumInput()

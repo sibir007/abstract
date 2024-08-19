@@ -1989,4 +1989,346 @@ alert(str1 == str2); // true
 
       alert( 'Österreich'.localeCompare('Zealand') ); // -1
 
-<https://learn.javascript.ru/string#tasks>
+### Массивы
+
+#### Объявление
+
+    let arr = new Array();
+    let arr = [];
+
+    let fruits = ["Яблоко", "Апельсин", "Слива"];
+    alert( fruits[0] ); // Яблоко
+    alert( fruits[1] ); // Апельсин
+    alert( fruits[2] ); // Слива
+
+    fruits[3] = 'Лимон'; // теперь ["Яблоко", "Апельсин", "Груша", "Лимон"]
+
+    let fruits = ["Яблоко", "Апельсин", "Слива"];
+    alert( fruits.length ); // 3
+    alert( fruits ); // Яблоко, Апельсин, Слива
+
+    // разные типы значений
+    let arr = [ 'Яблоко', { name: 'Джон' }, true, function() { alert('привет'); } ];
+
+    // получить элемент с индексом 1 (объект) и затем показать его свойство
+    alert( arr[1].name ); // Джон
+
+    // получить элемент с индексом 3 (функция) и выполнить её
+    arr[3](); // привет
+
+    let fruits = [
+      "Яблоко",
+      "Апельсин",
+      "Слива",
+    ];
+
+#### Получение последних элементов при помощи «at»
+
+    let fruits = ["Apple", "Orange", "Plum"];
+    alert( fruits[fruits.length-1] ); // Plum
+
+    // то же самое, что и fruits[fruits.length-1]
+    alert( fruits.at(-1) ); // Plum
+
+#### Методы pop/push, shift/unshift
+
+    let fruits = ["Яблоко", "Апельсин", "Груша"];
+    alert( fruits.pop() ); // удаляем "Груша" и выводим его
+    alert( fruits ); // Яблоко, Апельсин
+
+    let fruits = ["Яблоко", "Апельсин"];
+    fruits.push("Груша");
+    alert( fruits ); // Яблоко, Апельсин, Груша
+
+
+    let fruits = ["Яблоко", "Апельсин", "Груша"];
+    alert( fruits.shift() ); // удаляем Яблоко и выводим его
+    alert( fruits ); // Апельсин, Груша
+
+    let fruits = ["Апельсин", "Груша"];
+    fruits.unshift('Яблоко');
+    alert( fruits ); // Яблоко, Апельсин, Груша
+
+
+    let fruits = ["Яблоко"];
+    fruits.push("Апельсин", "Груша");
+    fruits.unshift("Ананас", "Лимон");
+    // ["Ананас", "Лимон", "Яблоко", "Апельсин", "Груша"]
+    alert( fruits );
+
+#### Внутреннее устройство массива
+
+Массив – это особый подвид объектов. Движок JavaScript старается хранить элементы массива в непрерывной области памяти, один за другим, они утратят эффективность, если мы перестанем работать с массивом как с «упорядоченной коллекцией данных» и начнём использовать его как обычный объект.
+
+Варианты неправильного применения массива:
+
+- Добавление нечислового свойства, например: arr.test = 5.
+- Создание «дыр», например: добавление arr[0], затем arr[1000] (между ними ничего нет).
+- Заполнение массива в обратном порядке, например: arr[1000], arr[999] и т.д.
+
+#### Эффективность
+
+Методы push/pop выполняются быстро, а методы shift/unshift – медленно.
+
+#### Перебор элементов
+
+    let arr = ["Яблоко", "Апельсин", "Груша"];
+    for (let i = 0; i < arr.length; i++) {
+      alert( arr[i] );
+    }
+
+    let fruits = ["Яблоко", "Апельсин", "Слива"];
+    // проходит по значениям
+    for (let fruit of fruits) {
+      alert( fruit );
+    }
+
+    //Цикл for..in оптимизирован под произвольные объекты, не массивы, и поэтому в 10-100 раз медленнее
+    let arr = ["Яблоко", "Апельсин", "Груша"];
+    for (let key in arr) {
+      alert( arr[key] ); // Яблоко, Апельсин, Груша
+    }
+
+#### Немного о «length»
+
+    let fruits = [];
+    fruits[123] = "Яблоко";
+    alert( fruits.length ); // 124
+
+    let arr = [1, 2, 3, 4, 5];
+    arr.length = 2; // укорачиваем до двух элементов
+    alert( arr ); // [1, 2]
+    arr.length = 5; // возвращаем length как было
+    alert( arr[3] ); // undefined: значения не восстановились
+
+    arr.length = 0; // самый простой способ очистить массив
+
+#### new Array()
+
+let arr = new Array("Яблоко", "Груша", "и тд");
+
+let arr = new Array(2); // создастся ли массив [2]?
+alert( arr[0] ); // undefined! нет элементов.
+alert( arr.length ); // length 2
+
+#### Многомерные массивы
+
+    let matrix = [
+      [1, 2, 3],
+      [4, 5, 6],
+      [7, 8, 9]
+    ];
+    alert( matrix[1][1] ); // 5, центральный элемент
+
+#### toString
+
+    let arr = [1, 2, 3];
+    alert( arr ); // 1,2,3
+    alert( String(arr) === '1,2,3' ); // true
+
+    alert( [] + 1 ); // "1"
+    alert( [1] + 1 ); // "11"
+    alert( [1,2] + 1 ); // "1,21"
+
+#### Не сравнивайте массивы при помощи == 
+
+У этого оператора нет специального подхода к массивам, он работает с ними, как и с любыми другими объектами.
+
+    alert( [] == [] ); // false
+    alert( [0] == [0] ); // false
+
+    alert( 0 == [] ); // true
+    alert('0' == [] ); // false
+    // после того, как [] был преобразован в ''
+    alert( 0 == '' ); // true, так как '' преобразуется в число 0
+    alert('0' == '' ); // false, нет преобразования типов, разные строки
+
+### Методы массивов
+
+#### Добавление/удаление элементов
+
+##### arr.push(...items) – добавляет элементы в конец,
+##### arr.pop() – извлекает элемент из конца,
+##### arr.shift() – извлекает элемент из начала,
+##### arr.unshift(...items) – добавляет элементы в начало.
+
+##### arr.splice(start[, deleteCount, elem1, ..., elemN])
+
+Он изменяет arr начиная с индекса start: удаляет deleteCount элементов и затем вставляет elem1, ..., elemN на их место. Возвращает массив из удалённых элементов.
+
+    let arr = ["I", "go", "home"];
+    delete arr[1]; // удалить "go"
+    alert( arr[1] ); // undefined
+    // теперь arr = ["I",  , "home"];
+    alert( arr.length ); // 3
+
+    let arr = ["Я", "изучаю", "JavaScript"];
+    arr.splice(1, 1); // начиная с индекса 1, удалить 1 элемент
+    alert( arr ); // осталось ["Я", "JavaScript"]
+
+    let arr = ["Я", "изучаю", "JavaScript", "прямо", "сейчас"];
+    // удалить 3 первых элемента и заменить их другими
+    let removed = arr.splice(0, 3, "Давай", "танцевать");
+    alert(removed) // ["Я", "изучаю", "JavaScript"]
+    alert( arr ) // теперь ["Давай", "танцевать", "прямо", "сейчас"]
+
+    let arr = ["Я", "изучаю", "JavaScript"];
+    // с индекса 2
+    // удалить 0 элементов
+    // вставить "сложный", "язык"
+    arr.splice(2, 0, "сложный", "язык");
+    alert( arr ); // "Я", "изучаю", "сложный", "язык", "JavaScript"
+
+    let arr = [1, 2, 5];
+    // начиная с индекса -1 (перед последним элементом)
+    // удалить 0 элементов,
+    // затем вставить числа 3 и 4
+    arr.splice(-1, 0, 3, 4);
+    alert( arr ); // 1,2,3,4,5
+
+##### arr.slice([start], [end])
+
+    let arr = ["t", "e", "s", "t"];
+    alert( arr.slice(1, 3) ); // e,s (копирует с 1 до 3)
+    alert( arr.slice(-2) ); // s,t (копирует с -2 до конца)
+
+##### arr.concat(arg1, arg2...)
+
+    let arr = [1, 2];
+    // создать массив из: arr и [3,4]
+    alert( arr.concat([3, 4]) ); // 1,2,3,4
+    // создать массив из: arr и [3,4] и [5,6]
+    alert( arr.concat([3, 4], [5, 6]) ); // 1,2,3,4,5,6
+    // создать массив из: arr и [3,4], потом добавить значения 5 и 6
+    alert( arr.concat([3, 4], 5, 6) ); // 1,2,3,4,5,6
+
+    let arr = [1, 2];
+    let arrayLike = {
+      0: "что-то",
+      length: 1
+    };
+    alert( arr.concat(arrayLike) ); // 1,2,[object Object]
+
+    let arr = [1, 2];
+    let arrayLike = {
+      0: "что-то",
+      1: "ещё",
+      [Symbol.isConcatSpreadable]: true,
+      length: 2
+    };
+    alert( arr.concat(arrayLike) ); // 1,2,что-то,ещё
+
+#### Перебор: forEach
+
+    // Вызов alert для каждого элемента
+    ["Бильбо", "Гэндальф", "Назгул"].forEach(alert);
+
+    ["Бильбо", "Гэндальф", "Назгул"].forEach((item, index, array) => {
+      alert(`У ${item} индекс ${index} в ${array}`);
+    });
+
+#### Поиск в массиве 
+
+##### indexOf/lastIndexOf и includes
+
+    alert( arr.indexOf(0) ); // 1
+    alert( arr.indexOf(false) ); // 2
+    alert( arr.indexOf(null) ); // -1
+    alert( arr.includes(1) ); // true
+
+методы используют строгое сравнение ===. Таким образом, если мы ищем false, он находит именно false, а не ноль.
+
+    let fruits = ['Яблоко', 'Апельсин', 'Яблоко']
+    alert( fruits.indexOf('Яблоко') ); // 0 (первый 'Яблоко')
+    alert( fruits.lastIndexOf('Яблоко') ); // 2 (последний 'Яблоко')
+
+    const arr = [NaN];
+    alert( arr.indexOf(NaN) ); // -1 (неверно, должен быть 0)
+    alert( arr.includes(NaN) );// true (верно)
+
+##### find и findIndex/findLastIndex
+
+    let result = arr.find(function(item, index, array) {
+      // если true - возвращается текущий элемент и перебор прерывается
+      // если все итерации оказались ложными, возвращается undefined
+    });
+
+    let users = [
+      {id: 1, name: "Вася"},
+      {id: 2, name: "Петя"},
+      {id: 3, name: "Маша"}
+    ];
+    let user = users.find(item => item.id == 1);
+    alert(user.name); // Вася
+
+    let users = [
+      {id: 1, name: "Вася"},
+      {id: 2, name: "Петя"},
+      {id: 3, name: "Маша"},
+      {id: 4, name: "Вася"}
+    ];
+    // Найти индекс первого Васи
+    alert(users.findIndex(user => user.name == 'Вася')); // 0
+    // Найти индекс последнего Васи
+    alert(users.findLastIndex(user => user.name == 'Вася')); // 3
+
+##### filter
+
+    let results = arr.filter(function(item, index, array) {
+      // если `true` -- элемент добавляется к results и перебор продолжается
+      // возвращается пустой массив в случае, если ничего не найдено
+    });
+
+    let users = [
+      {id: 1, name: "Вася"},
+      {id: 2, name: "Петя"},
+      {id: 3, name: "Маша"}
+    ];
+    // возвращает массив, состоящий из двух первых пользователей
+    let someUsers = users.filter(item => item.id < 3);
+    alert(someUsers.length); // 2
+
+#### Преобразование массива
+
+##### map
+
+    let result = arr.map(function(item, index, array) {
+      // возвращается новое значение вместо элемента
+    });
+
+    let lengths = ["Бильбо", "Гэндальф", "Назгул"].map(item => item.length);
+    alert(lengths); // 6,8,6
+
+##### sort(fn)
+
+    let arr = [ 1, 2, 15 ];
+    // метод сортирует содержимое arr
+    arr.sort();
+    alert( arr );  // 1, 15, 2 - По умолчанию элементы сортируются как строки.
+
+    function compare(a, b) {
+      if (a > b) return 1; // если первое значение больше второго
+      if (a == b) return 0; // если равны
+      if (a < b) return -1; // если первое значение меньше второго
+    }
+    let arr = [ 1, 2, 15 ];
+    arr.sort(compareNumeric);
+    alert(arr);  // 1, 2, 15
+
+    [1, -2, 15, 2, 0, 8].sort(function(a, b) {
+      alert( a + " <> " + b );
+      return a - b;
+    });
+
+    let arr = [ 1, 2, 15 ];
+    arr.sort(function(a, b) { return a - b; });
+    alert(arr);  // 1, 2, 15
+
+    arr.sort( (a, b) => a - b );
+
+    let countries = ['Österreich', 'Andorra', 'Vietnam'];
+    alert( countries.sort( (a, b) => a > b ? 1 : -1) ); // Andorra, Vietnam, Österreich (неправильно)
+    alert( countries.sort( (a, b) => a.localeCompare(b) ) ); // Andorra,Österreich,Vietnam (правильно!)
+
+
+<https://learn.javascript.ru/array-methods#sort-fn>
