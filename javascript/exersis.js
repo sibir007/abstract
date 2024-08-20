@@ -1,27 +1,21 @@
-function unique(arr) {
-    return new Set(arr)
-  }
-  
-  let values = ["Hare", "Krishna", "Hare", "Krishna",
-    "Krishna", "Krishna", "Hare", "Hare", ":-O"
-  ];
-  
-console.log( unique(values) ); // Hare,Krishna,:-O
+console.log(new Date(2013, 1, 20, 3, 12))
 
-function aclean(arr) {
-    let resMap = arr.reduce(function (acc, val) {
-        acc.
-        set(val.toLowerCase().
-        split('').
-        sort().
-        join(''), val);
-        return acc;
-    }, new Map);
-    return Array.from(resMap.values())
-} 
+let daysMap = new Map(
+    [
+        [0, 'ВС'],
+        [1, 'ПН'],
+        [2, 'ВТ'],
+        [3, 'СР'],
+        [4, 'ЧТ'],
+        [5, 'ПТ'],
+        [6, 'СБ'],
+]
+    
+)
+let date = new Date(2012, 0, 3);  // 3 января 2012 года
+// alert( getWeekDay(date) ); 
 
-// String().sort
+function getWeekDay(date) {
+    console.log(daysMap.get(String(date.getDay())))
+}
 
-let arr = ["nap", "teachers", "cheaters", "PAN", "ear", "era", "hectares"];
-
-console.log( aclean(arr) ); // "nap,teachers,ear" или "PAN,cheaters,era"
