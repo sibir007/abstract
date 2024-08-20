@@ -1,33 +1,27 @@
-style = ['Джаж', 'Блюз'];
-console.log(style)
-style.push('РР');
-console.log(style)
-style[Math.floor(style.length/2)] = 'Classic';
-console.log(style)
-console.log(style.shift())
-style.unshift('Rep', 'Reggi')
-console.log(style)
+function unique(arr) {
+    return new Set(arr)
+  }
+  
+  let values = ["Hare", "Krishna", "Hare", "Krishna",
+    "Krishna", "Krishna", "Hare", "Hare", ":-O"
+  ];
+  
+console.log( unique(values) ); // Hare,Krishna,:-O
 
-let arr = ["a", "b"];
+function aclean(arr) {
+    let resMap = arr.reduce(function (acc, val) {
+        acc.
+        set(val.toLowerCase().
+        split('').
+        sort().
+        join(''), val);
+        return acc;
+    }, new Map);
+    return Array.from(resMap.values())
+} 
 
-arr.push(function() {
-  console.log( this );
-})
+// String().sort
 
-arr[2](); // a,b,function(){...}
+let arr = ["nap", "teachers", "cheaters", "PAN", "ear", "era", "hectares"];
 
-function sumInput() {
-    rezArr = []
-    while (true) {
-        rez = prompt('enter num:', '');
-        if (rez == null || +rez == NaN || rez == '') break;
-        rezArr.push(+rez);
-    }
-    rezSum = 0;
-    for (const num of rezArr) {
-        rezSum += num
-    }
-    console.log(rezSum)
-}
-
-sumInput()
+console.log( aclean(arr) ); // "nap,teachers,ear" или "PAN,cheaters,era"
