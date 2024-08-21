@@ -3332,4 +3332,451 @@ JavaScript считает, что видит блок кода, отсюда и 
     let date = new Date( Date.parse('2012-01-26T13:51:50.417-07:00') );
     alert(date);
 
-<https://learn.javascript.ru/date#tasks>
+### Формат JSON, метод toJSON
+
+JSON поддерживает следующие типы данных:
+
+- Объекты { ... }
+- Массивы [ ... ]
+- Примитивы:
+  - строки,
+  - числа,
+  - логические значения true/false,
+  - null.
+
+JSON пропускает:
+
+- Свойства-функции (методы).
+- Символьные ключи и значения.
+- Свойства, содержащие undefined
+
+JavaScript предоставляет методы:
+
+**JSON.stringify** для преобразования объектов в JSON.
+**JSON.parse** для преобразования JSON обратно в объект.
+
+#### JSON.stringify
+
+    let student = {
+      name: 'John',
+      age: 30,
+      isAdmin: false,
+      courses: ['html', 'css', 'js'],
+      wife: null
+    };
+
+    let json = JSON.stringify(student);
+
+    alert(typeof json); // мы получили строку!
+
+    alert(json);
+    /* выведет объект в формате JSON:
+    {
+      "name": "John",
+      "age": 30,
+      "isAdmin": false,
+      "courses": ["html", "css", "js"],
+      "wife": null
+    }
+    */
+
+##### Исключаем и преобразуем: replacer
+
+    let json = JSON.stringify(value[, replacer, space])
+
+**value** Значение для кодирования.
+**replacer** Массив свойств для кодирования или функция соответствия function(key, value).
+**space** Дополнительное пространство (отступы), используемое для форматирования.
+
+ массив свойств
+
+    let room = {
+      number: 23
+    };
+    let meetup = {
+      title: "Conference",
+      participants: [{name: "John"}, {name: "Alice"}],
+      place: room // meetup ссылается на room
+    };
+    room.occupiedBy = meetup; // room ссылается на meetup
+    alert( JSON.stringify(meetup, ['title', 'participants']) );
+    // {"title":"Conference","participants":[{},{}]}
+
+все свойства, кроме room.occupiedBy, из-за которого появляется цикличная ссылка
+
+    let room = {
+      number: 23
+    };
+    let meetup = {
+      title: "Conference",
+      participants: [{name: "John"}, {name: "Alice"}],
+      place: room // meetup ссылается на room
+    };
+    room.occupiedBy = meetup; // room ссылается на meetup
+    alert( JSON.stringify(meetup, ['title', 'participants', 'place', 'name', 'number']) );
+    /*
+    {
+      "title":"Conference",
+      "participants":[{"name":"John"},{"name":"Alice"}],
+      "place":{"number":23}
+    }
+    */
+
+использовать функцию, а не массив
+
+    let room = {
+      number: 23
+    };
+
+    let meetup = {
+      title: "Conference",
+      participants: [{name: "John"}, {name: "Alice"}],
+      place: room // meetup ссылается на room
+    };
+
+    room.occupiedBy = meetup; // room ссылается на meetup
+
+    alert( JSON.stringify(meetup, function replacer(key, value) {
+      alert(`${key}: ${value}`);
+      return (key == 'occupiedBy') ? undefined : value;
+    }));
+
+    /* пары ключ:значение, которые приходят в replacer:
+    :             [object Object] // {"": meetup} пустой ключ, а значением является целевой объект в общем.
+    title:        Conference
+    participants: [object Object],[object Object]
+    0:            [object Object]
+    name:         John
+    1:            [object Object]
+    name:         Alice
+    place:        [object Object]
+    number:       23
+    occupiedBy: [object Object]
+    */
+
+##### Форматирование: space
+
+    let user = {
+      name: "John",
+      age: 25,
+      roles: {
+        isAdmin: false,
+        isEditor: true
+      }
+    };
+    alert(JSON.stringify(user, null, 2));
+    /* отступ в 2 пробела:
+    {
+      "name": "John",
+      "age": 25,
+      "roles": {
+        "isAdmin": false,
+        "isEditor": true
+      }
+    }
+    */
+    /* для JSON.stringify(user, null, 4) результат содержит больше отступов:
+    {
+        "name": "John",
+        "age": 25,
+        "roles": {
+            "isAdmin": false,
+            "isEditor": true
+        }
+    }
+    */
+
+##### Пользовательский «toJSON»
+
+    let room = {
+      number: 23,
+      toJSON() {
+        return this.number;
+      }
+    };
+    let meetup = {
+      title: "Conference",
+      room
+    };
+    alert( JSON.stringify(room) ); // 23
+    alert( JSON.stringify(meetup) );
+    /*
+      {
+        "title":"Conference",
+        "room": 23
+      }
+    */
+
+#### JSON.parse
+
+    let value = JSON.parse(str[, reviver]);
+
+**str** JSON для преобразования в объект.
+**reviver** Необязательная функция, которая будет вызываться для каждой пары (ключ, значение) и может преобразовывать значение. 
+
+    let user = '{ "name": "John", "age": 35, "isAdmin": false, "friends": [0,1,2,3] }';
+    user = JSON.parse(user);
+    alert( user.friends[1] ); // 1
+
+типичные ошибки в написанном от руки JSON
+
+    let json = `{
+      name: "John",                     // Ошибка: имя свойства без кавычек
+      "surname": 'Smith',               // Ошибка: одинарные кавычки в значении (должны быть двойными)
+      'isAdmin': false,                 // Ошибка: одинарные кавычки в ключе (должны быть двойными)
+      "birthday": new Date(2000, 2, 3), // Ошибка: не допускается конструктор "new", только значения
+      "gender": "male"                  // Ошибка: отсутствует запятая после непоследнего свойства
+      "friends": [0,1,2,3],             // Ошибка: не должно быть запятой после последнего свойства
+    }`;
+
+##### Использование reviver
+
+    let str = '{"title":"Conference","date":"2017-11-30T12:00:00.000Z"}';
+    let meetup = JSON.parse(str);
+    alert( meetup.date.getDate() ); // Ошибка!
+
+ функциz восстановления вторым аргументом, которая возвращает все значения «как есть», но date станет Date
+
+    let str = '{"title":"Conference","date":"2017-11-30T12:00:00.000Z"}';
+    let meetup = JSON.parse(str, function(key, value) {
+      if (key == 'date') return new Date(value);
+      return value;
+    });
+    alert( meetup.date.getDate() ); // 30 - теперь работает
+
+## Продвинутая работа с функциями
+
+### Рекурсия и стек
+
+Итеративный способ: цикл for:
+
+    function pow(x, n) {
+      let result = 1;
+      // умножаем result на x n раз в цикле
+      for (let i = 0; i < n; i++) {
+        result *= x;
+      }
+      return result;
+    }
+    alert( pow(2, 3) ); // 8
+
+Рекурсивный способ
+
+    function pow(x, n) {
+      return (n == 1) ? x : (x * pow(x, n - 1));
+    }
+
+Любая рекурсия может быть переделана в цикл. Как правило, вариант с циклом будет эффективнее с точки зрения памяти
+
+### Рекурсивные обходы
+
+    let company = { // тот же самый объект, сжатый для краткости
+      sales: [{name: 'John', salary: 1000}, {name: 'Alice', salary: 600 }],
+      development: {
+        sites: [{name: 'Peter', salary: 2000}, {name: 'Alex', salary: 1800 }],
+        internals: [{name: 'Jack', salary: 1300}]
+      }
+    };
+    // Функция для подсчёта суммы зарплат
+    function sumSalaries(department) {
+      if (Array.isArray(department)) { // случай (1)
+        return department.reduce((prev, current) => prev + current.salary, 0); // сумма элементов массива
+      } else { // случай (2)
+        let sum = 0;
+        for (let subdep of Object.values(department)) {
+          sum += sumSalaries(subdep); // рекурсивно вызывается для подотделов, суммируя результаты
+        }
+        return sum;
+      }
+    }
+    alert(sumSalaries(company)); // 6700
+
+### Связанный список
+
+ массивов есть недостатки. Операции «удалить элемент» и «вставить элемент» являются дорогостоящими, альтернативой может быть связанный список
+
+    let list = {
+      value: 1,
+      next: {
+        value: 2,
+        next: {
+          value: 3,
+          next: {
+            value: 4,
+            next: null
+          }
+        }
+      }
+    }; 
+
+### Остаточные параметры и оператор расширения
+
+#### Остаточные параметры (...)
+
+    function sum(a, b) {
+      return a + b;
+    }
+    alert( sum(1, 2, 3, 4, 5) ); // 3,4,5 остаточные параметры
+
+три точки `...` значит: «собери оставшиеся параметры и положи их в массив».
+
+    function sumAll(...args) { // args — имя массива
+      let sum = 0;
+      for (let arg of args) sum += arg;
+      return sum;
+    }
+    alert( sumAll(1) ); // 1
+    alert( sumAll(1, 2) ); // 3
+    alert( sumAll(1, 2, 3) ); // 6
+
+первые несколько параметров в переменные, а остальные – собрать в массив
+
+    function showName(firstName, lastName, ...titles) {
+      alert( firstName + ' ' + lastName ); // Юлий Цезарь
+      // Оставшиеся параметры пойдут в массив
+      // titles = ["Консул", "Император"]
+      alert( titles[0] ); // Консул
+      alert( titles[1] ); // Император
+      alert( titles.length ); // 2
+    }
+    showName("Юлий", "Цезарь", "Консул", "Император");
+
+Остаточные параметры должны располагаться в конце
+
+    function f(arg1, ...rest, arg2) { // arg2 после ...rest ?!
+      // Ошибка
+    }
+
+#### Переменная "arguments"
+
+Все аргументы функции находятся в псевдомассиве arguments под своими порядковыми номерами.
+
+    function showName() {
+      alert( arguments.length );
+      alert( arguments[0] );
+      alert( arguments[1] );
+      // Объект arguments можно перебирать
+      // for (let arg of arguments) alert(arg);
+    }
+    // Вывод: 2, Юлий, Цезарь
+    showName("Юлий", "Цезарь");
+    // Вывод: 1, Илья, undefined (второго аргумента нет)
+    showName("Илья");
+
+Стрелочные функции не имеют "arguments". Если мы обратимся к arguments из стрелочной функции, то получим аргументы внешней «нормальной» функции.
+
+    function f() {
+      let showArg = () => alert(arguments[0]);
+      showArg(2);
+    }
+    f(1); // 1
+
+#### Оператор расширения
+
+    let arr = [3, 5, 1];
+    alert( Math.max(arr) ); // NaN
+
+оператор расширения
+
+    let arr1 = [1, -2, 3, 4];
+    let arr2 = [8, 3, -8, 1];
+    alert( Math.max(1, ...arr1, 2, ...arr2, 25) ); // 25
+
+для слияния массивов
+
+    let arr = [3, 5, 1];
+    let arr2 = [8, 9, 15];
+    let merged = [0, ...arr, 2, ...arr2];
+    alert(merged); // 0,3,5,1,2,8,9,15 (0, затем arr, затем 2, в конце arr2)
+
+ превратить строку в массив символов
+
+    let str = "Привет";
+    alert( [...str] ); // П,р,и,в,е,т
+
+ можем использовать и Array.from
+
+    let str = "Привет";
+    // Array.from преобразует перебираемый объект в массив
+    alert( Array.from(str) ); // П,р,и,в,е,т
+
+### Область видимости переменных, замыкание
+
+#### Блоки кода
+
+    {
+      // показать сообщение
+      let message = "Hello";
+      alert(message);
+    }
+    {
+      // показать другое сообщение
+      let message = "Goodbye";
+      alert(message);
+    }
+
+Без блоков была бы ошибка
+
+    // показать сообщение
+    let message = "Hello";
+    alert(message);
+
+    // показать другое сообщение
+    let message = "Goodbye"; // SyntaxError: Identifier 'message' has already been declared
+    alert(message);
+
+Для **if, for, while** и т.д. переменные, объявленные в блоке кода {...}, также видны только внутри:
+
+    if (true) {
+      let phrase = "Hello";
+      alert(phrase); // Hello
+    }
+    alert(phrase); // Ошибка, нет такой переменной!
+
+#### Вложенные функции
+
+для упорядочивания нашего кода,
+
+    function sayHiBye(firstName, lastName) {
+
+      // функция-помощник, которую мы используем ниже
+      function getFullName() {
+        return firstName + " " + lastName;
+      }
+
+      alert( "Hello, " + getFullName() );
+      alert( "Bye, " + getFullName() );
+
+    }
+
+функция может быть возвращена
+
+    function makeCounter() {
+      let count = 0;
+
+      return function() {
+        return count++; // есть доступ к внешней переменной "count"
+      };
+    }
+
+    let counter = makeCounter();
+
+    alert( counter() ); // 0
+    alert( counter() ); // 1
+    alert( counter() ); // 2
+
+##### Лексическое окружение
+
+Шаг 1. Переменные
+
+В JavaScript у каждой выполняемой функции, блока кода `{...}` и скрипта есть связанный с ними внутренний (скрытый) объект, называемый лексическим окружением `LexicalEnvironment`.
+
+Объект лексического окружения состоит из двух частей:
+
+- Environment Record – объект, в котором как свойства хранятся все локальные переменные (а также некоторая другая информация, такая как значение this).
+
+- Ссылка на внешнее лексическое окружение – то есть то, которое соответствует коду снаружи (снаружи от текущих фигурных скобок).
+
+"Переменная" – это просто свойство специального внутреннего объекта: Environment Record. «Получить или изменить переменную», означает, «получить или изменить свойство этого объекта».
+
+<https://learn.javascript.ru/closure#shag-3-vnutrennee-i-vneshnee-leksicheskoe-okruzhenie>

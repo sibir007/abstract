@@ -1,21 +1,40 @@
-console.log(new Date(2013, 1, 20, 3, 12))
+let list = {
+    value: 1,
+    next: {
+      value: 2,
+      next: {
+        value: 3,
+        next: {
+          value: 4,
+          next: null
+        }
+      }
+    }
+  };
 
-let daysMap = new Map(
-    [
-        [0, 'ВС'],
-        [1, 'ПН'],
-        [2, 'ВТ'],
-        [3, 'СР'],
-        [4, 'ЧТ'],
-        [5, 'ПТ'],
-        [6, 'СБ'],
-]
-    
-)
-let date = new Date(2012, 0, 3);  // 3 января 2012 года
-// alert( getWeekDay(date) ); 
-
-function getWeekDay(date) {
-    console.log(daysMap.get(String(date.getDay())))
+function printListRec(list) {
+  if (list.next) printListRec(list.next)
+  console.log(list.value)
 }
+
+function printListIt(list) {
+    let current = list
+    // let count = 0
+    let values = []
+    do {
+        values.push(current.value)
+        // console.log(current.value)
+        current = current.next
+    } while (current);
+    
+    do {
+      current = values.pop()
+      if (current) console.log(current);
+    } while (current);
+
+}
+
+printListRec(list)
+printListIt(list)
+// console.log(Boolean(null))
 
