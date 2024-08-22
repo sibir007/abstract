@@ -4063,4 +4063,309 @@ Function Expression:
     sayHi = null;
     welcome(); // Hello, Guest (вложенный вызов работает)
 
-<https://learn.javascript.ru/new-function>
+### Синтаксис "new Function"
+
+#### Синтаксис
+
+Синтаксис для объявления функции:
+
+    let func = new Function([arg1, arg2, ...argN], functionBody);
+
+Функция создаётся с заданными аргументами arg1...argN и телом functionBody
+
+    let sum = new Function('a', 'b', 'return a + b');
+    alert( sum(1, 2) ); // 3
+
+функция без аргументов, в этом случае достаточно указать только тело:
+
+    let sayHi = new Function('alert("Hello")');
+    sayHi(); // Hello
+
+Но new Function позволяет превратить любую строку в функцию. 
+
+    let str = ... код, полученный с сервера динамически ...
+    let func = new Function(str);
+    func();
+
+#### Замыкание
+
+Обычно функция запоминает, где родилась, в специальном свойстве [[Environment]]. Это ссылка на лексическое окружение (Lexical Environment
+
+Но когда функция создаётся с использованием new Function, в её [[Environment]] записывается ссылка не на внешнее лексическое окружение, в котором она была создана, а на глобальное. Поэтому такая функция имеет доступ только к глобальным переменным.
+
+    function getFunc() {
+      let value = "test";
+      let func = new Function('alert(value)');
+      return func;
+    }
+    getFunc()(); // ошибка: value не определено
+
+перед отправкой JavaScript-кода на реальные работающие проекты код сжимается с помощью минификатора – специальной программы, которая уменьшает размер кода, удаляя комментарии, лишние пробелы, и, что самое главное, локальным переменным даются укороченные именапоэтому, если бы даже new Function и имела доступ к внешним переменным, она не смогла бы найти переименованную userName
+
+### Планирование: setTimeout и setInterval
+
+#### setTimeout
+
+позволяет вызвать функцию один раз через определённый интервал времени
+
+    let timerId = setTimeout(func|code, [delay], [arg1], [arg2], ...);
+
+`func|code` Функция или строка кода для выполнения. Обычно это функция. По историческим причинам можно передать и строку кода, но это не рекомендуется.
+`delay` Задержка перед запуском в миллисекундах (1000 мс = 1 с). Значение по умолчанию – 0.
+`arg1, arg2…` Аргументы, передаваемые в функцию
+
+    function sayHi(phrase, who) {
+      alert( phrase + ', ' + who );
+    }
+    setTimeout(sayHi, 1000, "Привет", "Джон"); // Привет, Джон
+
+первый аргумент является строкой, то JavaScript создаст из неё функцию
+
+    setTimeout("alert('Привет')", 1000);
+
+строка
+
+    setTimeout("alert('Привет')", 1000);
+
+Но использование строк не рекомендуется. Вместо этого используйте функции. Например, так:
+
+  setTimeout(() => alert('Привет'), 1000);
+
+Отмена через clearTimeout
+
+    let timerId = setTimeout(() => alert("ничего не происходит"), 1000);
+    alert(timerId); // идентификатор таймера
+    clearTimeout(timerId);
+    alert(timerId); // тот же идентификатор (не принимает значение null после отмены)
+
+#### setInterval
+
+позволяет вызывать функцию регулярно, повторяя вызов через определённый интервал времени.
+
+    let timerId = setInterval(func|code, [delay], [arg1], [arg2], ...);
+
+Все аргументы имеют такое же значение. Но отличие этого метода от setTimeout в том, что функция запускается не один раз, а периодически через указанный интервал времени.
+
+Чтобы остановить дальнейшее выполнение функции, необходимо вызвать clearInterval(timerId).
+
+    // повторить с интервалом 2 секунды
+    let timerId = setInterval(() => alert('tick'), 2000);
+
+    // остановить вывод через 5 секунд
+    setTimeout(() => { clearInterval(timerId); alert('stop'); }, 5000);
+
+#### Вложенный setTimeout
+
+    /** вместо:
+    let timerId = setInterval(() => alert('tick'), 2000);
+    */
+    let timerId = setTimeout(function tick() {
+      alert('tick');
+      timerId = setTimeout(tick, 2000); // (*)
+    }, 2000);
+
+Вложенный setTimeout – более гибкий метод, чем setInterval. С его помощью последующий вызов может быть задан по-разному в зависимости от результатов предыдущего.
+
+сервис, который отправляет запрос для получения данных на сервер каждые 5 секунд, но если сервер перегружен, то необходимо увеличить интервал запросов до 10, 20, 40 секунд… Вот псевдокод:
+
+    let delay = 5000;
+
+    let timerId = setTimeout(function request() {
+      ...отправить запрос...
+
+      if (ошибка запроса из-за перегрузки сервера) {
+        // увеличить интервал для следующего запроса
+        delay *= 2;
+      }
+
+      timerId = setTimeout(request, delay);
+
+    }, delay);
+
+#### setTimeout с нулевой задержкой
+
+планировщик будет вызывать функцию только после завершения выполнения текущего кода
+
+код выводит «Привет» и затем сразу «Мир»
+
+    setTimeout(() => alert("Мир"));
+    alert("Привет");
+
+##### Минимальная задержка вложенных таймеров в браузере
+
+В браузере есть ограничение на то, как часто внутренние счётчики могут выполняться. В стандарте HTML5 говорится: «после пяти вложенных таймеров интервал должен составлять не менее четырёх миллисекунд.».
+
+let start = Date.now();
+let times = [];
+
+    setTimeout(function run() {
+      times.push(Date.now() - start); // запоминаем задержку от предыдущего вызова
+
+      if (start + 100 < Date.now()) alert(times); // показываем задержку через 100 мс
+      else setTimeout(run); // если нужно ещё запланировать
+    });
+
+    // пример вывода:
+    // 1,1,1,1,9,15,20,24,30,35,40,45,50,55,59,64,70,75,80,85,90,95,100
+
+Первый таймер запускается сразу (как и указано в спецификации), а затем задержка вступает в игру, и мы видим 9, 15, 20, 24....
+
+### Декораторы и переадресация вызова, call/apply
+
+#### Прозрачное кеширование
+
+`slow(x)`, выполняющая ресурсоёмкие вычисления, но возвращающая стабильные результаты, которые мы будем кешировать (запоминать), чтобы сэкономить время на повторных вычислениях.
+
+    function slow(x) {
+      // здесь могут быть ресурсоёмкие вычисления
+      alert(`Called with ${x}`);
+      return x;
+    }
+
+    function cachingDecorator(func) {
+      let cache = new Map();
+
+      return function(x) {
+        if (cache.has(x)) {    // если кеш содержит такой x,
+          return cache.get(x); // читаем из него результат
+        }
+
+        let result = func(x); // иначе, вызываем функцию
+
+        cache.set(x, result); // и кешируем (запоминаем) результат
+        return result;
+      };
+    }
+
+    slow = cachingDecorator(slow);
+
+    alert( slow(1) ); // slow(1) кешируем
+    alert( "Again: " + slow(1) ); // возвращаем из кеша
+
+    alert( slow(2) ); // slow(2) кешируем
+    alert( "Again: " + slow(2) ); // возвращаем из кеша
+
+#### Применение «func.call» для передачи контекста
+
+Декоратор передаёт вызов оригинальному методу, но без контекста. Следовательно – ошибка.
+
+    // сделаем worker.slow кеширующим
+    let worker = {
+      someMethod() {
+        return 1;
+      },
+      slow(x) {
+        // здесь может быть страшно тяжёлая задача для процессора
+        alert("Called with " + x);
+        return x * this.someMethod(); // (*)
+      }
+    };
+    // тот же код, что и выше
+    function cachingDecorator(func) {
+      let cache = new Map();
+      return function(x) {
+        if (cache.has(x)) {
+          return cache.get(x);
+        }
+        let result = func(x); // (**)
+        cache.set(x, result);
+        return result;
+      };
+    }
+    alert( worker.slow(1) ); // оригинальный метод работает
+    worker.slow = cachingDecorator(worker.slow); // теперь сделаем его кеширующим
+    alert( worker.slow(2) ); // Ой! Ошибка: не удаётся прочитать свойство 'someMethod' из 'undefined'
+
+Существует специальный встроенный метод функции func.call(context, …args), который позволяет вызывать функцию, явно устанавливая this.
+
+специальный встроенный метод функции func.call(context, …args) позволяет вызывать функцию, явно устанавливая this.
+
+Синтаксис:
+
+    func.call(context, arg1, arg2, ...)
+
+два вызова делают почти то же самое:
+
+    func(1, 2, 3);
+    func.call(obj, 1, 2, 3)
+
+оба вызывают func с аргументами 1, 2 и 3. Единственное отличие состоит в том, что func.call ещё и устанавливает this равным obj.
+
+    function sayHi() {
+      alert(this.name);
+    }
+    let user = { name: "John" };
+    let admin = { name: "Admin" };
+    // используем 'call' для передачи различных объектов в качестве 'this'
+    sayHi.call( user ); // John
+    sayHi.call( admin ); // Admin
+
+Здесь мы используем call для вызова say с заданным контекстом и фразой:
+
+    function say(phrase) {
+      alert(this.name + ': ' + phrase);
+    }
+    let user = { name: "John" };
+    // 'user' становится 'this', и "Hello" становится первым аргументом
+    say.call( user, "Hello" ); // John: Hello
+
+В нашем случае мы можем использовать call в обёртке для передачи контекста в исходную функцию:
+
+    let worker = {
+      someMethod() {
+        return 1;
+      },
+      slow(x) {
+        alert("Called with " + x);
+        return x * this.someMethod(); // (*)
+      }
+    };
+    function cachingDecorator(func) {
+      let cache = new Map();
+      return function(x) {
+        if (cache.has(x)) {
+          return cache.get(x);
+        }
+        let result = func.call(this, x); // теперь 'this' передаётся правильно
+        cache.set(x, result);
+        return result;
+      };
+    }
+    worker.slow = cachingDecorator(worker.slow); // теперь сделаем её кеширующей
+    alert( worker.slow(2) ); // работает
+    alert( worker.slow(2) ); // работает, не вызывая первоначальную функцию (кешируется)
+
+#### Переходим к нескольким аргументам с «func.apply»
+
+    let worker = {
+      slow(min, max) {
+        alert(`Called with ${min},${max}`);
+        return min + max;
+      }
+    };
+
+    function cachingDecorator(func, hash) {
+      let cache = new Map();
+      return function() {
+        let key = hash(arguments); // (*)
+        if (cache.has(key)) {
+          return cache.get(key);
+        }
+
+        let result = func.call(this, ...arguments); // (**)
+
+        cache.set(key, result);
+        return result;
+      };
+    }
+
+    function hash(args) {
+      return args[0] + ',' + args[1];
+    }
+
+    worker.slow = cachingDecorator(worker.slow, hash);
+
+    alert( worker.slow(3, 5) ); // работает
+    alert( "Again " + worker.slow(3, 5) ); // аналогично (из кеша)
+
+<https://learn.javascript.ru/call-apply-decorators#perehodim-k-neskolkim-argumentam-s-func-apply>
