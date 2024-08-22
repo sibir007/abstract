@@ -4337,6 +4337,8 @@ let times = [];
 
 #### Переходим к нескольким аргументам с «func.apply»
 
+более мощный cachingDecorator
+
     let worker = {
       slow(min, max) {
         alert(`Called with ${min},${max}`);
@@ -4368,4 +4370,279 @@ let times = [];
     alert( worker.slow(3, 5) ); // работает
     alert( "Again " + worker.slow(3, 5) ); // аналогично (из кеша)
 
-<https://learn.javascript.ru/call-apply-decorators#perehodim-k-neskolkim-argumentam-s-func-apply>
+Вместо func.call(this, ...arguments) мы могли бы написать func.apply(this, arguments). Единственная разница в синтаксисе между call и apply состоит в том, что call ожидает список аргументов, в то время как apply принимает псевдомассив.
+
+    func.call(context, ...args); // передаёт массив как список с оператором расширения
+    func.apply(context, args);   // тот же эффект
+
+Передача всех аргументов вместе с контекстом другой функции называется «перенаправлением вызова» (call forwarding). При вызове wrapper из внешнего кода его не отличить от вызова исходной функции
+
+    let wrapper = function() {
+      return func.apply(this, arguments);
+    };
+
+#### Заимствование метода
+
+улучшение функции хеширования:
+
+    function hash(args) {
+      return args[0] + ',' + args[1];
+    }
+
+это не сработает, потому что мы вызываем hash(arguments), а объект arguments является перебираемым и псевдомассивом, но не реальным массивом:
+
+    function hash() {
+      alert( arguments.join() ); // Ошибка: arguments.join не является функцией
+    }
+    hash(1, 2);
+
+способ использовать соединение массива - заимствование метода:
+
+    function hash() {
+      alert( [].join.call(arguments) ); // 1,2
+    }
+    hash(1, 2);
+
+1. Пускай первым аргументом будет glue или, в случае отсутствия аргументов, им будет запятая ","
+2. Пускай result будет пустой строкой "".
+3. Добавить this[0] к result.
+4. Добавить glue и this[1].
+5. Добавить glue и this[2].
+6. …выполнять до тех пор, пока this.length элементов не будет склеено.
+7. Вернуть result.
+
+Таким образом, технически он принимает this и объединяет this[0], this[1]… и т.д. вместе. Он намеренно написан так, что допускает любой псевдомассив this (не случайно, многие методы следуют этой практике). Вот почему он также работает с this=arguments.
+
+### Привязка контекста к функции
+
+#### Потеря «this»
+
+      let user = {
+        firstName: "Вася",
+        sayHi() {
+          alert(`Привет, ${this.firstName}!`);
+        }
+      };
+      setTimeout(user.sayHi, 1000); // Привет, undefined!
+
+последняя строка может быть переписана как
+
+      let f = user.sayHi;
+      setTimeout(f, 1000); // контекст user потеряли
+
+Метод setTimeout в браузере имеет особенность: он устанавливает this=window для вызова функции (в Node.js this становится объектом таймера, но здесь это не имеет значения). Таким образом, для this.firstName он пытается получить window.firstName, которого не существует. В других подобных случаях this обычно просто становится undefined.
+
+##### Решение 1: сделать функцию-обёртку
+
+      setTimeout(() => user.sayHi(), 1000); // Привет, Вася!
+
+уязвимость - в переменную user будет записано другое значение
+
+      let user = {
+        firstName: "Вася",
+        sayHi() {
+          alert(`Привет, ${this.firstName}!`);
+        }
+      };
+      setTimeout(() => user.sayHi(), 1000);
+      // ...в течение 1 секунды
+      user = { sayHi() { alert("Другой пользователь в 'setTimeout'!"); } };
+      // Другой пользователь в 'setTimeout'!
+
+##### Решение 2: привязать контекст с помощью bind
+
+      let user = {
+        firstName: "Вася"
+      };
+      function func() {
+        alert(this.firstName);
+      }
+      let funcUser = func.bind(user);
+      funcUser(); // Вася
+
+func.bind(user) – это «связанный вариант» func, с фиксированным this=user.
+
+Все аргументы передаются исходному методу func как есть,
+
+      let user = {
+        firstName: "Вася"
+      };
+      function func(phrase) {
+        alert(phrase + ', ' + this.firstName);
+      }
+      // привязка this к user
+      let funcUser = func.bind(user);
+      funcUser("Привет"); // Привет, Вася (аргумент "Привет" передан, при этом this = user)
+
+с методом объекта:
+
+      let user = {
+        firstName: "Вася",
+        sayHi() {
+          alert(`Привет, ${this.firstName}!`);
+        }
+      };
+      let sayHi = user.sayHi.bind(user); // (*)
+      sayHi(); // Привет, Вася!
+      setTimeout(sayHi, 1000); // Привет, Вася!
+
+#### Частичное применение
+
+Полный синтаксис bind:
+
+      let bound = func.bind(context, [arg1], [arg2], ...);
+
+Мы можем привязать не только this, но и аргументы
+
+      function mul(a, b) {
+        return a * b;
+      }
+      let double = mul.bind(null, 2);
+      alert( double(3) ); // = mul(2, 3) = 6
+      alert( double(4) ); // = mul(2, 4) = 8
+      alert( double(5) ); // = mul(2, 5) = 10
+
+#### Частичное применение без контекста
+
+      function partial(func, ...argsBound) {
+        return function(...args) { // (*)
+          return func.call(this, ...argsBound, ...args);
+        }
+      }
+      // использование:
+      let user = {
+        firstName: "John",
+        say(time, phrase) {
+          alert(`[${time}] ${this.firstName}: ${phrase}!`);
+        }
+      };
+      // добавляем частично применённый метод с фиксированным временем
+      user.sayNow = partial(user.say, new Date().getHours() + ':' + new Date().getMinutes());
+
+      user.sayNow("Hello");
+      // Что-то вроде этого:
+      // [10:00] John: Hello!
+
+### Повторяем стрелочные функции
+
+- У стрелочных функций нет «this»
+- Стрелочные функции не имеют «arguments»
+
+## Свойства объекта, их конфигурация
+
+### Флаги и дескрипторы свойств
+
+#### Флаги свойств
+
+Помимо значения value, свойства объекта имеют три специальных атрибута (так называемые «флаги»).
+
+- writable – если true, свойство можно изменить, иначе оно только для чтения.
+- enumerable – если true, свойство перечисляется в циклах, в противном случае циклы его игнорируют.
+- configurable – если true, свойство можно удалить, а эти атрибуты можно изменять, иначе этого делать нельзя.
+
+Когда мы создаём свойство «обычным способом», все они имеют значение true. Но мы можем изменить их в любое время.
+
+Метод Object.getOwnPropertyDescriptor позволяет получить полную информацию о свойстве.
+
+**obj** Объект, из которого мы получаем информацию.
+**propertyName** Имя свойства.
+
+Возвращаемое значение – это объект, так называемый «дескриптор свойства»: он содержит значение свойства и все его флаги.
+
+    let user = {
+      name: "John"
+    };
+    let descriptor = Object.getOwnPropertyDescriptor(user, 'name');
+    alert( JSON.stringify(descriptor, null, 2 ) );
+    /* дескриптор свойства:
+    {
+      "value": "John",
+      "writable": true,
+      "enumerable": true,
+      "configurable": true
+    }
+    */
+
+Чтобы изменить флаги, мы можем использовать метод Object.defineProperty.
+
+    Object.defineProperty(obj, propertyName, descriptor)
+
+**obj, propertyName** Объект и его свойство, для которого нужно применить дескриптор.
+**descriptor** Применяемый дескриптор.
+
+Если свойство существует, defineProperty обновит его флаги. В противном случае метод создаёт новое свойство с указанным значением и флагами; если какой-либо флаг не указан явно, ему присваивается значение false.
+
+    let user = {};
+    Object.defineProperty(user, "name", {
+      value: "John"
+    });
+    let descriptor = Object.getOwnPropertyDescriptor(user, 'name');
+    alert( JSON.stringify(descriptor, null, 2 ) );
+    /*
+    {
+      "value": "John",
+      "writable": false,
+      "enumerable": false,
+      "configurable": false
+    }
+     */
+
+#### Только для чтения
+
+    let user = { };
+    Object.defineProperty(user, "name", {
+      value: "John",
+      // для нового свойства необходимо явно указывать все флаги, для которых значение true
+      enumerable: true,
+      configurable: true
+    });
+    alert(user.name); // John
+    user.name = "Pete"; // Ошибка
+
+#### Неперечислимое свойство
+
+    let user = {
+      name: "John",
+      toString() {
+        return this.name;
+      }
+    };
+    Object.defineProperty(user, "toString", {
+      enumerable: false
+    });
+    // Теперь наше свойство toString пропало из цикла:
+    for (let key in user) alert(key); // name
+
+Неперечислимые свойства также не возвращаются Object.keys:
+
+    alert(Object.keys(user)); // name
+
+#### Неконфигурируемое свойство
+
+    let descriptor = Object.getOwnPropertyDescriptor(Math, 'PI');
+    alert( JSON.stringify(descriptor, null, 2 ) );
+    /*
+    {
+      "value": 3.141592653589793,
+      "writable": false,
+      "enumerable": false,
+      "configurable": false
+    }
+    */
+    Math.PI = 3; // Ошибка, потому что writable: false
+    // delete Math.PI тоже не сработает
+    // Ошибка, из-за configurable: false
+    Object.defineProperty(Math, "PI", { writable: true });
+
+configurable: false не даст изменить флаги свойства, а также не даст его удалить. При этом можно изменить значение свойства.
+
+    let user = {
+      name: "John"
+    };
+    Object.defineProperty(user, "name", {
+      configurable: false
+    });
+    user.name = "Pete"; // работает
+    delete user.name; // Ошибка
+
+<https://learn.javascript.ru/property-descriptors#nekonfiguriruemoe-svoystvo>
