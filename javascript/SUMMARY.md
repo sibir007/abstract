@@ -4645,4 +4645,455 @@ configurable: false не даст изменить флаги свойства, 
     user.name = "Pete"; // работает
     delete user.name; // Ошибка
 
-<https://learn.javascript.ru/property-descriptors#nekonfiguriruemoe-svoystvo>
+#### Метод Object.defineProperties
+
+позволяет определять множество свойств сразу
+
+    Object.defineProperties(user, {
+      name: { value: "John", writable: false },
+      surname: { value: "Smith", writable: false },
+      // ...
+    });
+
+#### Object.getOwnPropertyDescriptors
+
+получить все дескрипторы свойств сразу
+
+    let clone = Object.defineProperties({}, Object.getOwnPropertyDescriptors(obj));
+
+аналогично, …Но это не копирует флаги
+
+    for (let key in user) {
+      clone[key] = user[key]
+    }
+
+#### Глобальное запечатывание объекта
+
+**Object.preventExtensions(obj)**
+Запрещает добавлять новые свойства в объект.
+**Object.seal(obj)**
+Запрещает добавлять/удалять свойства. Устанавливает configurable: false для всех существующих свойств.
+**Object.freeze(obj)**
+Запрещает добавлять/удалять/изменять свойства. Устанавливает configurable: false, writable: false для всех существующих свойств.
+А также есть методы для их проверки:
+
+**Object.isExtensible(obj)**
+Возвращает false, если добавление свойств запрещено, иначе true.
+**Object.isSealed(obj)**
+Возвращает true, если добавление/удаление свойств запрещено и для всех существующих свойств установлено configurable: false.
+**Object.isFrozen(obj)** Возвращает true, если добавление/удаление/изменение свойств запрещено, и для всех текущих свойств установлено configurable: false, writable: false.
+
+### Свойства - геттеры и сеттеры
+
+Есть два типа свойств объекта.
+
+- свойства-данные (data properties
+- свойства-аксессоры (accessor properties)
+
+#### Геттеры и сеттеры
+
+    let obj = {
+      get propName() {
+        // геттер, срабатывает при чтении obj.propName
+      },
+
+      set propName(value) {
+        // сеттер, срабатывает при записи obj.propName = value
+      }
+    };
+
+добавим свойство объекта fullName
+
+    let user = {
+      name: "John",
+      surname: "Smith",
+
+      get fullName() {
+        return `${this.name} ${this.surname}`;
+      }
+    };
+
+    alert(user.fullName); // John Smith
+
+Если мы попытаемся назначить user.fullName=, произойдёт ошибка:
+
+    let user = {
+      get fullName() {
+        return `...`;
+      }
+    };
+
+    user.fullName = "Тест"; // Ошибка (у свойства есть только геттер)
+
+ добавив сеттер для user.fullName
+
+     let user = {
+      name: "John",
+      surname: "Smith",
+
+      get fullName() {
+        return `${this.name} ${this.surname}`;
+      },
+
+      set fullName(value) {
+        [this.name, this.surname] = value.split(" ");
+      }
+    };
+
+    // set fullName запустится с данным значением
+    user.fullName = "Alice Cooper";
+
+    alert(user.name); // Alice
+    alert(user.surname); // Cooper
+
+##### Дескрипторы свойств доступа
+
+Свойства-аксессоры **не имеют** **value** и **writable**, но взамен предлагают функции get и set.
+
+То есть, дескриптор аксессора может иметь:
+
+**get** – функция без аргументов, которая сработает при чтении свойства,
+**set** – функция, принимающая один аргумент, вызываемая при присвоении свойства,
+enumerable – то же самое, что и для свойств-данных,
+**configurable** – то же самое, что и для свойств-данных.
+
+Например, для создания аксессора fullName при помощи defineProperty мы можем передать дескриптор с использованием get и set:
+
+    let user = {
+      name: "John",
+      surname: "Smith"
+    };
+
+    Object.defineProperty(user, 'fullName', {
+      get() {
+        return `${this.name} ${this.surname}`;
+      },
+
+      set(value) {
+        [this.name, this.surname] = value.split(" ");
+      }
+    });
+
+    alert(user.fullName); // John Smith
+
+    for(let key in user) alert(key); // name, surname
+
+Ещё раз заметим, что свойство объекта может быть либо свойством-аксессором (с методами get/set), либо свойством-данным (со значением value).
+
+При попытке указать и get, и value в одном дескрипторе будет ошибка:
+
+    // Error: Invalid property descriptor.
+    Object.defineProperty({}, 'prop', {
+      get() {
+        return 1
+      },
+
+      value: 2
+    });
+
+##### Умные геттеры/сеттеры
+
+    let user = {
+      get name() {
+        return this._name;
+      },
+
+      set name(value) {
+        if (value.length < 4) {
+          alert("Имя слишком короткое, должно быть более 4 символов");
+          return;
+        }
+        this._name = value;
+      }
+    };
+
+    user.name = "Pete";
+    alert(user.name); // Pete
+
+    user.name = ""; // Имя слишком короткое...
+
+существует широко известное соглашение о том, что свойства, которые начинаются с символа "_", являются внутренними, и к ним не следует обращаться из-за пределов объекта.
+
+##### Использование для совместимости
+
+объект user, используя свойства-данные имя name и возраст age:
+
+    function User(name, age) {
+      this.name = name;
+      this.age = age;
+    }
+
+    let john = new User("John", 25);
+
+    alert( john.age ); // 25
+
+возраста age мы можем решить хранить дату рождения birthday
+
+    function User(name, birthday) {
+      this.name = name;
+      this.birthday = birthday;
+    }
+
+    let john = new User("John", new Date(1992, 6, 1));
+
+Что нам делать со старым кодом, который использует свойство age? Добавление геттера для age решит проблему:
+
+    function User(name, birthday) {
+      this.name = name;
+      this.birthday = birthday;
+
+      // возраст рассчитывается из текущей даты и дня рождения
+      Object.defineProperty(this, "age", {
+        get() {
+          let todayYear = new Date().getFullYear();
+          return todayYear - this.birthday.getFullYear();
+        }
+      });
+    }
+
+    let john = new User("John", new Date(1992, 6, 1));
+
+    alert( john.birthday ); // доступен как день рождения
+    alert( john.age );      // ...так и возраст
+
+## Прототипы, наследование
+
+### Прототипное наследование
+
+#### [[Prototype]]
+
+специальное скрытое свойство [[Prototype]] (так оно названо в спецификации), которое либо равно null, либо ссылается на другой объект. Этот объект называется «прототип»
+
+Когда мы хотим прочитать свойство из object, а оно отсутствует, JavaScript автоматически берёт его из прототипа
+
+Свойство [[Prototype]] является внутренним и скрытым, но есть много способов задать его. Одним из них является использование __proto__, например так
+
+    let animal = {
+      eats: true,
+      walk() {
+        alert("Animal walk");
+      }
+    };
+
+    let rabbit = {
+      jumps: true,
+      __proto__: animal
+    };
+
+    let longEar = {
+      earLength: 10,
+      __proto__: rabbit
+    };
+
+    // walk взят из цепочки прототипов
+    longEar.walk(); // Animal walk
+    alert(longEar.jumps); // true (из rabbit)
+
+Так что если у animal много полезных свойств и методов, то они автоматически становятся доступными у rabbit. Такие свойства называются «унаследованными».
+
+ __proto__ — не то же самое, что внутреннее свойство [[Prototype]]. Это геттер/сеттер для [[Prototype]]
+
+ Современный JavaScript предполагает, что мы должны использовать функции Object.getPrototypeOf/Object.setPrototypeOf вместо того, чтобы получать/устанавливать прототип.
+
+#### Операция записи не использует прототип
+
+мы присваиваем rabbit собственный метод walk:
+
+    let animal = {
+      eats: true,
+      walk() {
+        /* этот метод не будет использоваться в rabbit */
+      }
+    };
+
+    let rabbit = {
+      __proto__: animal
+    };
+
+    rabbit.walk = function() {
+      alert("Rabbit! Bounce-bounce!");
+    };
+
+    rabbit.walk(); // Rabbit! Bounce-bounce!
+
+Свойства-аксессоры – исключение, так как запись в него обрабатывается функцией-сеттером. То есть это фактически вызов функции
+
+    let user = {
+      name: "John",
+      surname: "Smith",
+
+      set fullName(value) {
+        [this.name, this.surname] = value.split(" ");
+      },
+
+      get fullName() {
+        return `${this.name} ${this.surname}`;
+      }
+    };
+
+    let admin = {
+      __proto__: user,
+      isAdmin: true
+    };
+
+    alert(admin.fullName); // John Smith (*)
+
+    // срабатывает сеттер!
+    admin.fullName = "Alice Cooper"; // (**)
+    alert(admin.name); // Alice
+    alert(admin.surname); // Cooper
+
+#### Значение «this»
+
+**Неважно, где находится метод: в объекте или его прототипе. При вызове метода this — всегда объект перед точкой.**
+
+    // методы animal
+    let animal = {
+      walk() {
+        if (!this.isSleeping) {
+          alert(`I walk`);
+        }
+      },
+      sleep() {
+        this.isSleeping = true;
+      }
+    };
+
+    let rabbit = {
+      name: "White Rabbit",
+      __proto__: animal
+    };
+
+    // модифицирует rabbit.isSleeping
+    rabbit.sleep();
+
+    alert(rabbit.isSleeping); // true
+    alert(animal.isSleeping); // undefined (нет такого свойства в прототипе)
+
+#### Цикл for…in
+
+Цикл for..in проходит не только по собственным, но и по унаследованным свойствам объекта
+
+    let animal = {
+      eats: true
+    };
+
+    let rabbit = {
+      jumps: true,
+      __proto__: animal
+    };
+
+    // Object.keys возвращает только собственные ключи
+    alert(Object.keys(rabbit)); // jumps
+
+    // for..in проходит и по своим, и по унаследованным ключам
+    for(let prop in rabbit) alert(prop); // jumps, затем eats
+
+Если унаследованные свойства нам не нужны, то мы можем отфильтровать их при помощи встроенного метода obj.hasOwnProperty(key)
+
+    let animal = {
+      eats: true
+    };
+
+    let rabbit = {
+      jumps: true,
+      __proto__: animal
+    };
+
+    for(let prop in rabbit) {
+      let isOwn = rabbit.hasOwnProperty(prop);
+
+      if (isOwn) {
+        alert(`Our: ${prop}`); // Our: jumps
+      } else {
+        alert(`Inherited: ${prop}`); // Inherited: eats
+      }
+    }
+
+В этом примере цепочка наследования выглядит так: rabbit наследует от animal, который наследует от Object.prototype (так как animal – литеральный объект {...}, то это по умолчанию), а затем null
+
+### F.prototype
+
+F.prototype означает обычное свойство с именем "prototype" для F
+
+    let animal = {
+      eats: true
+    };
+
+    function Rabbit(name) {
+      this.name = name;
+    }
+
+    Rabbit.prototype = animal;
+
+    let rabbit = new Rabbit("White Rabbit"); //  rabbit.__proto__ == animal
+
+    alert( rabbit.eats ); // true
+
+F.prototype используется только в момент вызова new F
+F.prototype используется только при вызове new F и присваивается в качестве свойства [[Prototype]] нового объекта.
+
+Если после создания свойство F.prototype изменится (F.prototype = <другой объект>), то новые объекты, созданные с помощью new F, будут иметь в качестве [[Prototype]] другой объект, а уже существующие объекты сохранят старый.
+
+#### F.prototype по умолчанию, свойство constructor
+
+У каждой функции (за исключением стрелочных) по умолчанию уже есть свойство "prototype". По умолчанию "prototype" – объект с единственным свойством constructor, которое ссылается на функцию-конструктор.
+
+    function Rabbit() {}
+    // по умолчанию:
+    // Rabbit.prototype = { constructor: Rabbit }
+
+    alert( Rabbit.prototype.constructor == Rabbit ); // true
+
+Соответственно, если мы ничего не меняем, то свойство constructor будет доступно всем кроликам через [[Prototype]]:
+
+    function Rabbit() {}
+    // по умолчанию:
+    // Rabbit.prototype = { constructor: Rabbit }
+
+    let rabbit = new Rabbit(); // наследует от {constructor: Rabbit}
+
+    alert(rabbit.constructor == Rabbit); // true (свойство получено из прототипа)
+
+Мы можем использовать свойство constructor существующего объекта для создания нового
+
+    function Rabbit(name) {
+      this.name = name;
+      alert(name);
+    }
+
+    let rabbit = new Rabbit("White Rabbit");
+
+    let rabbit2 = new rabbit.constructor("Black Rabbit");
+
+**…JavaScript сам по себе не гарантирует правильное значение свойства "constructor".**
+
+ если мы заменим прототип по умолчанию на другой объект, то свойства "constructor" в нём не будет.
+
+     function Rabbit() {}
+    Rabbit.prototype = {
+      jumps: true
+    };
+
+    let rabbit = new Rabbit();
+    alert(rabbit.constructor === Rabbit); // false
+
+сохранить верное свойство "constructor", мы должны добавлять/удалять/изменять свойства у прототипа по умолчанию вместо того, чтобы перезаписывать его целиком:
+
+    function Rabbit() {}
+
+    // Не перезаписываем Rabbit.prototype полностью,
+    // а добавляем к нему свойство
+    Rabbit.prototype.jumps = true
+    // Прототип по умолчанию сохраняется, и мы всё ещё имеем доступ к Rabbit.prototype.constructor
+
+Или мы можем заново создать свойство constructor:
+
+    Rabbit.prototype = {
+      jumps: true,
+      constructor: Rabbit
+    };
+
+    // теперь свойство constructor снова корректное, так как мы добавили его
+
+<[Задачи](https://learn.javascript.ru/function-prototype#tasks)>
