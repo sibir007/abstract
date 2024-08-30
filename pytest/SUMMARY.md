@@ -315,13 +315,176 @@ Running it will show that MyPlugin was added and its hook was invoked:
 Fixtures are created when first requested by a test, and are destroyed based on their scope:
 
 - **function**: the default scope, the fixture is destroyed at the end of the test.
-
 - **class**: the fixture is destroyed during teardown of the last test in the class.
-
 - **module**: the fixture is destroyed during teardown of the last test in the module.
-
 - **package**: the fixture is destroyed during teardown of the last test in the package where the fixture is defined, including sub-packages and sub-directories within it.
+- **session**: the fixture is destroyed at the end of the test session.
 
-    session: the fixture is destroyed at the end of the test session.
+остановился
+ <https://docs.pytest.org/en/stable/how-to/fixtures.html#fixture-scopes>
 
-    <https://docs.pytest.org/en/stable/how-to/fixtures.html#fixture-scopes>
+### How to capture warnings
+
+<https://docs.pytest.org/en/stable/how-to/capture-warnings.html#how-to-capture-warnings>
+
+#### Controlling warnings
+
+`$ pytest -q test_show_warnings.py -W error::UserWarning`
+
+pytest provides its own -W flag to control which warnings are ignored, displayed, or turned into errors. See the [warning filter]<https://docs.python.org/3/library/warnings.html#warning-filter> documentation for more advanced use-cases.
+
+The same option can be set in the pytest.ini or pyproject.toml file using the filterwarnings ini option
+
+    # pytest.ini
+    [pytest]
+    filterwarnings =
+        error
+        ignore::UserWarning
+        ignore:function ham\(\) is deprecated:DeprecationWarning
+    
+    # pyproject.toml
+    [tool.pytest.ini_options]
+    filterwarnings = [
+        "error",
+        "ignore::UserWarning",
+        # note the use of single quote below to denote "raw" strings in TOML
+        'ignore:function ham\(\) is deprecated:DeprecationWarning',
+    ]
+
+#### @pytest.mark.filterwarnings
+
+use the @pytest.mark.filterwarnings to add warning filters to specific test items
+
+    import warnings
+
+
+    def api_v1():
+        warnings.warn(UserWarning("api v1, should use functions from v2"))
+        return 1
+
+
+    @pytest.mark.filterwarnings("ignore:api v1")
+    def test_one():
+        assert api_v1() == 1
+
+
+#### Disabling warnings summary
+
+Although not recommended, you can use the `--disable-warnings` command-line option to suppress the warning summary entirely from the test run output.
+
+#### Disabling warning capture entirely
+
+    [pytest]
+    addopts = -p no:warnings
+
+Or passing -p no:warnings in the command-line
+
+#### DeprecationWarning and PendingDeprecationWarning
+
+    [pytest]
+    filterwarnings =
+        ignore:.*U.*mode is deprecated:DeprecationWarning
+
+This will ignore all warnings of type DeprecationWarning where the start of the message matches the regular expression ".*U.*mode is deprecated".
+
+#### Ensuring code triggers a deprecation warning
+
+You can also use pytest.deprecated_call() for checking that a certain function call triggers a DeprecationWarning or PendingDeprecationWarning:
+
+    import pytest
+
+
+    def test_myfunction_deprecated():
+        with pytest.deprecated_call():
+            myfunction(17)
+
+#### Asserting warnings with the warns function
+
+        import warnings
+
+        import pytest
+
+
+        def test_warning():
+            with pytest.warns(UserWarning):
+                warnings.warn("my warning", UserWarning)
+
+Recording warnings
+You can record raised warnings either using pytest.warns() or with the recwarn fixture.
+
+To record with pytest.warns() without asserting anything about the warnings, pass no arguments as the expected warning type and it will default to a generic Warning:
+
+    with pytest.warns() as record:
+        warnings.warn("user", UserWarning)
+        warnings.warn("runtime", RuntimeWarning)
+
+    assert len(record) == 2
+    assert str(record[0].message) == "user"
+    assert str(record[1].message) == "runtime"
+    The recwarn fixture will record warnings for the whole function:
+
+    import warnings
+
+
+    def test_hello(recwarn):
+        warnings.warn("hello", UserWarning)
+        assert len(recwarn) == 1
+        w = recwarn.pop(UserWarning)
+        assert issubclass(w.category, UserWarning)
+        assert str(w.message) == "hello"
+        assert w.filename
+        assert w.lineno
+
+#### Additional use cases of warnings in tests
+
+Here are some use cases involving warnings that often come up in tests, and suggestions on how to deal with them:
+
+To ensure that at least one of the indicated warnings is issued, use:
+
+    def test_warning():
+        with pytest.warns((RuntimeWarning, UserWarning)):
+            ...
+    To ensure that only certain warnings are issued, use:
+
+    def test_warning(recwarn):
+        ...
+        assert len(recwarn) == 1
+        user_warning = recwarn.pop(UserWarning)
+        assert issubclass(user_warning.category, UserWarning)
+
+To ensure that no warnings are emitted, use:
+
+    def test_warning():
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            ...
+To suppress warnings, use:
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        ...
+        
+#### Custom failure messages
+
+Recording warnings provides an opportunity to produce custom test failure messages for when no warnings are issued or other conditions are met.
+
+    def test():
+        with pytest.warns(Warning) as record:
+            f()
+            if not record:
+                pytest.fail("Expected a warning!")
+
+If no warnings are issued when calling f, then not record will evaluate to True. You can then call pytest.fail() with a custom error message.
+
+Internal pytest warnings
+pytest may generate its own warnings in some situations, such as improper usage or deprecated features.
+
+For example, pytest will emit a warning if it encounters a class that matches python_classes but also defines an __init__ constructor, as this prevents the class from being instantiated:
+
+    # content of test_pytest_warnings.py
+    class Test:
+        def __init__(self):
+            pass
+
+        def test_foo(self):
+            assert 1 == 1
