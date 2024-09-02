@@ -1,23 +1,19 @@
-let hamster = {
-  
-    eat(food) {
-      this.stomach.push(food);
-    }
-  };
-  
-  let speedy = {
-    stomach: [],
-    __proto__: hamster
-  };
-  
-  let lazy = {
-    stomach: [],
-    __proto__: hamster
-  };
-  
-  // Этот хомяк нашёл еду
-  speedy.eat("apple");
-  alert( speedy.stomach ); // apple
-  
-  // У этого хомяка тоже есть еда. Почему? Исправьте
-  alert( lazy.stomach ); // apple
+async function test() {
+  let promise = new Promise((resolve, reject) => {
+    setTimeout(() => resolve('готово1'), 1000)
+  });
+
+  let result = await promise;
+  console.log(result);
+};
+
+async function test2() {
+  let promise = new Promise((resolve, reject) => {
+    setTimeout(() => resolve('готово2'), 500)
+  });
+
+  let result = await promise;
+  console.log(result);
+};
+test();
+test2();

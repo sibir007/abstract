@@ -488,3 +488,5 @@ For example, pytest will emit a warning if it encounters a class that matches py
 
         def test_foo(self):
             assert 1 == 1
+
+## pytest --capture=tee-sys was recently added (v5.4.0). You can capture as well as see the output on stdout/err.
