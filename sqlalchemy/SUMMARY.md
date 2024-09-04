@@ -742,3 +742,109 @@ The Session.execute() method, in addition to handling ORM-enabled Select objects
     'expr': <AliasedClass ...; User>,
     'name': 'user2',
     'type': <class 'User'>}]
+
+## Tutorials
+
+### SQLAlchemy GROUP BY: A Comprehensive Guide
+
+<https://www.slingacademy.com/article/sqlalchemy-group-by-comprehensive-guide/>
+
+#### Setting Up the Environment
+
+        from sqlalchemy import create_engine, Column, Integer, String, DateTime, func
+        from sqlalchemy.ext.declarative import declarative_base
+        from sqlalchemy.orm import sessionmaker
+
+        engine = create_engine('sqlite:///group_by.db', echo=False)
+        Base = declarative_base()
+
+        # Define a sample table
+        class User(Base):
+        __tablename__ = 'users'
+        id = Column(Integer, primary_key=True)
+        name = Column(String)
+        age = Column(Integer)
+        registration_date = Column(DateTime)
+
+        Base.metadata.create_all(engine)
+
+        # Create a session
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+#### Simple GROUP BY Queries
+
+mock data to work with:
+
+        # Add sample users
+
+        session.add_all([
+        User(name='Alice', age=30, registration_date='2023-01-01'),
+        User(name='Bob', age=40, registration_date='2023-01-02'),
+        User(name='Charlie', age=30, registration_date='2023-01-03'),
+        User(name='David', age=40, registration_date='2023-01-01'),
+        ])
+        session.commit()
+
+how many users are of each age:
+
+        from sqlalchemy import func
+
+        # Group users by age and count each group
+        users_grouped_by_age = session.query(User.age, func.count(User.id)).group_by(User.age).all()
+        for age_group in users_grouped_by_age:
+        print(f'Age: {age_group.age}, Count: {age_group[1]}')
+
+#### Expanding the GROUP BY Query
+
+find the average age of users who registered on the same date
+
+        # Group users by registration date and calculate the average age
+        avg_age_by_reg_date = session.query(User.registration_date, func.avg(User.age).label('average_age')).group_by(User.registration_date).all()
+        for data in avg_age_by_reg_date:
+        print(f'Date: {data.registration_date}, Average Age: {data.average_age:.2f}')
+
+#### GROUP BY with JOIN Operations
+
+introduce a new table to represent user purchases and then join this table with our users:
+
+        # Define a new Purchases table
+        class Purchase(Base):
+        __tablename__ = 'purchases'
+        id = Column(Integer, primary_key=True)
+        user_id = Column(Integer)
+        item = Column(String)
+        price = Column(Integer)
+        purchase_date = Column(DateTime)
+
+        # Add some purchases
+        session.add_all([
+        Purchase(user_id=1, item='Book', price=20, purchase_date='2023-01-10'),
+        Purchase(user_id=2, item='Pen', price=3, purchase_date='2023-01-10'),
+        Purchase(user_id=1, item='Notebook', price=5, purchase_date='2023-01-11'),
+        # ...add more purchases
+        ])
+        session.commit()
+
+group the number of items purchased by each user:
+
+        # Group purchases by user
+        user_purchases = session.query(User.name, func.count(Purchase.id).label('total_purchases'))\
+        .join(Purchase, User.id == Purchase.user_id)\
+        .group_by(User.name)\
+        .all()
+        for purchase in user_purchases:
+        print(f'User: {purchase.name}, Total Purchases: {purchase.total_purchases}')
+
+#### Advanced GROUP BY with HAVING Clauses
+
+identify users who have made purchases totaling over a certain amount:
+
+        # Filter groups by the sum of purchases
+        high_spenders = session.query(User.name, func.sum(Purchase.price).label('total_spent'))\
+        .join(Purchase, User.id == Purchase.user_id)\
+        .group_by(User.name)\
+        .having(func.sum(Purchase.price) > 50)\
+        .all()
+        for spender in high_spenders:
+        print(f'User: {spender.name}, Total Spent: {spender.total_spent}')
