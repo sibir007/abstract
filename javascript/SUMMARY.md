@@ -5461,6 +5461,602 @@ class Rabbit, который наследуется от Animal:
 
 Поэтому, если мы создаём собственный конструктор, мы должны вызвать super, в противном случае объект для this не будет создан, и мы получим ошибку.
 
+    class Animal {
+
+      constructor(name) {
+        this.speed = 0;
+        this.name = name;
+      }
+
+      // ...
+    }
+
+    class Rabbit extends Animal {
+
+      constructor(name, earLength) {
+        super(name);
+        this.earLength = earLength;
+      }
+
+      // ...
+    }
+
+    // теперь работает
+    let rabbit = new Rabbit("Белый кролик", 10);
+    alert(rabbit.name); // Белый кролик
+    alert(rabbit.earLength); // 10
+
+##### Переопределение полей класса: тонкое замечание
+
+родительский конструктор всегда использует своё собственное значение поля, а не переопределённое.
+
+    class Animal {
+      name = 'animal';
+
+      constructor() {
+        alert(this.name); // (*)
+      }
+    }
+
+    class Rabbit extends Animal {
+      name = 'rabbit';
+    }
+
+    new Animal(); // animal
+    new Rabbit(); // animal
+
+Когда родительский конструктор вызывается в производном классе, он использует переопределённый метод.
+
+    class Animal {
+      showName() {  // вместо this.name = 'animal'
+        alert('animal');
+      }
+
+      constructor() {
+        this.showName(); // вместо alert(this.name);
+      }
+    }
+
+    class Rabbit extends Animal {
+      showName() {
+        alert('rabbit');
+      }
+    }
+
+    new Animal(); // animal
+    new Rabbit(); // rabbit
+
+причина заключается в порядке инициализации полей. Поле класса инициализируется:
+
+- Перед конструктором для базового класса (который ничего не расширяет),
+- Сразу после super() для производного класса.
+
+#### Устройство super, [[HomeObject]]
+
+    let animal = {
+      name: "Animal",
+      eat() {
+        alert(`${this.name} ест.`);
+      }
+    };
+
+    let rabbit = {
+      __proto__: animal,
+      name: "Кролик",
+      eat() {
+        // вот как предположительно может работать super.eat()
+        this.__proto__.eat.call(this); // (*)
+      }
+    };
+
+    rabbit.eat(); // Кролик ест.
+
+код работает так, как задумано: выполняется нужный alert.
+
+добавим ещё один объект в цепочку наследования и увидим, как все сломается:
+
+    let animal = {
+      name: "Животное",
+      eat() {
+        alert(`${this.name} ест.`);
+      }
+    };
+
+    let rabbit = {
+      __proto__: animal,
+      eat() {
+        // ...делаем что-то специфичное для кролика и вызываем родительский (animal) метод
+        this.__proto__.eat.call(this); // (*)
+      }
+    };
+
+    let longEar = {
+      __proto__: rabbit,
+      eat() {
+        // ...делаем что-то, связанное с длинными ушами, и вызываем родительский (rabbit) метод
+        this.__proto__.eat.call(this); // (**)
+      }
+    };
+
+    longEar.eat(); // Error: Maximum call stack size exceeded
+
+обеих линиях (*) и (**) значение this.__proto__ одно и то же: rabbit. В обоих случаях метод rabbit.eat вызывается в бесконечном цикле не поднимаясь по цепочке вызовов.
+
+Для решения этой проблемы в JavaScript было добавлено специальное внутреннее свойство для функций: [[HomeObject]].
+
+Когда функция объявлена как метод внутри класса или объекта, её свойство [[HomeObject]] становится равно этому объекту.
+
+Затем super использует его, чтобы получить прототип родителя и его методы.
+
+    let animal = {
+      name: "Животное",
+      eat() {         // animal.eat.[[HomeObject]] == animal
+        alert(`${this.name} ест.`);
+      }
+    };
+
+    let rabbit = {
+      __proto__: animal,
+      name: "Кролик",
+      eat() {         // rabbit.eat.[[HomeObject]] == rabbit
+        super.eat();
+      }
+    };
+
+    let longEar = {
+      __proto__: rabbit,
+      name: "Длинноух",
+      eat() {         // longEar.eat.[[HomeObject]] == longEar
+        super.eat();
+      }
+    };
+
+    // работает верно
+    longEar.eat();  // Длинноух ест.
+
+Метод, такой как longEar.eat, знает свой [[HomeObject]] и получает метод родителя из его прототипа. Вообще без использования this.
+
+#### Методы не «свободны»
+
+До этого мы неоднократно видели, что функции в JavaScript «свободны», не привязаны к объектам. Их можно копировать между объектами и вызывать с любым this.
+
+Но само существование [[HomeObject]] нарушает этот принцип, так как методы запоминают свои объекты. [[HomeObject]] нельзя изменить, эта связь – навсегда.
+
+Единственное место в языке, где используется [[HomeObject]] – это super. Поэтому если метод не использует super, то мы все ещё можем считать его свободным и копировать между объектами. А вот если super в коде есть, то возможны побочные эффекты.
+
+    let animal = {
+      sayHi() {
+        alert("Я животное");
+      }
+    };
+
+    // rabbit наследует от animal
+    let rabbit = {
+      __proto__: animal,
+      sayHi() {
+        super.sayHi();
+      }
+    };
+
+    let plant = {
+      sayHi() {
+        alert("Я растение");
+      }
+    };
+
+    // tree наследует от plant
+    let tree = {
+      __proto__: plant,
+      sayHi: rabbit.sayHi // (*)
+    };
+
+    tree.sayHi();  // Я животное (?!?)
+
+#### Методы, а не свойства-функции
+
+Свойство `[[HomeObject]]` определено для методов как классов, так и обычных объектов. Но для объектов методы должны быть объявлены именно как method(), а не "method: function()".
+
+Для нас различий нет, но они есть для JavaScript.
+
+В приведённом ниже примере используется синтаксис не метода, свойства-функции. Поэтому у него нет `[[HomeObject]]`, и наследование не работает:
+
+    let animal = {
+      eat: function() { // намеренно пишем так, а не eat() { ...
+        // ...
+      }
+    };
+
+    let rabbit = {
+      __proto__: animal,
+      eat: function() {
+        super.eat();
+      }
+    };
+
+    rabbit.eat();  // Ошибка вызова super (потому что нет [[HomeObject]])
+
+### Статические свойства и методы
+
+#### Статические методы
+
+Мы также можем присвоить метод самому классу. Такие методы называются статическими.
+
+В объявление класса они добавляются с помощью ключевого слова static, например:
+
+    class User {
+      static staticMethod() {
+        alert(this === User);
+      }
+    }
+
+    User.staticMethod(); // true
+
+Это фактически то же самое, что присвоить метод напрямую как свойство функции:
+
+    class User { }
+
+    User.staticMethod = function() {
+      alert(this === User);
+    };
+
+Значением this при вызове User.staticMethod() является сам конструктор класса User (правило «объект до точки»).
+
+использование
+
+Здесь метод Article.compare стоит «над» статьями, как средство для их сравнения. Это метод не отдельной статьи, а всего класса.
+
+Другим примером может быть так называемый «фабричный» метод.
+
+Скажем, нам нужно несколько способов создания статьи:
+
+Создание через заданные параметры (title, date и т. д.).
+Создание пустой статьи с сегодняшней датой.
+…или как-то ещё.
+
+    class Article {
+      constructor(title, date) {
+        this.title = title;
+        this.date = date;
+      }
+
+      static createTodays() {
+        // помним, что this = Article
+        return new this("Сегодняшний дайджест", new Date());
+      }
+    }
+
+    let article = Article.createTodays();
+
+    alert( article.title ); // Сегодняшний дайджест
+
+Статические методы также используются в классах, относящихся к базам данных, для поиска/сохранения/удаления вхождений в базу данных, например:
+
+    // предположим, что Article - это специальный класс для управления статьями
+    // статический метод для удаления статьи по id:
+    Article.remove({id: 12345});
+
+Статические методы недоступны для отдельных объектов
+
+// ...
+article.createTodays(); /// Error: article.createTodays is not a function
+
+#### Статические свойства
+
+Статические свойства также возможны, они выглядят как свойства класса, но с static в начале:
+
+    class Article {
+      static publisher = "Илья Кантор";
+    }
+
+    alert( Article.publisher ); // Илья Кантор
+
+Это то же самое, что и прямое присваивание Article:
+
+    Article.publisher = "Илья Кантор";
+
+#### Наследование статических свойств и методов
+
+метод Animal.compare в коде ниже наследуется и доступен как Rabbit.compare:
+
+    class Animal {
+
+      constructor(name, speed) {
+        this.speed = speed;
+        this.name = name;
+      }
+
+      run(speed = 0) {
+        this.speed += speed;
+        alert(`${this.name} бежит со скоростью ${this.speed}.`);
+      }
+
+      static compare(animalA, animalB) {
+        return animalA.speed - animalB.speed;
+      }
+
+    }
+
+    // Наследует от Animal
+    class Rabbit extends Animal {
+      hide() {
+        alert(`${this.name} прячется!`);
+      }
+    }
+
+    let rabbits = [
+      new Rabbit("Белый кролик", 10),
+      new Rabbit("Чёрный кролик", 5)
+    ];
+
+    rabbits.sort(Rabbit.compare);
+
+    rabbits[0].run(); // Чёрный кролик бежит со скоростью 5.
+
+Так что Rabbit extends Animal создаёт две ссылки на прототип:
+
+Функция Rabbit прототипно наследует от функции Animal.
+Rabbit.prototype прототипно наследует от Animal.prototype.
+В результате наследование работает как для обычных, так и для статических методов.
+
+Давайте это проверим кодом:
+
+    class Animal {}
+    class Rabbit extends Animal {}
+
+    // для статики
+    alert(Rabbit.__proto__ === Animal); // true
+
+    // для обычных методов
+    alert(Rabbit.prototype.__proto__ === Animal.prototype); // true
+
+### Приватные и защищённые методы и свойства
+
+В JavaScript есть два типа полей (свойств и методов) объекта:
+
+- Публичные: доступны отовсюду. Они составляют внешний интерфейс. До этого момента мы использовали только публичные свойства и методы.
+- Приватные: доступны только внутри класса. Они для внутреннего интерфейса.
+«защищённые» поля, доступные только внутри класса или для дочерних классов (то есть, как приватные, но разрешён доступ для наследующих классов), они не реализованы в JavaScript на уровне языка, но на практике они очень удобны, поэтому их эмулируют.
+
+#### Защищённое свойство «waterAmount»
+
+Давайте для начала создадим простой класс для описания кофеварки:
+
+    class CoffeeMachine {
+      waterAmount = 0; // количество воды внутри
+
+      constructor(power) {
+        this.power = power;
+        alert( `Создана кофеварка, мощность: ${power}` );
+      }
+
+    }
+
+    // создаём кофеварку
+    let coffeeMachine = new CoffeeMachine(100);
+
+    // добавляем воды
+    coffeeMachine.waterAmount = 200;
+
+Прямо сейчас свойства waterAmount и power публичные. Мы можем легко получать и устанавливать им любое значение извне.
+
+Давайте изменим свойство waterAmount на защищённое, чтобы иметь больше контроля над ним. Например, мы не хотим, чтобы кто-либо устанавливал его ниже нуля.
+
+Защищённые свойства обычно начинаются с префикса _.
+
+Это не синтаксис языка: есть хорошо известное соглашение между программистами, что такие свойства и методы не должны быть доступны извне. Большинство программистов следуют этому соглашению.
+
+Так что наше свойство будет называться _waterAmount:
+
+    class CoffeeMachine {
+      _waterAmount = 0;
+
+      set waterAmount(value) {
+        if (value < 0) throw new Error("Отрицательное количество воды");
+        this._waterAmount = value;
+      }
+
+      get waterAmount() {
+        return this._waterAmount;
+      }
+
+      constructor(power) {
+        this._power = power;
+      }
+
+    }
+
+    // создаём новую кофеварку
+    let coffeeMachine = new CoffeeMachine(100);
+
+    // устанавливаем количество воды
+    coffeeMachine.waterAmount = -10; // Error: Отрицательное количество воды
+
+#### Свойство только для чтения «power»
+
+Давайте сделаем свойство power доступным только для чтения. Иногда нужно, чтобы свойство устанавливалось только при создании объекта и после этого никогда не изменялось.
+
+Это как раз требуется для кофеварки: мощность никогда не меняется.
+
+Для этого нам нужно создать только геттер, но не сеттер:
+
+    class CoffeeMachine {
+      // ...
+
+      constructor(power) {
+        this._power = power;
+      }
+
+      get power() {
+        return this._power;
+      }
+
+    }
+
+    // создаём кофеварку
+    let coffeeMachine = new CoffeeMachine(100);
+
+    alert(`Мощность: ${coffeeMachine.power}W`); // Мощность: 100W
+
+    coffeeMachine.power = 25; // Error (no setter)
+
+**Геттеры/сеттеры** Здесь мы использовали синтаксис геттеров/сеттеров.
+
+Но в большинстве случаев использование функций get.../set... предпочтительнее:
+
+    class CoffeeMachine {
+      _waterAmount = 0;
+
+      setWaterAmount(value) {
+        if (value < 0) throw new Error("Отрицательное количество воды");
+        this._waterAmount = value;
+      }
+
+      getWaterAmount() {
+        return this._waterAmount;
+      }
+    }
+
+    new CoffeeMachine().setWaterAmount(100);
+
+Это выглядит немного длиннее, но функции более гибкие. Они могут принимать несколько аргументов (даже если они нам сейчас не нужны). Итак, на будущее, если нам надо что-то отрефакторить, функции – более безопасный выбор.
+
+С другой стороны, синтаксис get/set короче, решать вам.
+
+**Защищённые поля наследуются**. Если мы унаследуем class MegaMachine extends CoffeeMachine, ничто не помешает нам обращаться к this._waterAmount или this._power из методов нового класса.
+
+Таким образом, защищённые поля, конечно же, наследуются. В отличие от приватных полей, в чём мы убедимся ниже.
+
+#### Приватное свойство «#waterLimit»
+
+Приватные свойства и методы должны начинаться с #. Они доступны только внутри класса.
+
+Например, в классе ниже есть приватное свойство #waterLimit и приватный метод #checkWater для проверки количества воды:
+
+    class CoffeeMachine {
+      #waterLimit = 200;
+
+      #checkWater(value) {
+        if (value < 0) throw new Error("Отрицательный уровень воды");
+        if (value > this.#waterLimit) throw new Error("Слишком много воды");
+      }
+    }
+
+    let coffeeMachine = new CoffeeMachine();
+
+    // снаружи нет доступа к приватным методам класса
+    coffeeMachine.#checkWater(); // Error
+    coffeeMachine.#waterLimit = 1000; // Error
+
+На уровне языка # является специальным символом, который означает, что поле приватное. Мы не можем получить к нему доступ извне или из наследуемых классов.
+
+Приватные поля не конфликтуют с публичными. У нас может быть два поля одновременно – приватное #waterAmount и публичное waterAmount.
+
+    class CoffeeMachine {
+
+      #waterAmount = 0;
+
+      get waterAmount() {
+        return this.#waterAmount;
+      }
+
+      set waterAmount(value) {
+        if (value < 0) throw new Error("Отрицательный уровень воды");
+        this.#waterAmount = value;
+      }
+    }
+
+    let machine = new CoffeeMachine();
+
+    machine.waterAmount = 100;
+    alert(machine.#waterAmount); // Error
+
+Но если мы унаследуем от CoffeeMachine, то мы не получим прямого доступа к #waterAmount. Мы будем вынуждены полагаться на геттер/сеттер waterAmount:
+
+    class MegaCoffeeMachine extends CoffeeMachine {
+      method() {
+        alert( this.#waterAmount ); // Error: can only access from CoffeeMachine
+      }
+    }
+
+Во многих случаях такое ограничение слишком жёсткое. Раз уж мы расширяем CoffeeMachine, у нас может быть вполне законная причина для доступа к внутренним методам и свойствам. Поэтому защищённые свойства используются чаще, хоть они и не поддерживаются синтаксисом языка.
+
+Важно:
+Приватные поля особенные.
+
+Как мы помним, обычно мы можем получить доступ к полям объекта с помощью this[name]:
+
+    class User {
+      ...
+      sayHi() {
+        let fieldName = "name";
+        alert(`Hello, ${this[fieldName]}`);
+      }
+    }
+
+С приватными свойствами такое невозможно: `this['#name']` не работает. Это ограничение синтаксиса сделано для обеспечения приватности.
+
+### Расширение встроенных классов
+
+От встроенных классов, таких как Array, Map и других, тоже можно наследовать.
+
+Например, в этом примере PowerArray наследуется от встроенного Array:
+
+    // добавим один метод (можно более одного)
+    class PowerArray extends Array {
+      isEmpty() {
+        return this.length === 0;
+      }
+    }
+
+    let arr = new PowerArray(1, 2, 5, 10, 50);
+    alert(arr.isEmpty()); // false
+
+    let filteredArr = arr.filter(item => item >= 10);
+    alert(filteredArr); // 10, 50
+    alert(filteredArr.isEmpty()); // false
+
+Обратите внимание на интересный момент: встроенные методы, такие как filter, map и другие возвращают новые объекты унаследованного класса PowerArray. Их внутренняя реализация такова, что для этого они используют свойство объекта constructor.
+
+    arr.constructor === PowerArray
+
+Поэтому при вызове метода arr.filter() он внутри создаёт массив результатов, именно используя arr.constructor, а не обычный массив. Это замечательно, поскольку можно продолжать использовать методы PowerArray далее на результатах.
+
+При помощи специального статического геттера Symbol.species можно вернуть конструктор, который JavaScript будет использовать в filter, map и других методах для создания новых объектов.
+
+Если бы мы хотели, чтобы методы map, filter и т. д. возвращали обычные массивы, мы могли бы вернуть Array в Symbol.species, вот так:
+
+    class PowerArray extends Array {
+      isEmpty() {
+        return this.length === 0;
+      }
+
+      // встроенные методы массива будут использовать этот метод как конструктор
+      static get [Symbol.species]() {
+        return Array;
+      }
+    }
+
+    let arr = new PowerArray(1, 2, 5, 10, 50);
+    alert(arr.isEmpty()); // false
+
+    // filter создаст новый массив, используя arr.constructor[Symbol.species] как конструктор
+    let filteredArr = arr.filter(item => item >= 10);
+
+    // filteredArr не является PowerArray, это Array
+    alert(filteredArr.isEmpty()); // Error: filteredArr.isEmpty is not a function
+
+Аналогично работают другие коллекции
+Другие коллекции, такие как Map, Set, работают аналогично. Они также используют Symbol.species.
+
+#### Отсутствие статического наследования встроенных классов
+
+Обычно, когда один класс наследует другой, то наследуются и статические методы. Это было подробно разъяснено в главе Статические свойства и методы.
+
+Но встроенные классы – исключение. Они не наследуют статические методы друг друга.
+
+Например, и Array, и Date наследуют от Object, так что в их экземплярах доступны методы из Object.prototype. Но `Array.[[Prototype]]` не ссылается на Object, поэтому нет методов Array.keys() или Date.keys().
+
+### Проверка класса: "instanceof"
 
 
 
