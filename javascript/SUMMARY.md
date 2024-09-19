@@ -6068,7 +6068,7 @@ Rabbit.prototype прототипно наследует от Animal.prototype.
 
 ### Введение: колбэки
 
-функция загружает на страницу новый скрипт. Когда в тело документа добавится конструкция <script src="…">, браузер загрузит скрипт и выполнит его
+функция загружает на страницу новый скрипт. Когда в тело документа добавится конструкция `<script src="…">`, браузер загрузит скрипт и выполнит его
 
     function loadScript(src) {
       let script = document.createElement('script');
@@ -7053,6 +7053,349 @@ async/await отлично работает с Promise.all
 ## Генераторы, продвинутая итерация
 
 <https://learn.javascript.ru/generators-iterators>
+
+### Генераторы
+
+#### Функция-генератор
+
+    function* generateSequence() {
+      yield 1;
+      yield 2;
+      return 3;
+    }
+
+Например, здесь мы создаём генератор и получаем первое из возвращаемых им значений:
+
+    function* generateSequence() {
+      yield 1;
+      yield 2;
+      return 3;
+    }
+
+    let generator = generateSequence();
+
+    let one = generator.next();
+
+    alert(JSON.stringify(one)); // {value: 1, done: false}
+
+Результатом метода next() всегда является объект с двумя свойствами:
+
+- value: значение из yield.
+- done: true, если выполнение функции завершено, иначе false.
+
+`function* f(…)` или `function *f(…)`? - Нет разницы, оба синтаксиса корректны.
+
+#### Перебор генераторов
+
+Возвращаемые ими значения можно перебирать через for..of:
+
+    function* generateSequence() {
+      yield 1;
+      yield 2;
+      return 3;
+    }
+
+    let generator = generateSequence();
+
+    for(let value of generator) {
+      alert(value); // 1, затем 2
+    }
+
+Но обратите внимание: пример выше выводит значение 1, затем 2. Значение 3 выведено не будет!
+
+Это из-за того, что перебор через for..of игнорирует последнее значение, при котором done: true. Поэтому, если мы хотим, чтобы были все значения при переборе через for..of, то надо возвращать их через yield:
+
+    function* generateSequence() {
+      yield 1;
+      yield 2;
+      yield 3;
+    }
+
+    let generator = generateSequence();
+
+    for(let value of generator) {
+      alert(value); // 1, затем 2, затем 3
+    }
+
+Так как генераторы являются перебираемыми объектами, мы можем использовать всю связанную с ними функциональность, например оператор расширения ...:
+
+    function* generateSequence() {
+      yield 1;
+      yield 2;
+      yield 3;
+    }
+
+    let sequence = [0, ...generateSequence()];
+
+    alert(sequence); // 0, 1, 2, 3
+
+#### Использование генераторов для перебираемых объектов
+
+    let range = {
+      from: 1,
+      to: 5,
+
+      *[Symbol.iterator]() { // краткая запись для [Symbol.iterator]: function*()
+        for(let value = this.from; value <= this.to; value++) {
+          yield value;
+        }
+      }
+    };
+
+    alert( [...range] ); // 1,2,3,4,5
+
+#### Композиция генераторов
+
+    function* generateSequence(start, end) {
+      for (let i = start; i <= end; i++) yield i;
+    }
+
+    function* generatePasswordCodes() {
+
+      // 0..9
+      yield* generateSequence(48, 57);
+
+      // A..Z
+      yield* generateSequence(65, 90);
+
+      // a..z
+      yield* generateSequence(97, 122);
+
+    }
+
+    let str = '';
+
+    for(let code of generatePasswordCodes()) {
+      str += String.fromCharCode(code);
+    }
+
+    alert(str); // 0..9A..Za..z
+
+#### yield – дорога в обе стороны
+
+    function* gen() {
+      let ask1 = yield "2 + 2 = ?";
+
+      alert(ask1); // 4
+
+      let ask2 = yield "3 * 3 = ?"
+
+      alert(ask2); // 9
+    }
+
+    let generator = gen();
+
+    alert( generator.next().value ); // "2 + 2 = ?"
+
+    alert( generator.next(4).value ); // "3 * 3 = ?"
+
+    alert( generator.next(9).done ); // true
+
+#### generator.throw
+
+    function* gen() {
+      try {
+        let result = yield "2 + 2 = ?"; // (1)
+
+        alert("Выполнение программы не дойдёт до этой строки, потому что выше возникнет исключение");
+      } catch(e) {
+        alert(e); // покажет ошибку
+      }
+    }
+
+    let generator = gen();
+
+    let question = generator.next().value;
+
+    generator.throw(new Error("Ответ не найден в моей базе данных")); // (2)
+
+Текущая строка вызывающего кода – это строка с generator.throw, отмечена (2). Таким образом, мы можем отловить её во внешнем коде, как здесь:
+
+    function* generate() {
+      let result = yield "2 + 2 = ?"; // Ошибка в этой строке
+    }
+
+    let generator = generate();
+
+    let question = generator.next().value;
+
+    try {
+      generator.throw(new Error("Ответ не найден в моей базе данных"));
+    } catch(e) {
+      alert(e); // покажет ошибку
+    }
+
+### Асинхронные итераторы и генераторы
+
+    let range = {
+      from: 1,
+      to: 5,
+
+      // for await..of вызывает этот метод один раз в самом начале
+      [Symbol.asyncIterator]() { // (1)
+        // ...возвращает объект-итератор:
+        // далее for await..of работает только с этим объектом,
+        // запрашивая у него следующие значения вызовом next()
+        return {
+          current: this.from,
+          last: this.to,
+
+          // next() вызывается на каждой итерации цикла for await..of
+          async next() { // (2)
+            // должен возвращать значение как объект {done:.., value :...}
+            // (автоматически оборачивается в промис с помощью async)
+
+            // можно использовать await внутри для асинхронности:
+            await new Promise(resolve => setTimeout(resolve, 1000)); // (3)
+
+            if (this.current <= this.last) {
+              return { done: false, value: this.current++ };
+            } else {
+              return { done: true };
+            }
+          }
+        };
+      }
+    };
+
+    (async () => {
+
+      for await (let value of range) { // (4)
+        alert(value); // 1,2,3,4,5
+      }
+
+    })()
+
+
+Вот небольшая шпаргалка:
+
+наименование | Итераторы | Асинхронные итераторы
+:---:|:---:|:---:
+Метод для создания итерируемого объекта	Symbol. |iterator |	Symbol.asyncIterator
+next() возвращает |	любое значение|	промис
+для цикла используйте |	for..of	| for await..of
+
+Оператор расширения ... не работает асинхронно
+Функции, которые требуют обычных синхронных итераторов, не работают с асинхронными.
+
+Например, оператор расширения (три точки ...) не будет работать:
+
+    alert( [...range] ); // Ошибка, нет Symbol.iterator
+Это естественно, так как он ожидает Symbol.iterator, как и for..of без await. Ему не подходит Symbol.asyncIterator.
+
+### Асинхронные генераторы
+
+    async function* generateSequence(start, end) {
+
+      for (let i = start; i <= end; i++) {
+
+        // ура, можно использовать await!
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        yield i;
+      }
+
+    }
+
+    (async () => {
+
+      let generator = generateSequence(1, 5);
+      for await (let value of generator) {
+        alert(value); // 1, потом 2, потом 3, потом 4, потом 5
+      }
+
+    })();
+
+Из обычного генератора мы можем получить значения при помощи result = generator.next(). Для асинхронного нужно добавить await, вот так:
+
+    result = await generator.next(); // result = {value: ..., done: true/false}
+
+### Асинхронно перебираемые объекты
+
+Если хотим добавить асинхронные действия в генератор, нужно заменить Symbol.iterator на асинхронный Symbol.asyncIterator:
+
+    let range = {
+      from: 1,
+      to: 5,
+
+      async *[Symbol.asyncIterator]() { // то же, что и [Symbol.asyncIterator]: async function*()
+        for(let value = this.from; value <= this.to; value++) {
+
+          // пауза между значениями, ожидание
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
+          yield value;
+        }
+      }
+    };
+
+    (async () => {
+
+      for await (let value of range) {
+        alert(value); // 1, потом 2, потом 3, потом 4, потом 5
+      }
+
+    })();
+
+### Пример из реальной практики
+
+Есть много онлайн-сервисов, которые предоставляют данные постранично. Например, когда нам нужен список пользователей, запрос возвращает предопределённое количество (например, 100) пользователей – «одну страницу», и URL следующей страницы.
+
+Этот подход очень распространён, и речь не только о пользователях, а о чём угодно. Например, GitHub позволяет получать коммиты таким образом, с разбивкой по страницам:
+
+Нужно сделать запрос на URL в виде `https://api.github.com/repos/<repo>/commits`.
+В ответ придёт JSON с 30 коммитами, а также со ссылкой на следующую страницу в заголовке Link.
+Затем можно использовать эту ссылку для следующего запроса, чтобы получить дополнительную порцию коммитов, и так далее.
+Но нам бы, конечно же, хотелось вместо этого сложного взаимодействия иметь просто объект с коммитами, которые можно перебирать, вот так:
+
+  let repo = 'javascript-tutorial/en.javascript.info'; // репозиторий на GitHub, откуда брать коммиты
+
+  for await (let commit of fetchCommits(repo)) {
+    // обработка коммитов
+  }
+
+Мы бы хотели сделать функцию fetchCommits(repo), которая будет получать коммиты, делая запросы всякий раз, когда это необходимо. И пусть она сама разбирается со всем, что касается нумерации страниц, для нас это будет просто for await..of.
+
+С асинхронными генераторами это довольно легко реализовать:
+
+    async function* fetchCommits(repo) {
+      let url = `https://api.github.com/repos/${repo}/commits`;
+
+      while (url) {
+        const response = await fetch(url, { // (1)
+          headers: {'User-Agent': 'Our script'}, // GitHub требует заголовок user-agent
+        });
+
+        const body = await response.json(); // (2) ответ в формате JSON (массив коммитов)
+
+        // (3) Ссылка на следующую страницу находится в заголовках, извлекаем её
+        let nextPage = response.headers.get('Link').match(/<(.*?)>; rel="next"/);
+        nextPage = nextPage && nextPage[1];
+
+        url = nextPage;
+
+        for(let commit of body) { // (4) вернуть коммиты один за другим, до окончания страницы
+          yield commit;
+        }
+      }
+    }
+
+Пример использования (показывает авторов коммитов в консоли):
+
+    (async () => {
+
+      let count = 0;
+
+      for await (const commit of fetchCommits('javascript-tutorial/en.javascript.info')) {
+
+        console.log(commit.author.login);
+
+        if (++count == 100) { // остановимся на 100 коммитах
+          break;
+        }
+      }
+
+    })();
 
 ## Модули
 
