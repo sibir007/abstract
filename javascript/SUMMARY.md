@@ -7405,3 +7405,58 @@ next() возвращает |	любое значение|	промис
 
 <https://learn.javascript.ru/js-misc>
 
+## Delay, Sleep, Pause & Wait in JavaScript
+
+1. Plain setTimeout
+
+```javascript
+console.log('Hello');
+setTimeout(() => { console.log('World!'); }, 2000);
+```
+
+2. Incremental setTimeout
+
+```javascript
+setTimeout(() => { console.log('Hello'); }, 1000);
+setTimeout(() => { console.log('World!'); }, 2000);
+```
+
+3. Blocking the Event Loop with a Loop
+
+```javascript
+console.log('Hello');
+const date = Date.now();
+let currentDate = null;
+do {
+  currentDate = Date.now();
+} while (currentDate - date < 2000);
+console.log('World!');
+```
+
+4. Using Promises with setTimeout
+
+```javascript
+const sleep = function(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+console.log('Hello');
+sleep(2000).then(() => { console.log('World!'); });
+```
+
+5. Using async/await with Promises
+
+```javascript
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function delayedGreeting() {
+  console.log('Hello');
+  await sleep(2000);
+  console.log('World!');
+  await sleep(2000);
+  console.log('Goodbye!');
+}
+
+delayedGreeting();
+```
