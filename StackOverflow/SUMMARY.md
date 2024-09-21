@@ -37,3 +37,12 @@ group by hour, minute, second. To only group by hour it would be '%H' instead of
         def test_pandas_function():
             import pandas
             ...
+
+## Visual Studio
+
+### switch between terminals
+
+- From the Command Palette (`Ctrl+Shift+P`), use the View: Toggle Terminal command.
+- To toggle the terminal panel, use the `Ctrl+`` keyboard shortcut.
+- To create a new terminal, use the `Ctrl+Shift+`` keyboard shortcut.
+- Navigate between terminal groups using focus next `Ctrl+PageDown` and focus previous 'Ctrl+PageUp'
