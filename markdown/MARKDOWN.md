@@ -156,6 +156,7 @@ This is really***very***important text.
 * And here's the third list item.
 
 ### Code Blocks
+
 Code blocks are normally indented four spaces or one tab. When they’re in a list, indent them eight spaces or two tabs.
 
 1. Open the file.
