@@ -1,0 +1,136 @@
+<svg host="65bd71144e" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="481px" height="144px" viewBox="-0.5 -0.5 481 144" content="&lt;mxfile&gt;&lt;diagram id=&quot;4q_j7vZbOT9VeyKVb2Bf&quot; name=&quot;Page-1&quot;&gt;7Zldj9o6EIZ/DRK9WJSQBJJLAv2SthIqbc/ppTcxibWOjRyzQH99x4lNPtlDlxz1Bi524zdjJ57HHs/AyFlmx48C7dIvPMZ0NLXi48hZjabTuRXAXyWcSsFz3VJIBIlLya6EDfmFtWhpdU9inDcMJedUkl1TjDhjOJINDQnBD02zLafNp+5QgjvCJkK0q/5DYpmWqu9Zlf4JkyQ1T7YtfSdDxlgLeYpifqhJzvuRsxScy/IqOy4xVb4zfin7fbhw9/xiAjN5TQen7PCC6F7P7QNJ9gKDZj9MJ/DvBxY54QyulCHfKl+n6v4TYs+EJQojzriejjwZH0l8hDcIU5lREGy4zKXgz3jJKRegMM7AMtwSSlsSoiRh0IxgDhj08AULScD7C30jI3GsHhMeUiLxZoci9cwDLDXQBN+zGKvpWdDq+kO7SI2JjzVJ++cj5hmW4gQm+q6hqteqbdAdKvJnm7RG3dEa0ostOY9c8YALjaQfj9vBE4LX14InAmUdl+cHklFUupUzudF37Gt8KrlyXpQSGj+iE9+rSeQSRc+mFaZckF8wLKp4IiH15pzOGhYb1VMjEDgHm7VBYLekL+jYMHxEudRCxClFu5w8naeRIZEQFnIpeTYc4WmT8NTvALbdHsCzAQDPOoA7VCkpiJa7x4Qb+/WtQ/FWvrZxctgzsHe/KeirB7tSHouOK6dSvuoJO8XekkiiEofyPUVPmK55TqSKEM5KlLbhjhMmC6944chbFYqQS85gEogUnDBgPmCFuhUXCEuxILKXrHs1WYNydh1K/3aS8w7JDKY63kihgmTpB3X6JPm7kbNQlhy6XoiafxoqL/AuN3UTrdtFqyQOfbe0OIpSWCWY9eBuYg3Bj0tr4hUTW0Lbrtr/yXwAto57HVuzBm6B6/fG4SUl6vXvYXioMBw047DXARz08J0PsHmDexj+gzDsX032chjuIzkASFMh1EiKPRu/Awmi7j3k3saxJ+T2cTTV3E0g7Q7I7znuwMMsXqiCDlp8V3gQFB0MbZhJGKM8LaoBu1mM4COR/yonT4Ig0O2fRdudO7q9MiGxaJxqjTXsDZiSCuGlxmB6argHa2JZrlF+asX1jVINWbRO9VZ70IshNed7EeFGAglnQIKNlUaC40YV26VaPzlNMiswRZK8NAvdPpB6uLVaoFUMt/1mLu21cuTy1XWnel3aGqedk7dz7XK+nXGKVXWe4XULbdp7tt9P9YFOdadVP/ec6nZf+XzO5W6KIt3vN+4H++WD/bwXbiqw+mgOcbR3vwxh+LCIIr5ncqyLqiIewDs5tvIfhAhAhliEx4VXlAXqtYzxTrl5XAYhpE5XbWKxRvJw7oH2stiS+JEj9lo/9VUZ5xQjVusteVkYmsxEl4m14eP4s4omgHDc/wJRisTCvDGrz+qe4Lx5PfcVlb3RyRqgqrS9v5XjeHPv7TmOSnG8eooD4/nO/5bhBD0ZjvP3Mhxn1s5MJn7gBNXnbQmPa/ngRav6uM08KgCG9dveQPkQNKtfG0rz6icb5/1v&lt;/diagram&gt;&lt;/mxfile&gt;">
+    <defs>
+        <clipPath id="mx-clip-4-42-132-26-0">
+            <rect x="4" y="42" width="132" height="26"/>
+        </clipPath>
+        <clipPath id="mx-clip-193-39-82-44-0">
+            <rect x="193" y="39" width="82" height="44"/>
+        </clipPath>
+        <clipPath id="mx-clip-334-39-142-106-0">
+            <rect x="334" y="39" width="142" height="106"/>
+        </clipPath>
+    </defs>
+    <g>
+        <rect x="30" y="95" width="250" height="30" fill="none" stroke="none" pointer-events="all"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 248px; height: 1px; padding-top: 110px; margin-left: 31px;">
+                        <div data-drawio-colors="color: rgb(0, 0, 0); " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(0, 0, 0); line-height: 1.2; pointer-events: all; white-space: normal; overflow-wrap: normal;">
+                                Figure 1-2. Version 2 of the banking demo
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="155" y="114" fill="rgb(0, 0, 0)" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                    Figure 1-2. Version 2 of the banking demo
+                </text>
+            </switch>
+        </g>
+        <path d="M 0 29 L 0 3 L 140 3 L 140 29" fill="rgb(255, 255, 255)" stroke="rgb(0, 0, 0)" stroke-miterlimit="10" pointer-events="all"/>
+        <path d="M 0 29 L 0 63 L 140 63 L 140 29" fill="none" stroke="rgb(0, 0, 0)" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 0 29 L 140 29" fill="none" stroke="rgb(0, 0, 0)" stroke-miterlimit="10" pointer-events="none"/>
+        <g fill="rgb(0, 0, 0)" font-family="Helvetica" font-weight="bold" pointer-events="none" text-anchor="middle" font-size="12px">
+            <text x="69.5" y="20.5">
+                BankProgram
+            </text>
+        </g>
+        <path d="M 0 33 L 140 33" fill="none" stroke="rgb(0, 0, 0)" stroke-miterlimit="10" pointer-events="none"/>
+        <g fill="rgb(0, 0, 0)" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-42-132-26-0)" font-size="12px">
+            <text x="5.5" y="54.5">
+                main(String[] args): void
+            </text>
+        </g>
+        <path d="M 189 26 L 189 0 L 279 0 L 279 26" fill="rgb(255, 255, 255)" stroke="rgb(0, 0, 0)" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 189 26 L 189 78 L 279 78 L 279 26" fill="none" stroke="rgb(0, 0, 0)" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 189 26 L 279 26" fill="none" stroke="rgb(0, 0, 0)" stroke-miterlimit="10" pointer-events="none"/>
+        <g fill="rgb(0, 0, 0)" font-family="Helvetica" font-weight="bold" pointer-events="none" text-anchor="middle" font-size="12px">
+            <text x="233.5" y="17.5">
+                BankClient
+            </text>
+        </g>
+        <path d="M 189 30 L 279 30" fill="none" stroke="rgb(0, 0, 0)" stroke-miterlimit="10" pointer-events="none"/>
+        <g fill="rgb(0, 0, 0)" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-193-39-82-44-0)" font-size="12px">
+            <text x="194.5" y="51.5">
+                run() :void
+            </text>
+        </g>
+        <path d="M 139.86 32.78 L 186.4 31.93" fill="none" stroke="rgb(0, 0, 0)" stroke-miterlimit="10" stroke-dasharray="3 3" pointer-events="none"/>
+        <path d="M 174.64 38.65 L 187.52 31.91 L 174.41 25.65" fill="none" stroke="rgb(0, 0, 0)" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 32px; margin-left: 164px;">
+                        <div data-drawio-colors="color: rgb(0, 0, 0); background-color: rgb(255, 255, 255); " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(0, 0, 0); line-height: 1.2; pointer-events: none; background-color: rgb(255, 255, 255); white-space: nowrap;">
+                                Use
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="164" y="36" fill="rgb(0, 0, 0)" font-family="Helvetica" font-size="11px" text-anchor="middle">
+                    Use
+                </text>
+            </switch>
+        </g>
+        <path d="M 330 26 L 330 0 L 480 0 L 480 26" fill="rgb(255, 255, 255)" stroke="rgb(0, 0, 0)" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 330 26 L 330 140 L 480 140 L 480 26" fill="none" stroke="rgb(0, 0, 0)" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 330 26 L 480 26" fill="none" stroke="rgb(0, 0, 0)" stroke-miterlimit="10" pointer-events="none"/>
+        <g fill="rgb(0, 0, 0)" font-family="Helvetica" font-weight="bold" pointer-events="none" text-anchor="middle" font-size="12px">
+            <text x="404.5" y="17.5">
+                Bank
+            </text>
+        </g>
+        <path d="M 330 30 L 480 30" fill="none" stroke="rgb(0, 0, 0)" stroke-miterlimit="10" pointer-events="none"/>
+        <g fill="rgb(0, 0, 0)" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-334-39-142-106-0)" font-size="12px">
+            <text x="335.5" y="51.5">
+                newAccount(): int
+            </text>
+            <text x="335.5" y="65.5">
+                getBalance(int: a): int
+            </text>
+            <text x="335.5" y="79.5">
+                deposit(int a, int n) :void
+            </text>
+            <text x="335.5" y="93.5">
+                authorizeLoan(int a, int n) : boolean
+            </text>
+            <text x="335.5" y="107.5">
+                toString() :String
+            </text>
+            <text x="335.5" y="121.5">
+                addInterest() :void
+            </text>
+            <text x="335.5" y="135.5">
+                charAt(int n): int
+            </text>
+        </g>
+        <path d="M 278.91 30.6 L 328.51 30.66" fill="none" stroke="rgb(0, 0, 0)" stroke-miterlimit="10" stroke-dasharray="3 3" pointer-events="none"/>
+        <path d="M 316.62 37.15 L 329.63 30.66 L 316.64 24.15" fill="none" stroke="rgb(0, 0, 0)" stroke-miterlimit="10" pointer-events="none"/>
+        <g transform="translate(-0.5 -0.5)">
+            <switch>
+                <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 31px; margin-left: 305px;">
+                        <div data-drawio-colors="color: rgb(0, 0, 0); background-color: rgb(255, 255, 255); " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(0, 0, 0); line-height: 1.2; pointer-events: none; background-color: rgb(255, 255, 255); white-space: nowrap;">
+                                Use
+                            </div>
+                        </div>
+                    </div>
+                </foreignObject>
+                <text x="305" y="34" fill="rgb(0, 0, 0)" font-family="Helvetica" font-size="11px" text-anchor="middle">
+                    Use
+                </text>
+            </switch>
+        </g>
+    </g>
+    <switch>
+        <g requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"/>
+        <a transform="translate(0,-5)" xlink:href="https://www.diagrams.net/doc/faq/svg-export-text-problems" target="_blank">
+            <text text-anchor="middle" font-size="10px" x="50%" y="100%">
+                Text is not SVG - cannot display
+            </text>
+        </a>
+    </switch>
+</svg>
