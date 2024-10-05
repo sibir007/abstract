@@ -2,14 +2,16 @@
 
 ## Git Basics
 
-### Getting a Git Repository
+###  Git Basics 2.1 Getting a Git Repository
+
+#### Initializing a Repository in an Existing Directory
 
 `$ git init`
 `$ touch SUMMARY.md`
 `$ git add SUMMARY.md`
 `$ git commit -m 'Initial project version'`
 
-### Cloning an Existing Repository
+#### Cloning an Existing Repository
 
 `$ git clone https://github.com/libgit2/libgit2`
 That creates a directory named libgit2, initializes a .git directory inside it, pulls down all the data for that repository, and checks out a working copy of the latest version.
@@ -17,8 +19,18 @@ That creates a directory named libgit2, initializes a .git directory inside it, 
 `$ git clone https://github.com/libgit2/libgit2 mylibgit`
 clone the repository into a directory named something other than libgit2, you can specify the new directory name as an additional argument
 
+### 2.2 Git Basics - Recording Changes to the Repository
+
+Untracked          Unmodified          Modified          Staged
+    |-----add file-----|------------------|--------------->|
+    |                  |----edit file---->|                |
+    |<---remove file---|                  |---stage file-->|
+    |                  |<---------------commit-------------|
+
+#### Checking the Status of Your Files
+
 `$ git status`
-see your untracked file 
+see your untracked file
 
 `$ git status -s` Short Status
  `M README` modified files but not yet staged
@@ -27,13 +39,34 @@ see your untracked file
 `M  lib/simplegit.rb`  modified and staged
 `?? LICENSE.txt` New files that aren’t tracked 
 
-### Ignoring Files
+#### Tracking New Files
+
+```bash
+git add README
+```
+
+#### Staging Modified Files
+
+```bash
+git add CONTRIBUTING.md
+```
+
+#### Short Status
+
+`$ git status -s` Short Status
+ `M README` modified files but not yet staged
+`MM Rakefile` modified, staged and then modified again
+`A  lib/git.rb` new files that have been added to the staging area
+`M  lib/simplegit.rb`  modified and staged
+`?? LICENSE.txt` New files that aren’t tracked 
+
+#### Ignoring Files
 
 `$ cat .gitignore`
 `*.[oa]`
 `*~`
 
-### Viewing Your Staged and Unstaged Changes
+#### Viewing Your Staged and Unstaged Changes
 
 `git diff` compares what is in your working directory with what is in your staging area
 `$ git diff --staged` `git diff --cached` are synonyms
@@ -112,7 +145,7 @@ CONTRIBUTING.md - staged
 `$ git restore --staged CONTRIBUTING.md`
 CONTRIBUTING.md - modified
 
-#### Git Basics - Working with Remotes
+#### 2.5 Git Basics - Working with Remotes
 
 ##### Showing Your Remotes
 
@@ -155,3 +188,160 @@ If your current branch is set up to track a remote branch, you can use the `git 
 ### 2.6 Git Basics - Tagging
 
 <https://git-scm.com/book/en/v2/Git-Basics-Tagging>
+
+#### Listing Your Tags
+
+```bash
+git tag
+```
+
+only in looking at the 1.8.5 series,
+
+```bash
+git tag -l "v1.8.5*"
+```
+
+#### Creating Tags
+
+```bash
+git tag -a v1.4 -m "my version 1.4"
+```
+
+-m specifies a tagging message
+
+see the tag data
+
+```bash
+git show v1.4
+```
+
+#### Lightweight Tags
+
+````bash
+git tag v1.4-lw # commit checksum stored in a file
+````
+
+#### Tagging Later
+
+```bash
+git tag -a v1.2 9fceb02 # tagging commit 9fceb02
+```
+
+#### Sharing Tags
+
+By default, the git push command doesn’t transfer tags to remote servers. You will have to explicitly push tags to a shared server after you have created them. This process is just like sharing remote branches — you can run ```git push origin <tagname>```
+
+```bash
+git push origin v1.5
+```
+
+```bash
+git push origin --tags # This will transfer all of your tags to the remote server that are not already there
+```
+
+#### Deleting Tags
+
+```bash
+git tag -d v1.4-lw
+```
+
+deleting a tag from a remote server:
+first variation
+
+```bash
+git push origin :refs/tags/v1.4-lw
+```
+
+second (and more intuitive) way to delete a remote tag is with
+
+```bash
+git push origin --delete <tagname>
+```
+
+#### Checking out Tags
+
+If you want to view the versions of files a tag is pointing to, you can do a git checkout of that tag, although this puts your repository in “detached HEAD” state, which has some ill side effects:
+
+```bash
+git checkout v2.0.0
+```
+
+In “detached HEAD” state, if you make changes and then create a commit, the tag will stay the same, but your new commit won’t belong to any branch and will be unreachable, except by the exact commit hash. Thus, if you need to make changes — say you’re fixing a bug on an older version, for instance — you will generally want to create a branch:
+
+```bash
+git checkout -b version2 v2.0.0
+```
+
+### 2.7 Git Basics - Git Aliases
+
+<https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases>
+
+## Git Branching
+
+### 3.1 Git Branching - Branches in a Nutshell
+
+#### Creating a New Branch
+
+```bash
+git branch testing
+```
+
+where the branch pointers are pointing. This option is called --decorate.
+
+```bash
+git log --oneline --decorate
+f30ab (HEAD -> master, testing) Add feature #32 - ability to add new formats to the central interface
+34ac2 Fix bug #1328 - stack overflow under certain conditions
+98ca9 Initial commit
+```
+
+#### Switching Branches
+
+```bash
+git checkout testing # This moves HEAD to point to the testing branch.
+vim test.rb
+$ git commit -a -m 'Make a change' #  HEAD branch moves forward when a commit is mad
+```
+
+```bash
+git checkout master
+$ vim test.rb
+$ git commit -a -m 'Make other changes'
+# print out the history of your commits, showing where your branch pointers are and how your history has diverged
+git log --oneline --decorate --graph --all
+* c2b9e (HEAD, master) Make other changes
+| * 87ab2 (testing) Make a change
+|/
+* f30ab Add feature #32 - ability to add new formats to the central interface
+* 34ac2 Fix bug #1328 - stack overflow under certain conditions
+* 98ca9 Initial commit of my project
+```
+
+`git checkout -b <newbranchname>` # Creating a new branch and switching to it at the same time
+
+Switch to an existing branch: `git switch testing-branch`.
+
+Create a new branch and switch to it: `git switch -c new-branch`. The -c flag stands for create, you can also use the full flag: --create.
+
+Return to your previously checked out branch: `git switch -`.
+
+### 3.2 Git Branching - Basic Branching and Merging
+
+```bash
+git checkout -b iss53
+Switched to a new branch "iss53"
+```
+
+This is shorthand for:
+
+```bash
+git branch iss53
+git checkout iss53
+```
+
+```bash
+$ vim index.html
+$ git commit -a -m 'Create new footer [issue 53]'
+```
+
+<https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging>

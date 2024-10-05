@@ -140,3 +140,12 @@ Keyboard shortcuts for Linux
 * The Alt+Click gesture may not work on some Linux distributions. 
 You can change the modifier key for the Insert cursor command to 
 Ctrl+Click with the “editor.multiCursorModifier” setting. 
+
+## Multiple clipboards
+
+- Copy (Cmd+c on OSX or Ctrl+c on Windows and Linux)
+- Merge-Copy (Cmd+Shift+c on OSX or Ctrl+Shift+c on Windows and Linux)
+Cut (Cmd+x on OSX or Ctrl+x on Windows and Linux)
+- Merge-Cut (Cmd+Shift+x on OSX or Ctrl+Shift+x on Windows and Linux)
+- Select clipboard to paste (Cmd+Alt+v on OSX or Ctrl+Alt+v on Windows and Linux)
+- Paste and cycle through clipboard items (Cmd+Shift+v on OSX or Ctrl+Shift+v on Windows and Linux)
