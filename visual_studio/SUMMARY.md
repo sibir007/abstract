@@ -26,16 +26,15 @@ Ctrl+ ↑ / `↓` Scroll line up/down
 Alt+ PgUp / PgDn Scroll page up/down 
 Ctrl+Shift+ [  /  ] Fold/unfold region 
 Ctrl+K Ctrl+ [  /  ] Fold/unfold all subregions 
-Ctrl+K Ctrl+0 / 
-Ctrl+K Ctrl+J 
-Fold/Unfold all regions 
+Ctrl+K Ctrl+0 / Ctrl+K Ctrl+J Fold/Unfold all regions 
 Ctrl+K Ctrl+C Add line comment 
 Ctrl+K Ctrl+U Remove line comment 
 Ctrl+/ Toggle line comment 
 Ctrl+Shift+A Toggle block comment 
 Alt+Z Toggle word wrap 
   
-Rich languages editing 
+### Rich languages editing 
+
 Ctrl+Space, Ctrl+I Trigger suggestion 
 Ctrl+Shift+Space Trigger parameter hints 
 Ctrl+Shift+I Format document 
@@ -48,7 +47,9 @@ Shift+F12 Show References
 F2 Rename Symbol 
 Ctrl+K Ctrl+X Trim trailing whitespace 
 Ctrl+K M Change file language 
-Multi-cursor and selection 
+
+### Multi-cursor and selection 
+
 Alt+Click Insert cursor* 
 Shift+Alt+ ↑ / ↓ Insert cursor above/below 
 Ctrl+U Undo last cursor operation 
@@ -59,7 +60,9 @@ Ctrl+F2 Select all occurrences of current word
 Shift+Alt + → Expand selection 
 Shift+Alt + ← Shrink selection 
 Shift+Alt + drag mouse Column (box) selection 
-Display 
+
+### Display 
+
 F11 Toggle full screen 
 Shift+Alt+0 Toggle editor layout (horizontal/vertical) 
 Ctrl+ = / - Zoom in/out 
@@ -76,14 +79,18 @@ Ctrl+K Ctrl+H Show Output panel
 Ctrl+Shift+V Open Markdown preview 
 Ctrl+K V Open Markdown preview to the side 
 Ctrl+K Z Zen Mode (Esc Esc to exit) 
-Search and replace 
+
+### Search and replace 
+
 Ctrl+F Find 
 Ctrl+H Replace 
 F3 / Shift+F3 Find next/previous 
 Alt+Enter Select all occurrences of Find match 
 Ctrl+D Add selection to next Find match 
 Ctrl+K Ctrl+D Move last selection to next Find match 
-Navigation 
+
+### Navigation 
+
 Ctrl+T Show all Symbols 
 Ctrl+G Go to Line... 
 Ctrl+P Go to File... 
@@ -95,7 +102,9 @@ Ctrl+Shift+Tab Navigate editor group history
 Ctrl+Alt+- Go back 
 Ctrl+Shift+- Go forward 
 Ctrl+M Toggle Tab moves focus 
-Editor management 
+
+### Editor management 
+
 Ctrl+W Close editor 
 Ctrl+K F Close folder 
 Ctrl+\ Split editor 
@@ -106,7 +115,9 @@ Ctrl+Shift+PgUp Move editor left
 Ctrl+Shift+PgDn Move editor right 
 Ctrl+K ← Move active editor group left/up 
 Ctrl+K → Move active editor group right/down 
-File management 
+
+### File management 
+
 Ctrl+N New File 
 Ctrl+O Open File... 
 Ctrl+S Save 
@@ -120,14 +131,18 @@ Ctrl+Shift+Tab Open previous
 Ctrl+K P Copy path of active file 
 Ctrl+K R Reveal active file in Explorer 
 Ctrl+K O Show active file in new window/instance 
-Debug 
+
+### Debug 
+
 F9 Toggle breakpoint 
 F5 Start / Continue 
 F11 / Shift+F11 Step into/out 
 F10 Step over 
 Shift+F5 Stop 
 Ctrl+K Ctrl+I Show hover 
-Integrated terminal 
+
+### Integrated terminal 
+
 Ctrl+` Show integrated terminal 
 Ctrl+Shift+` Create new terminal 
 Ctrl+Shift+C Copy selection 
