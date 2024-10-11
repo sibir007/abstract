@@ -328,6 +328,10 @@ Return to your previously checked out branch: `git switch -`.
 ### 3.2 Git Branching - Basic Branching and Merging
 
 ```bash
+# First, let’s say you’re working on your project and have a couple of commits already on the master branch.
+
+# You’ve decided that you’re going to work on issue #53 in whatever issue-tracking system your company uses. To create a new branch and switch to it at the same time, you can run the git checkout command with the -b switch:
+
 git checkout -b iss53
 Switched to a new branch "iss53"
 ```
@@ -342,50 +346,41 @@ git checkout iss53
 You work on your website and do some commits. Doing so moves the iss53 branch forward, because you have it checked out (that is, your HEAD is pointing to it)
 
 ```bash
+# You work on your website and do some commits. Doing so moves the iss53 branch forward, because you have it checked out (that is, your HEAD is pointing to it):
+
 $ vim index.html
 $ git commit -a -m 'Create new footer [issue 53]'
-```
 
- if your working directory or staging area has uncommitted changes that conflict with the branch you’re checking out, Git won’t let you switch branches. It’s best to have a clean working state when you switch branches. There are ways to get around this (namely, stashing and commit amending) that we’ll cover later on, in Stashing and Cleaning. For now, let’s assume you’ve committed all your changes, so you can switch back to your master branch:
+# For now, let’s assume you’ve committed all your changes, so you can switch back to your master branch:
 
-```bash
 $ git checkout master
 Switched to branch 'master'
-```
-Next, you have a hotfix to make. Let’s create a hotfix branch on which to work until it’s completed:
 
-```bash
+# Next, you have a hotfix to make. Let’s create a hotfix branch on which to work until it’s completed:
+
 $ git checkout -b hotfix
 Switched to a new branch 'hotfix'
 $ vim index.html
 $ git commit -a -m 'Fix broken email address'
 [hotfix 1fb7853] Fix broken email address
  1 file changed, 2 insertions(+)
- ```
 
- You can run your tests, make sure the hotfix is what you want, and finally merge the hotfix branch back into your master branch to deploy to production. You do this with the git merge command:
+# You can run your tests, make sure the hotfix is what you want, and finally merge the hotfix branch back into your master branch to deploy to production. You do this with the git merge command:
 
-```bash
 $ git checkout master
 $ git merge hotfix
 Updating f42c576..3a0874c
 Fast-forward
  index.html | 2 ++
  1 file changed, 2 insertions(+)
-```
 
-You’ll notice the phrase “fast-forward” in that merge. Because the commit C4 pointed to by the branch hotfix you merged in was directly ahead of the commit C2 you’re on, Git simply moves the pointer forward. To phrase that another way, when you try to merge one commit with a commit that can be reached by following the first commit’s history, Git simplifies things by moving the pointer forward because there is no divergent work to merge together — this is called a “fast-forward.”
+# After your super-important fix is deployed, you’re ready to switch back to the work you were doing before you were interrupted. However, first you’ll delete the hotfix branch, because you no longer need it — the master branch points at the same place. You can delete it with the -d option to git branch:
 
-After your super-important fix is deployed, you’re ready to switch back to the work you were doing before you were interrupted. However, first you’ll delete the hotfix branch, because you no longer need it — the master branch points at the same place. You can delete it with the -d option to git branch:
-
-```bash
 $ git branch -d hotfix
 Deleted branch hotfix (3a0874c).
-```
 
-Now you can switch back to your work-in-progress branch on issue #53 and continue working on it.
+# Now you can switch back to your work-in-progress branch on issue #53 and continue working on it.
 
-```bash
 $ git checkout iss53
 Switched to branch "iss53"
 $ vim index.html
@@ -394,41 +389,36 @@ $ git commit -a -m 'Finish the new footer [issue 53]'
 1 file changed, 1 insertion(+)
 ```
 
-It’s worth noting here that the work you did in your hotfix branch is not contained in the files in your iss53 branch. If you need to pull it in, you can merge your master branch into your iss53 branch by running git merge master, or you can wait to integrate those changes until you decide to pull the iss53 branch back into master later.
-
 #### Basic Merging
 
-Suppose you’ve decided that your issue #53 work is complete and ready to be merged into your master branch. In order to do that, you’ll merge your iss53 branch into master, much like you merged your hotfix branch earlier. All you have to do is check out the branch you wish to merge into and then run the git merge command:
-
 ```bash
+# Suppose you’ve decided that your issue #53 work is complete and ready to be merged into your master branch. In order to do that, you’ll merge your iss53 branch into master, much like you merged your hotfix branch earlier. All you have to do is check out the branch you wish to merge into and then run the git merge command:
+
 $ git checkout master
 Switched to branch 'master'
 $ git merge iss53
 Merge made by the 'recursive' strategy.
 index.html |    1 +
 1 file changed, 1 insertion(+)
+
+# Now that your work is merged in, you have no further need for the iss53 branch. You can close the issue in your issue-tracking system, and delete the branch:
+
+$ git branch -d iss53
 ```
-
-This looks a bit different than the hotfix merge you did earlier. In this case, your development history has diverged from some older point. Because the commit on the branch you’re on isn’t a direct ancestor of the branch you’re merging in, Git has to do some work. In this case, Git does a simple three-way merge, using the two snapshots pointed to by the branch tips and the common ancestor of the two.
-
-Instead of just moving the branch pointer forward, Git creates a new snapshot that results from this three-way merge and automatically creates a new commit that points to it. This is referred to as a merge commit, and is special in that it has more than one parent.
-
-Now that your work is merged in, you have no further need for the iss53 branch. You can close the issue in your issue-tracking system, and delete the branch:
-
-```$ git branch -d iss53```
 
 #### Basic Merge Conflicts
 
-Occasionally, this process doesn’t go smoothly. If you changed the same part of the same file differently in the two branches you’re merging, Git won’t be able to merge them cleanly. If your fix for issue #53 modified the same part of a file as the hotfix branch, you’ll get a merge conflict that looks something like this:
+```bash
+# Occasionally, this process doesn’t go smoothly. If you changed the same part of the same file differently in the two branches you’re merging, Git won’t be able to merge them cleanly. If your fix for issue #53 modified the same part of a file as the hotfix branch, you’ll get a merge conflict that looks something like this:
 
 $ git merge iss53
 Auto-merging index.html
 CONFLICT (content): Merge conflict in index.html
 Automatic merge failed; fix conflicts and then commit the result.
-Git hasn’t automatically created a new merge commit. It has paused the process while you resolve the conflict. If you want to see which files are unmerged at any point after a merge conflict, you can run git status:
 
-```bash
-git status
+# Git hasn’t automatically created a new merge commit. It has paused the process while you resolve the conflict. If you want to see which files are unmerged at any point after a merge conflict, you can run git status:
+
+$ git status
 On branch master
 You have unmerged paths.
   (fix conflicts and run "git commit")
@@ -443,15 +433,14 @@ no changes added to commit (use "git add" and/or "git commit -a")
 
 Anything that has merge conflicts and hasn’t been resolved is listed as unmerged. Git adds standard conflict-resolution markers to the files that have conflicts, so you can open them manually and resolve those conflicts. Your file contains a section that looks something like this:
 
-  ```git
-  <<<<<<< HEAD:index.html
-  <div id="footer">contact : email.support@github.com</div>
-  =======
-  <div id="footer">
-   please contact us at support@github.com
-  </div>
-  >>>>>>> iss53:index.html
-  ```
+```<<<<<<< HEAD:index.html
+<div id="footer">contact : email.support@github.com</div>
+=======
+<div id="footer">
+ please contact us at support@github.com
+</div>
+>>>>>>> iss53:index.html
+```
 
 This means the version in HEAD (your master branch, because that was what you had checked out when you ran your merge command) is the top part of that block (everything above the =======), while the version in your iss53 branch looks like everything in the bottom part. In order to resolve the conflict, you have to either choose one side or the other or merge the contents yourself. For instance, you might resolve this conflict by replacing the entire block with this:
 
@@ -465,7 +454,7 @@ This resolution has a little of each section, and the <<<<<<<, =======, and >>>>
 
 ### 3.3 Git Branching - Branch Management
 
-Branch Management
+
 
 The git branch command does more than just create and delete branches. If you run it with no arguments, you get a simple listing of your current branches:
 
@@ -476,9 +465,7 @@ $ git branch
   testing
 ```
 
-Notice the * character that prefixes the master branch: it indicates the branch that you currently have checked out (i.e., the branch that HEAD points to)
-
- To see the last commit on each branch, you can run git branch -v:
+To see the last commit on each branch, you can run git branch -v:
 
 ```bash
 $ git branch -v
@@ -487,7 +474,105 @@ $ git branch -v
   testing 782fd34 Add scott to the author list in the readme
 ```
 
-<https://git-scm.com/book/en/v2/Git-Branching-Branch-Management>
+The useful --merged and --no-merged options can filter this list to branches that you have or have not yet merged into the branch you’re currently on. To see which branches are already merged into the branch you’re on, you can run git branch --merged:
+
+```bash
+$ git branch --merged
+  iss53
+* master
+```
+
+To see all the branches that contain work you haven’t yet merged in, you can run git branch --no-merged:
+
+```bash
+$ git branch --no-merged
+  testing
+```
+
+This shows your other branch. Because it contains work that isn’t merged in yet, trying to delete it with git branch -d will fail:
+
+```bash
+$ git branch -d testing
+error: The branch 'testing' is not fully merged.
+If you are sure you want to delete it, run 'git branch -D testing'.
+```
+
+#### Changing a branch name
+
+Rename the branch locally with the git branch --move command:
+
+```bash
+$ git branch --move bad-branch-name corrected-branch-name
+```
+
+This replaces your bad-branch-name with corrected-branch-name, but this change is only local for now. To let others see the corrected branch on the remote, push it:
+
+```bash
+$ git push --set-upstream origin corrected-branch-name
+```
+
+Now we’ll take a brief look at where we are now:
+
+```bash
+$ git branch --all
+* corrected-branch-name
+  main
+  remotes/origin/bad-branch-name
+  remotes/origin/corrected-branch-name
+  remotes/origin/main
+```
+
+Notice that you’re on the branch corrected-branch-name and it’s available on the remote. However, the branch with the bad name is also still present there but you can delete it by executing the following command:
+
+```bash
+$ git push origin --delete bad-branch-name
+```
+
+#### Changing the master branch name
+
+Rename your local master branch into main with the following command:
+
+```bash
+$ git branch --move master main
+```
+
+There’s no local master branch anymore, because it’s renamed to the main branch.
+
+To let others see the new main branch, you need to push it to the remote. This makes the renamed branch available on the remote.
+
+```bash
+$ git push --set-upstream origin main
+```
+
+Now we end up with the following state:
+
+```bash
+$ git branch --all
+* main
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/main
+  remotes/origin/master
+```
+
+Now you have a few more tasks in front of you to complete the transition:
+
+- Any projects that depend on this one will need to update their code and/or configuration.
+
+- Update any test-runner configuration files.
+
+- Adjust build and release scripts.
+
+- Redirect settings on your repo host for things like the repo’s default branch, merge rules, and other things that match branch names.
+
+- Update references to the old branch in documentation.
+
+- Close or merge any pull requests that target the old branch.
+
+After you’ve done all these tasks, and are certain the main branch performs just as the master branch, you can delete the master branch:
+
+```bash
+$ git push origin --delete master
+```
 
 ### 3.4 Git Branching - Branching Workflows
 
@@ -495,6 +580,55 @@ $ git branch -v
 
 ### 3.5 Git Branching - Remote Branches
 
-Remote Branches
+Remote references are references (pointers) in your remote repositories, including branches, tags, and so on. You can get a full list of remote references explicitly with
 
-Remote references are references (pointers) in your remote repositories, including branches, tags, and so on. You can get a full list of remote references explicitly with ```git ls-remote <remote>```, or ```git remote show <remote>``` for remote branches as well as more information. Nevertheless, a more common way is to take advantage of remote-tracking branches.
+`git ls-remote <remote>`
+
+, or
+
+`git remote show <remote>`
+
+for remote branches as well as more information
+
+To synchronize your work with a given remote, you run a
+
+`git fetch <remote>`
+
+let’s assume you have another internal Git server that is used only for development by one of your sprint teams. This server is at git.team1.ourcompany.com. You can add it as a new remote reference to the project you’re currently working on by running the 
+
+`git remote add teamone git://git.team1.ourcompany.com`
+
+Now, you can run
+
+`git fetch teamone`
+
+ to fetch everything the remote `teamone` server has that you don’t have yet. Because that server has a subset of the data your origin server has right now, Git fetches no data but sets a remote-tracking branch called `teamone/master` to point to the commit that `teamone` has as its master branch.
+
+####  Pushing
+
+If you have a branch named `serverfix` that you want to work on with others, you can push it up the same way you pushed your first branch. Run `git push <remote> <branch>`:
+
+```bash
+$ git push origin serverfix
+Counting objects: 24, done.
+Delta compression using up to 8 threads.
+Compressing objects: 100% (15/15), done.
+Writing objects: 100% (24/24), 1.91 KiB | 0 bytes/s, done.
+Total 24 (delta 2), reused 0 (delta 0)
+To https://github.com/schacon/simplegit
+ * [new branch]      serverfix -> serverfix
+```
+
+The next time one of your collaborators fetches from the server, they will get a reference to where the server’s version of serverfix is under the remote branch `origin/serverfix`:
+
+```bash
+$ git fetch origin
+remote: Counting objects: 7, done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 3 (delta 0), reused 3 (delta 0)
+Unpacking objects: 100% (3/3), done.
+From https://github.com/schacon/simplegit
+ * [new branch]      serverfix    -> origin/serverfix
+```
+
+<https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches>
