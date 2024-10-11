@@ -339,10 +339,162 @@ git branch iss53
 git checkout iss53
 ```
 
+You work on your website and do some commits. Doing so moves the iss53 branch forward, because you have it checked out (that is, your HEAD is pointing to it)
+
 ```bash
 $ vim index.html
 $ git commit -a -m 'Create new footer [issue 53]'
 ```
 
+ if your working directory or staging area has uncommitted changes that conflict with the branch you’re checking out, Git won’t let you switch branches. It’s best to have a clean working state when you switch branches. There are ways to get around this (namely, stashing and commit amending) that we’ll cover later on, in Stashing and Cleaning. For now, let’s assume you’ve committed all your changes, so you can switch back to your master branch:
 
-<https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging>
+```bash
+$ git checkout master
+Switched to branch 'master'
+```
+Next, you have a hotfix to make. Let’s create a hotfix branch on which to work until it’s completed:
+
+```bash
+$ git checkout -b hotfix
+Switched to a new branch 'hotfix'
+$ vim index.html
+$ git commit -a -m 'Fix broken email address'
+[hotfix 1fb7853] Fix broken email address
+ 1 file changed, 2 insertions(+)
+ ```
+
+ You can run your tests, make sure the hotfix is what you want, and finally merge the hotfix branch back into your master branch to deploy to production. You do this with the git merge command:
+
+```bash
+$ git checkout master
+$ git merge hotfix
+Updating f42c576..3a0874c
+Fast-forward
+ index.html | 2 ++
+ 1 file changed, 2 insertions(+)
+```
+
+You’ll notice the phrase “fast-forward” in that merge. Because the commit C4 pointed to by the branch hotfix you merged in was directly ahead of the commit C2 you’re on, Git simply moves the pointer forward. To phrase that another way, when you try to merge one commit with a commit that can be reached by following the first commit’s history, Git simplifies things by moving the pointer forward because there is no divergent work to merge together — this is called a “fast-forward.”
+
+After your super-important fix is deployed, you’re ready to switch back to the work you were doing before you were interrupted. However, first you’ll delete the hotfix branch, because you no longer need it — the master branch points at the same place. You can delete it with the -d option to git branch:
+
+```bash
+$ git branch -d hotfix
+Deleted branch hotfix (3a0874c).
+```
+
+Now you can switch back to your work-in-progress branch on issue #53 and continue working on it.
+
+```bash
+$ git checkout iss53
+Switched to branch "iss53"
+$ vim index.html
+$ git commit -a -m 'Finish the new footer [issue 53]'
+[iss53 ad82d7a] Finish the new footer [issue 53]
+1 file changed, 1 insertion(+)
+```
+
+It’s worth noting here that the work you did in your hotfix branch is not contained in the files in your iss53 branch. If you need to pull it in, you can merge your master branch into your iss53 branch by running git merge master, or you can wait to integrate those changes until you decide to pull the iss53 branch back into master later.
+
+#### Basic Merging
+
+Suppose you’ve decided that your issue #53 work is complete and ready to be merged into your master branch. In order to do that, you’ll merge your iss53 branch into master, much like you merged your hotfix branch earlier. All you have to do is check out the branch you wish to merge into and then run the git merge command:
+
+```bash
+$ git checkout master
+Switched to branch 'master'
+$ git merge iss53
+Merge made by the 'recursive' strategy.
+index.html |    1 +
+1 file changed, 1 insertion(+)
+```
+
+This looks a bit different than the hotfix merge you did earlier. In this case, your development history has diverged from some older point. Because the commit on the branch you’re on isn’t a direct ancestor of the branch you’re merging in, Git has to do some work. In this case, Git does a simple three-way merge, using the two snapshots pointed to by the branch tips and the common ancestor of the two.
+
+Instead of just moving the branch pointer forward, Git creates a new snapshot that results from this three-way merge and automatically creates a new commit that points to it. This is referred to as a merge commit, and is special in that it has more than one parent.
+
+Now that your work is merged in, you have no further need for the iss53 branch. You can close the issue in your issue-tracking system, and delete the branch:
+
+```$ git branch -d iss53```
+
+#### Basic Merge Conflicts
+
+Occasionally, this process doesn’t go smoothly. If you changed the same part of the same file differently in the two branches you’re merging, Git won’t be able to merge them cleanly. If your fix for issue #53 modified the same part of a file as the hotfix branch, you’ll get a merge conflict that looks something like this:
+
+$ git merge iss53
+Auto-merging index.html
+CONFLICT (content): Merge conflict in index.html
+Automatic merge failed; fix conflicts and then commit the result.
+Git hasn’t automatically created a new merge commit. It has paused the process while you resolve the conflict. If you want to see which files are unmerged at any point after a merge conflict, you can run git status:
+
+```bash
+git status
+On branch master
+You have unmerged paths.
+  (fix conflicts and run "git commit")
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+
+    both modified:      index.html
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+Anything that has merge conflicts and hasn’t been resolved is listed as unmerged. Git adds standard conflict-resolution markers to the files that have conflicts, so you can open them manually and resolve those conflicts. Your file contains a section that looks something like this:
+
+  ```git
+  <<<<<<< HEAD:index.html
+  <div id="footer">contact : email.support@github.com</div>
+  =======
+  <div id="footer">
+   please contact us at support@github.com
+  </div>
+  >>>>>>> iss53:index.html
+  ```
+
+This means the version in HEAD (your master branch, because that was what you had checked out when you ran your merge command) is the top part of that block (everything above the =======), while the version in your iss53 branch looks like everything in the bottom part. In order to resolve the conflict, you have to either choose one side or the other or merge the contents yourself. For instance, you might resolve this conflict by replacing the entire block with this:
+
+```html
+<div id="footer">
+please contact us at email.support@github.com
+</div>
+```
+
+This resolution has a little of each section, and the <<<<<<<, =======, and >>>>>>> lines have been completely removed. After you’ve resolved each of these sections in each conflicted file, run git add on each file to mark it as resolved. Staging the file marks it as resolved in Git.
+
+### 3.3 Git Branching - Branch Management
+
+Branch Management
+
+The git branch command does more than just create and delete branches. If you run it with no arguments, you get a simple listing of your current branches:
+
+```bash
+$ git branch
+  iss53
+* master
+  testing
+```
+
+Notice the * character that prefixes the master branch: it indicates the branch that you currently have checked out (i.e., the branch that HEAD points to)
+
+ To see the last commit on each branch, you can run git branch -v:
+
+```bash
+$ git branch -v
+  iss53   93b412c Fix javascript issue
+* master  7a98805 Merge branch 'iss53'
+  testing 782fd34 Add scott to the author list in the readme
+```
+
+<https://git-scm.com/book/en/v2/Git-Branching-Branch-Management>
+
+### 3.4 Git Branching - Branching Workflows
+
+<https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows>
+
+### 3.5 Git Branching - Remote Branches
+
+Remote Branches
+
+Remote references are references (pointers) in your remote repositories, including branches, tags, and so on. You can get a full list of remote references explicitly with ```git ls-remote <remote>```, or ```git remote show <remote>``` for remote branches as well as more information. Nevertheless, a more common way is to take advantage of remote-tracking branches.
