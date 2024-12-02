@@ -96,19 +96,20 @@ Calling pytest from Python code
 
 You can specify additional plugins to pytest.main:
 
-        # content of myinvoke.py
-        import sys
+```python
+# content of myinvoke.py
+import sys
 
-        import pytest
-
-
-        class MyPlugin:
-            def pytest_sessionfinish(self):
-                print("*** test run reporting finishing")
+import pytest
 
 
-        if __name__ == "__main__":
-            sys.exit(pytest.main(["-qq"], plugins=[MyPlugin()]))
+class MyPlugin:
+    def pytest_sessionfinish(self):
+        print("*** test run reporting finishing")
+
+
+if __name__ == "__main__":
+    sys.exit(pytest.main(["-qq"], plugins=[MyPlugin()]))```
 
 Running it will show that MyPlugin was added and its hook was invoked:
 
@@ -119,85 +120,92 @@ Running it will show that MyPlugin was added and its hook was invoked:
 
 #### Asserting with the assert statement
 
-        content of test_assert1.py
+```python
+#content of test_assert1.py
 
-        def f():
-            return 3
+def f():
+    return 3
 
 
-        def test_function():
-            assert f() == 4
+def test_function():
+    assert f() == 4```
 
 #### Assertions about expected exceptions
 
-        import pytest
+```python
+import pytest
 
 
-        def test_zero_division():
-            with pytest.raises(ZeroDivisionError):
-                1 / 0
+def test_zero_division():
+    with pytest.raises(ZeroDivisionError):
+        1 / 0
 
-        def test_recursion_depth():
-            with pytest.raises(RuntimeError) as excinfo:
+def test_recursion_depth():
+    with pytest.raises(RuntimeError) as excinfo:
 
-                def f():
-                    f()
+        def f():
+            f()
 
-                f()
-            assert "maximum recursion" in str(excinfo.value)
+        f()
+    assert "maximum recursion" in str(excinfo.value)
 
-        def test_foo_not_implemented():
-            def foo():
-                raise NotImplementedError
+def test_foo_not_implemented():
+    def foo():
+        raise NotImplementedError
 
-            with pytest.raises(RuntimeError) as excinfo:
-                foo()
-            assert excinfo.type is RuntimeError
+    with pytest.raises(RuntimeError) as excinfo:
+        foo()
+    assert excinfo.type is RuntimeError
+```
 
 ##### Matching exception messages
 
-        import pytest
+```python
+import pytest
 
 
-        def myfunc():
-            raise ValueError("Exception 123 raised")
+def myfunc():
+    raise ValueError("Exception 123 raised")
 
 
-        def test_match():
-            with pytest.raises(ValueError, match=r".* 123 .*"):
-                myfunc()
+def test_match():
+    with pytest.raises(ValueError, match=r".* 123 .*"):
+        myfunc()
+```
 
 ##### Matching exception groups
 
-        def test_exception_in_group():
-            with pytest.raises(ExceptionGroup) as excinfo:
-                raise ExceptionGroup(
-                    "Group message",
-                    [
-                        RuntimeError("Exception 123 raised"),
-                    ],
-                )
-            assert excinfo.group_contains(RuntimeError, match=r".* 123 .*")
-            assert not excinfo.group_contains(TypeError)
+```python
+def test_exception_in_group():
+    with pytest.raises(ExceptionGroup) as excinfo:
+        raise ExceptionGroup(
+            "Group message",
+            [
+                RuntimeError("Exception 123 raised"),
+            ],
+        )
+    assert excinfo.group_contains(RuntimeError, match=r".* 123 .*")
+    assert not excinfo.group_contains(TypeError)
 
-        def test_exception_in_group_at_given_depth():
-            with pytest.raises(ExceptionGroup) as excinfo:
-                raise ExceptionGroup(
-                    "Group message",
+def test_exception_in_group_at_given_depth():
+    with pytest.raises(ExceptionGroup) as excinfo:
+        raise ExceptionGroup(
+            "Group message",
+            [
+                RuntimeError(),
+                ExceptionGroup(
+                    "Nested group",
                     [
-                        RuntimeError(),
-                        ExceptionGroup(
-                            "Nested group",
-                            [
-                                TypeError(),
-                            ],
-                        ),
+                        TypeError(),
                     ],
-                )
-            assert excinfo.group_contains(RuntimeError, depth=1)
-            assert excinfo.group_contains(TypeError, depth=2)
-            assert not excinfo.group_contains(RuntimeError, depth=2)
-            assert not excinfo.group_contains(TypeError, depth=1)
+                ),
+            ],
+        )
+    assert excinfo.group_contains(RuntimeError, depth=1)
+    assert excinfo.group_contains(TypeError, depth=2)
+    assert not excinfo.group_contains(RuntimeError, depth=2)
+    assert not excinfo.group_contains(TypeError, depth=1)
+```
 
 #### Assertions about expected warnings
 
@@ -205,11 +213,13 @@ Running it will show that MyPlugin was added and its hook was invoked:
 
 #### Making use of context-sensitive comparisons
 
-        # content of test_assert2.py
-        def test_set_comparison():
-            set1 = set("1308")
-            set2 = set("8035")
-            assert set1 == set2
+```python
+# content of test_assert2.py
+def test_set_comparison():
+    set1 = set("1308")
+    set2 = set("8035")
+    assert set1 == set2
+```
 
 #### Defining your own explanation for failed assertions
 
@@ -228,32 +238,33 @@ Running it will show that MyPlugin was added and its hook was invoked:
 - A test/fixture can request more than one fixture at a time
 - Fixtures can be requested more than once per test (return values are cached)
 
-      # contents of test_append.py
-      import pytest
+```python
+# contents of test_append.py
+import pytest
 
 
-      # Arrange
-      @pytest.fixture
-      def first_entry():
-          return "a"
+# Arrange
+@pytest.fixture
+def first_entry():
+    return "a"
 
 
-      # Arrange
-      @pytest.fixture
-      def order():
-          return []
+# Arrange
+@pytest.fixture
+def order():
+    return []
 
 
-      # Act
-      @pytest.fixture
-      def append_first(order, first_entry):
-          return order.append(first_entry)
+# Act
+@pytest.fixture
+def append_first(order, first_entry):
+    return order.append(first_entry)
 
 
-      def test_string_only(append_first, order, first_entry):
-          # Assert
-          assert order == [first_entry]
-
+def test_string_only(append_first, order, first_entry):
+    # Assert
+    assert order == [first_entry]
+```
 #### Autouse fixtures (fixtures you don’t have to request)
 
     # contents of test_append.py
