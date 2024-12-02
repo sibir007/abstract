@@ -3235,6 +3235,24 @@ async def create_file(
 
 ### Handling Errors
 
+There are many situations in which you need to notify an error to a client that is using your API.
+
+This client could be a browser with a frontend, a code from someone else, an IoT device, etc.
+
+You could need to tell the client that:
+
+- The client doesn't have enough privileges for that operation.
+- The client doesn't have access to that resource.
+The item the client was trying to access doesn't exist.
+etc.
+- In these cases, you would normally return an HTTP status code in the range of 400 (from 400 to 499).
+
+This is similar to the 200 HTTP status codes (from 200 to 299). Those "200" status codes mean that somehow there was a "success" in the request.
+
+The status codes in the 400 range mean that there was an error from the client.
+
+Remember all those "404 Not Found" errors (and jokes)?
+
 ```py
 from fastapi import FastAPI, HTTPException # Import HTTPException
 
@@ -3284,4 +3302,774 @@ Tip
 
 #### Add custom headers
 
-<https://fastapi.tiangolo.com/tutorial/handling-errors/#add-custom-headers>
+There are some situations in where it's useful to be able to add custom headers to the HTTP error. For example, for some types of security.
+
+You probably won't need to use it directly in your code.
+
+But in case you needed it for an advanced scenario, you can add custom headers:
+
+```py
+from fastapi import FastAPI, HTTPException
+
+app = FastAPI()
+
+items = {"foo": "The Foo Wrestlers"}
+
+
+@app.get("/items-header/{item_id}")
+async def read_item_header(item_id: str):
+    if item_id not in items:
+        raise HTTPException(
+            status_code=404,
+            detail="Item not found",
+            headers={"X-Error": "There goes my error"},
+        )
+    return {"item": items[item_id]}
+```
+
+#### Install custom exception handlers
+
+You can add custom exception handlers with [the same exception utilities from Starlette](https://www.starlette.io/exceptions/).
+
+Let's say you have a custom exception UnicornException that you (or a library you use) might raise.
+
+And you want to handle this exception globally with FastAPI.
+
+You could add a custom exception handler with @app.exception_handler():
+
+```py
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+
+
+class UnicornException(Exception):
+    def __init__(self, name: str):
+        self.name = name
+
+
+app = FastAPI()
+
+
+@app.exception_handler(UnicornException)
+async def unicorn_exception_handler(request: Request, exc: UnicornException):
+    return JSONResponse(
+        status_code=418,
+        content={"message": f"Oops! {exc.name} did something. There goes a rainbow..."},
+    )
+
+
+@app.get("/unicorns/{name}")
+async def read_unicorn(name: str):
+    if name == "yolo":
+        raise UnicornException(name=name)
+    return {"unicorn_name": name}
+```
+
+#### Override the default exception handlers
+
+FastAPI has some default exception handlers.
+
+These handlers are in charge of returning the default JSON responses when you raise an HTTPException and when the request has invalid data.
+
+You can override these exception handlers with your own.
+
+Override request validation exceptions¶
+When a request contains invalid data, FastAPI internally raises a `RequestValidationError`.
+
+And it also includes a default exception handler for it.
+
+To override it, `import the RequestValidationError` and use it with `@app.exception_handler(RequestValidationError)` to decorate the exception handler.
+
+The exception handler will receive a `Request` and the exception.
+
+```py
+from fastapi import FastAPI, HTTPException
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import PlainTextResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+app = FastAPI()
+
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request, exc):
+    return PlainTextResponse(str(exc.detail), status_code=exc.status_code)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc):
+    return PlainTextResponse(str(exc), status_code=400)
+
+
+@app.get("/items/{item_id}")
+async def read_item(item_id: int):
+    if item_id == 3:
+        raise HTTPException(status_code=418, detail="Nope! I don't like 3.")
+    return {"item_id": item_id}
+```
+
+you will get a text version, with:
+
+```txt
+1 validation error
+path -> item_id
+  value is not a valid integer (type=type_error.integer)
+```
+
+`RequestValidationError` is a sub-class of Pydantic's `ValidationError`.
+
+FastAPI uses it so that, if you use a Pydantic model in response_model, and your data has an error, you will see the error in your log.
+
+But the client/user will not see it. Instead, the client will receive an "Internal Server Error" with an HTTP status code 500.
+
+It should be this way because if you have a Pydantic `ValidationError` in your response or anywhere in your code (not in the client's request), it's actually a bug in your code.
+
+And while you fix it, your clients/users shouldn't have access to internal information about the error, as that could expose a security vulnerability.
+
+#### Override the HTTPException error handler
+
+```py
+from fastapi import FastAPI, HTTPException
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import PlainTextResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+app = FastAPI()
+
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request, exc):
+    return PlainTextResponse(str(exc.detail), status_code=exc.status_code)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc):
+    return PlainTextResponse(str(exc), status_code=400)
+
+
+@app.get("/items/{item_id}")
+async def read_item(item_id: int):
+    if item_id == 3:
+        raise HTTPException(status_code=418, detail="Nope! I don't like 3.")
+    return {"item_id": item_id}
+```
+
+#### Use the RequestValidationError body
+
+```py
+from fastapi import FastAPI, Request, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content=jsonable_encoder({"detail": exc.errors(), "body": exc.body}),
+    )
+
+
+class Item(BaseModel):
+    title: str
+    size: int
+
+
+@app.post("/items/")
+async def create_item(item: Item):
+    return item
+
+```
+
+Now try sending an invalid item like:
+
+```json
+{
+  "title": "towel",
+  "size": "XL"
+}
+```
+
+You will receive a response telling you that the data is invalid containing the received body:
+
+```json
+{
+  "detail": [
+    {
+      "loc": [
+        "body",
+        "size"
+      ],
+      "msg": "value is not a valid integer",
+      "type": "type_error.integer"
+    }
+  ],
+  "body": {
+    "title": "towel",
+    "size": "XL"
+  }
+}
+```
+
+#### FastAPI's HTTPException vs Starlette's HTTPException
+
+FastAPI has its own HTTPException.
+
+And FastAPI's HTTPException error class inherits from Starlette's HTTPException error class.
+
+The only difference is that FastAPI's HTTPException accepts any JSON-able data for the detail field, while Starlette's HTTPException only accepts strings for it.
+
+So, you can keep raising FastAPI's HTTPException as normally in your code.
+
+But when you register an exception handler, you should register it for Starlette's `HTTPException`.
+
+This way, if any part of Starlette's internal code, or a Starlette extension or plug-in, raises a Starlette HTTPException, your handler will be able to catch and handle it.
+
+In this example, to be able to have both `HTTPExceptions` in the same code, Starlette's exceptions is renamed to `StarletteHTTPException`:
+
+`from starlette.exceptions import HTTPException as StarletteHTTPException`
+
+#### Reuse FastAPI's exception handlers
+
+If you want to use the exception along with the same default exception handlers from FastAPI, you can import and reuse the default exception handlers from fastapi.exception_handlers:
+
+```py
+from fastapi import FastAPI, HTTPException
+from fastapi.exception_handlers import (
+    http_exception_handler,
+    request_validation_exception_handler,
+)
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+app = FastAPI()
+
+
+@app.exception_handler(StarletteHTTPException)
+async def custom_http_exception_handler(request, exc):
+    print(f"OMG! An HTTP error!: {repr(exc)}")
+    return await http_exception_handler(request, exc)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc):
+    print(f"OMG! The client sent invalid data!: {exc}")
+    return await request_validation_exception_handler(request, exc)
+
+
+@app.get("/items/{item_id}")
+async def read_item(item_id: int):
+    if item_id == 3:
+        raise HTTPException(status_code=418, detail="Nope! I don't like 3.")
+    return {"item_id": item_id}
+```
+
+### Path Operation Configuration
+
+#### Response Status Code
+
+```py
+from fastapi import FastAPI, status
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+class Item(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    tax: float | None = None
+    tags: set[str] = set()
+
+
+@app.post("/items/", response_model=Item, status_code=status.HTTP_201_CREATED)
+async def create_item(item: Item):
+    return item
+```
+
+#### Tags
+
+```py
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+class Item(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    tax: float | None = None
+    tags: set[str] = set()
+
+
+@app.post("/items/", response_model=Item, tags=["items"])
+async def create_item(item: Item):
+    return item
+
+
+@app.get("/items/", tags=["items"])
+async def read_items():
+    return [{"name": "Foo", "price": 42}]
+
+
+@app.get("/users/", tags=["users"])
+async def read_users():
+    return [{"username": "johndoe"}]
+```
+
+hey will be added to the OpenAPI schema and used by the automatic documentation interfaces
+
+#### Tags with Enums
+
+```py
+from enum import Enum
+
+from fastapi import FastAPI
+
+app = FastAPI()
+
+
+class Tags(Enum):
+    items = "items"
+    users = "users"
+
+
+@app.get("/items/", tags=[Tags.items])
+async def get_items():
+    return ["Portal gun", "Plumbus"]
+
+
+@app.get("/users/", tags=[Tags.users])
+async def read_users():
+    return ["Rick", "Morty"]
+```
+
+#### Summary and description
+
+```py
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+class Item(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    tax: float | None = None
+    tags: set[str] = set()
+
+
+@app.post(
+    "/items/",
+    response_model=Item,
+    summary="Create an item",
+    description="Create an item with all the information, name, description, price, tax and a set of unique tags",
+)
+async def create_item(item: Item):
+    return item
+```
+
+#### Description from docstring
+
+As descriptions tend to be long and cover multiple lines, you can declare the path operation description in the function docstring and FastAPI will read it from there.
+
+You can write Markdown in the docstring, it will be interpreted and displayed correctly (taking into account docstring indentation).
+
+```py
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+class Item(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    tax: float | None = None
+    tags: set[str] = set()
+
+
+@app.post("/items/", response_model=Item, summary="Create an item")
+async def create_item(item: Item):
+    """
+    Create an item with all the information:
+
+    - **name**: each item must have a name
+    - **description**: a long description
+    - **price**: required
+    - **tax**: if the item doesn't have tax, you can omit this
+    - **tags**: a set of unique tag strings for this item
+    """
+    return item
+```
+
+#### Response description
+
+```py
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+class Item(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    tax: float | None = None
+    tags: set[str] = set()
+
+
+@app.post(
+    "/items/",
+    response_model=Item,
+    summary="Create an item",
+    response_description="The created item",
+)
+async def create_item(item: Item):
+    """
+    Create an item with all the information:
+
+    - **name**: each item must have a name
+    - **description**: a long description
+    - **price**: required
+    - **tax**: if the item doesn't have tax, you can omit this
+    - **tags**: a set of unique tag strings for this item
+    """
+    return item
+```
+
+Notice that `response_description` refers specifically to the response, the `description` refers to the path operation in general.
+
+#### Deprecate a path operation
+
+```py
+from fastapi import FastAPI
+
+app = FastAPI()
+
+
+@app.get("/items/", tags=["items"])
+async def read_items():
+    return [{"name": "Foo", "price": 42}]
+
+
+@app.get("/users/", tags=["users"])
+async def read_users():
+    return [{"username": "johndoe"}]
+
+
+@app.get("/elements/", tags=["items"], deprecated=True)
+async def read_elements():
+    return [{"item_id": "Foo"}]
+```
+
+It will be clearly marked as deprecated in the interactive doc
+
+#### JSON Compatible Encoder
+
+There are some cases where you might need to convert a data type (like a Pydantic model) to something compatible with JSON (like a dict, list, etc).
+
+For example, if you need to store it in a database.
+
+For that, FastAPI provides a `jsonable_encoder()` function
+
+##### Using the jsonable_encoder
+
+Let's imagine that you have a database fake_db that only receives JSON compatible data.
+
+For example, it doesn't receive datetime objects, as those are not compatible with JSON.
+
+So, a datetime object would have to be converted to a str containing the data in ISO format.
+
+The same way, this database wouldn't receive a Pydantic model (an object with attributes), only a dict.
+
+You can use jsonable_encoder for that.
+
+It receives an object, like a Pydantic model, and returns a JSON compatible version:
+
+```py
+from datetime import datetime
+
+from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
+from pydantic import BaseModel
+
+fake_db = {}
+
+
+class Item(BaseModel):
+    title: str
+    timestamp: datetime
+    description: str | None = None
+
+
+app = FastAPI()
+
+
+@app.put("/items/{id}")
+def update_item(id: str, item: Item):
+    json_compatible_item_data = jsonable_encoder(item)
+    fake_db[id] = json_compatible_item_data
+```
+
+In this example, it would convert the Pydantic model to a dict, and the datetime to a str.
+
+The result of calling it is something that can be encoded with the Python standard json.dumps().
+
+It doesn't return a large str containing the data in JSON format (as a string). It returns a Python standard data structure (e.g. a dict) with values and sub-values that are all compatible with JSON.
+
+#### Body - Updates
+
+##### Update replacing with PUT
+
+To update an item you can use the HTTP PUT operation.
+
+You can use the jsonable_encoder to convert the input data to data that can be stored as JSON (e.g. with a NoSQL database). For example, converting datetime to str.
+
+```py
+from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+class Item(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    price: float | None = None
+    tax: float = 10.5
+    tags: list[str] = []
+
+
+items = {
+    "foo": {"name": "Foo", "price": 50.2},
+    "bar": {"name": "Bar", "description": "The bartenders", "price": 62, "tax": 20.2},
+    "baz": {"name": "Baz", "description": None, "price": 50.2, "tax": 10.5, "tags": []},
+}
+
+
+@app.get("/items/{item_id}", response_model=Item)
+async def read_item(item_id: str):
+    return items[item_id]
+
+
+@app.put("/items/{item_id}", response_model=Item)
+async def update_item(item_id: str, item: Item):
+    update_item_encoded = jsonable_encoder(item)
+    items[item_id] = update_item_encoded
+    return update_item_encoded
+```
+
+PUT is used to receive data that should replace the existing data.
+
+Warning about replacing
+
+That means that if you want to update the item bar using PUT with a body containing:
+
+```json
+{
+    "name": "Barz",
+    "price": 3,
+    "description": None,
+}
+```
+
+because it doesn't include the already stored attribute "tax": 20.2, the input model would take the default value of "tax": 10.5.
+
+And the data would be saved with that "new" tax of 10.5.
+
+##### Partial updates with PATCH
+
+You can also use the HTTP PATCH operation to partially update data.
+
+This means that you can send only the data that you want to update, leaving the rest intact.
+
+Note
+
+PATCH is less commonly used and known than PUT.
+
+And many teams use only PUT, even for partial updates.
+
+You are free to use them however you want, FastAPI doesn't impose any restrictions.
+
+But this guide shows you, more or less, how they are intended to be used.
+
+##### Using Pydantic's exclude_unset parameter
+
+```py
+from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+class Item(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    price: float | None = None
+    tax: float = 10.5
+    tags: list[str] = []
+
+
+items = {
+    "foo": {"name": "Foo", "price": 50.2},
+    "bar": {"name": "Bar", "description": "The bartenders", "price": 62, "tax": 20.2},
+    "baz": {"name": "Baz", "description": None, "price": 50.2, "tax": 10.5, "tags": []},
+}
+
+
+@app.get("/items/{item_id}", response_model=Item)
+async def read_item(item_id: str):
+    return items[item_id]
+
+
+@app.patch("/items/{item_id}", response_model=Item)
+async def update_item(item_id: str, item: Item):
+    stored_item_data = items[item_id]
+    stored_item_model = Item(**stored_item_data)
+    update_data = item.dict(exclude_unset=True)
+    updated_item = stored_item_model.copy(update=update_data)
+    items[item_id] = jsonable_encoder(updated_item)
+    return updated_item
+```
+
+##### Using Pydantic's update parameter
+
+Now, you can create a copy of the existing model using .model_copy(), and pass the update parameter with a dict containing the data to update.
+Like stored_item_model.model_copy(update=update_data):
+
+```py
+from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+class Item(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    price: float | None = None
+    tax: float = 10.5
+    tags: list[str] = []
+
+
+items = {
+    "foo": {"name": "Foo", "price": 50.2},
+    "bar": {"name": "Bar", "description": "The bartenders", "price": 62, "tax": 20.2},
+    "baz": {"name": "Baz", "description": None, "price": 50.2, "tax": 10.5, "tags": []},
+}
+
+
+@app.get("/items/{item_id}", response_model=Item)
+async def read_item(item_id: str):
+    return items[item_id]
+
+
+@app.patch("/items/{item_id}", response_model=Item)
+async def update_item(item_id: str, item: Item):
+    stored_item_data = items[item_id]
+    stored_item_model = Item(**stored_item_data)
+    update_data = item.dict(exclude_unset=True)
+    updated_item = stored_item_model.copy(update=update_data)
+    items[item_id] = jsonable_encoder(updated_item)
+    return updated_item
+```
+
+### Dependencies
+
+```py
+from typing import Annotated
+
+from fastapi import Depends, FastAPI # Import Depends
+
+app = FastAPI()
+
+
+async def common_parameters(q: str | None = None, skip: int = 0, limit: int = 100): # Create a dependency, or "dependable"
+    return {"q": q, "skip": skip, "limit": limit}
+
+
+@app.get("/items/")
+async def read_items(commons: Annotated[dict, Depends(common_parameters)]): # Declare the dependency, in the "dependant"
+    return commons
+
+
+@app.get("/users/")
+async def read_users(commons: Annotated[dict, Depends(common_parameters)]): # Declare the dependency, in the "dependant"
+    return commons
+```
+You can think of it as a path operation function without the "decorator" (without the `@app.get("/some-path`")).
+
+And it can return anything you want.
+
+In this case, this dependency expects:
+
+- An optional query parameter q that is a str.
+- An optional query parameter skip that is an int, and by default is 0.
+- An optional query parameter limit that is an int, and by default is 100.
+- And then it just returns a dict containing those values.
+
+And then it just returns a dict containing those values.
+
+Although you use Depends in the parameters of your function the same way you use Body, Query, etc, Depends works a bit differently.
+
+You only give Depends a single parameter.
+
+This parameter must be something like a function.
+
+You don't call it directly (don't add the parenthesis at the end), you just pass it as a parameter to Depends().
+
+And that function takes parameters in the same way that path operation functions do.
+
+Whenever a new request arrives, FastAPI will take care of:
+
+- Calling your dependency ("dependable") function with the correct parameters.
+- Get the result from your function.
+- Assign that result to the parameter in your path operation function.
+  
+#### Share Annotated dependencies
+
+But because we are using Annotated, we can store that Annotated value in a variable and use it in multiple places:
+
+```py
+from typing import Annotated
+
+from fastapi import Depends, FastAPI
+
+app = FastAPI()
+
+
+async def common_parameters(q: str | None = None, skip: int = 0, limit: int = 100):
+    return {"q": q, "skip": skip, "limit": limit}
+
+
+CommonsDep = Annotated[dict, Depends(common_parameters)]
+
+
+@app.get("/items/")
+async def read_items(commons: CommonsDep):
+    return commons
+
+
+@app.get("/users/")
+async def read_users(commons: CommonsDep):
+    return commons
+```
+
+#### To async or not to async
+
+<https://fastapi.tiangolo.com/tutorial/dependencies/#to-async-or-not-to-async>
