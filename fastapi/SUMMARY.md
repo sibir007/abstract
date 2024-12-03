@@ -4345,3 +4345,717 @@ async def dependency_c(dep_b: Annotated[DepB, Depends(dependency_b)]):
     finally:
         dep_c.close(dep_b)
 ```
+
+#### Dependencies with yield and HTTPException
+
+```py
+from typing import Annotated
+
+from fastapi import Depends, FastAPI, HTTPException
+
+app = FastAPI()
+
+
+data = {
+    "plumbus": {"description": "Freshly pickled plumbus", "owner": "Morty"},
+    "portal-gun": {"description": "Gun to create portals", "owner": "Rick"},
+}
+
+
+class OwnerError(Exception):
+    pass
+
+
+def get_username():
+    try:
+        yield "Rick"
+    except OwnerError as e:
+        raise HTTPException(status_code=400, detail=f"Owner error: {e}")
+
+
+@app.get("/items/{item_id}")
+def get_item(item_id: str, username: Annotated[str, Depends(get_username)]):
+    if item_id not in data:
+        raise HTTPException(status_code=404, detail="Item not found")
+    item = data[item_id]
+    if item["owner"] != username:
+        raise OwnerError(username)
+    return item
+```
+
+An alternative you could use to catch exceptions (and possibly also raise another HTTPException) is to create a Custom Exception Handler
+
+#### Dependencies with yield and except
+
+If you catch an exception using `except` in a dependency with `yield` and you don't raise it again (or `raise` a new exception), FastAPI won't be able to notice there was an exception, the same way that would happen with regular Python:
+
+```py
+from typing import Annotated
+
+from fastapi import Depends, FastAPI, HTTPException
+
+app = FastAPI()
+
+
+class InternalError(Exception):
+    pass
+
+
+def get_username():
+    try:
+        yield "Rick"
+    except InternalError:
+        print("Oops, we didn't raise again, Britney 😱")
+
+
+@app.get("/items/{item_id}")
+def get_item(item_id: str, username: Annotated[str, Depends(get_username)]):
+    if item_id == "portal-gun":
+        raise InternalError(
+            f"The portal gun is too dangerous to be owned by {username}"
+        )
+    if item_id != "plumbus":
+        raise HTTPException(
+            status_code=404, detail="Item not found, there's only a plumbus here"
+        )
+    return item_id
+```
+
+In this case, the client will see an HTTP 500 Internal Server Error response as it should, given that we are not raising an HTTPException or similar, but the server will not have any logs or any other indication of what was the error. 😱
+
+#### Always raise in Dependencies with yield and except
+
+If you catch an exception in a dependency with yield, unless you are raising another HTTPException or similar, you should re-raise the original exception.
+
+You can re-raise the same exception using raise:
+
+```py
+from typing import Annotated
+
+from fastapi import Depends, FastAPI, HTTPException
+
+app = FastAPI()
+
+
+class InternalError(Exception):
+    pass
+
+
+def get_username():
+    try:
+        yield "Rick"
+    except InternalError:
+        print("We don't swallow the internal error here, we raise again 😎")
+        raise
+
+
+@app.get("/items/{item_id}")
+def get_item(item_id: str, username: Annotated[str, Depends(get_username)]):
+    if item_id == "portal-gun":
+        raise InternalError(
+            f"The portal gun is too dangerous to be owned by {username}"
+        )
+    if item_id != "plumbus":
+        raise HTTPException(
+            status_code=404, detail="Item not found, there's only a plumbus here"
+        )
+    return item_id
+```
+
+Now the client will get the same HTTP 500 Internal Server Error response, but the server will have our custom InternalError in the logs. 😎
+
+This diagram shows HTTPException, but you could also raise any other exception that you catch in a dependency with yield or with a Custom Exception Handler.
+
+If you raise any exception, it will be passed to the dependencies with yield, including HTTPException. In most cases you will want to re-raise that same exception or a new one from the dependency with yield to make sure it's properly handled.
+
+### Security
+
+#### OAuth2
+
+OAuth2 is a specification that defines several ways to handle authentication and authorization.
+
+It is quite an extensive specification and covers several complex use cases.
+
+It includes ways to authenticate using a "third party".
+
+That's what all the systems with "login with Facebook, Google, Twitter, GitHub" use underneath.
+
+#### OAuth 1
+
+There was an OAuth 1, which is very different from OAuth2, and more complex, as it included direct specifications on how to encrypt the communication.
+
+It is not very popular or used nowadays.
+
+OAuth2 doesn't specify how to encrypt the communication, it expects you to have your application served with HTTPS.
+
+#### OpenID Connect
+
+OpenID Connect is another specification, based on OAuth2.
+
+It just extends OAuth2 specifying some things that are relatively ambiguous in OAuth2, to try to make it more interoperable.
+
+For example, Google login uses OpenID Connect (which underneath uses OAuth2).
+
+But Facebook login doesn't support OpenID Connect. It has its own flavor of OAuth2.
+
+#### OpenID (not "OpenID Connect")
+
+There was also an "OpenID" specification. That tried to solve the same thing as OpenID Connect, but was not based on OAuth2.
+
+So, it was a complete additional system.
+
+It is not very popular or used nowadays.
+
+#### OpenAPI
+
+OpenAPI (previously known as Swagger) is the open specification for building APIs (now part of the Linux Foundation).
+
+#### FastAPI is based on OpenAPI.
+
+That's what makes it possible to have multiple automatic interactive documentation interfaces, code generation, etc.
+
+OpenAPI has a way to define multiple security "schemes".
+
+By using them, you can take advantage of all these standard-based tools, including these interactive documentation systems.
+
+OpenAPI defines the following security schemes:
+
+- apiKey: an application specific key that can come from:
+  - A query parameter.
+  - A header.
+  - A cookie.
+- http: standard HTTP authentication systems, including:
+  - bearer: a header Authorization with a value of Bearer plus a token. This is inherited from OAuth2.
+  - HTTP Basic authentication.
+  - HTTP Digest, etc.
+- oauth2: all the OAuth2 ways to handle security (called "flows").
+  - Several of these flows are appropriate for building an OAuth 2.0 authentication provider (like Google, Facebook, Twitter, GitHub, etc):
+    - implicit
+    - clientCredentials
+    - authorizationCode
+  - But there is one specific "flow" that can be perfectly used for handling authentication in the same application directly:
+    - password: some next chapters will cover examples of this.
+- openIdConnect: has a way to define how to discover OAuth2 authentication data automatically.
+  - This automatic discovery is what is defined in the OpenID Connect specification.
+
+#### FastAPI utilities
+
+FastAPI provides several tools for each of these security schemes in the fastapi.security module that simplify using these security mechanisms.
+
+In the next chapters you will see how to add security to your API using those tools provided by FastAPI.
+
+And you will also see how it gets automatically integrated into the interactive documentation system.
+
+### Security - First Steps
+
+```py
+# main.py
+from typing import Annotated
+
+from fastapi import Depends, FastAPI
+from fastapi.security import OAuth2PasswordBearer
+
+app = FastAPI()
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+@app.get("/items/")
+async def read_items(token: Annotated[str, Depends(oauth2_scheme)]):
+    return {"token": token}
+```
+
+`fastapi dev main.py`
+
+Go to the interactive docs at: <http://127.0.0.1:8000/docs>
+
+You already have a shiny new "Authorize" button.
+
+And your path operation has a little lock in the top-right corner that you can click.
+
+And if you click it, you have a little authorization form to type a username and password (and other optional fields
+
+#### The `password` flow
+
+Now let's go back a bit and understand what is all that.
+
+The password "flow" is one of the ways ("flows") defined in OAuth2, to handle security and authentication.
+
+OAuth2 was designed so that the backend or API could be independent of the server that authenticates the user.
+
+But in this case, the same FastAPI application will handle the API and the authentication.
+
+So, let's review it from that simplified point of view:
+
+- The user types the username and password in the frontend, and hits Enter.
+- The frontend (running in the user's browser) sends that username and password to a specific URL in our API (declared with tokenUrl="token").
+- The API checks that username and password, and responds with a "token" (we haven't implemented any of this yet).
+  - A "token" is just a string with some content that we can use later to verify this user.
+  - Normally, a token is set to expire after some time.
+    - So, the user will have to log in again at some point later.
+    - And if the token is stolen, the risk is less. It is not like a permanent key that will work forever (in most of the cases).
+- The frontend stores that token temporarily somewhere.
+- The user clicks in the frontend to go to another section of the frontend web app.
+- The frontend needs to fetch some more data from the API.
+  - But it needs authentication for that specific endpoint.
+  - So, to authenticate with our API, it sends a header Authorization with a value of Bearer plus the token.
+  - If the token contains foobar, the content of the Authorization header would be: Bearer foobar.
+
+#### FastAPI's `OAuth2PasswordBearer`
+
+FastAPI provides several tools, at different levels of abstraction, to implement these security features.
+
+In this example we are going to use OAuth2, with the Password flow, using a Bearer token. We do that using the OAuth2PasswordBearer class.
+
+When we create an instance of the OAuth2PasswordBearer class we pass in the tokenUrl parameter. This parameter contains the URL that the client (the frontend running in the user's browser) will use to send the username and password in order to get a token.
+
+`oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")`
+
+Here tokenUrl="token" refers to a relative URL token that we haven't created yet. As it's a relative URL, it's equivalent to ./token.
+
+Because we are using a relative URL, if your API was located at https://example.com/, then it would refer to https://example.com/token. But if your API was located at https://example.com/api/v1/, then it would refer to https://example.com/api/v1/token.
+
+Using a relative URL is important to make sure your application keeps working even in an advanced use case like Behind a Proxy.
+
+This parameter doesn't create that endpoint / path operation, but declares that the URL `/token` will be the one that the client should use to get the token. That information is used in OpenAPI, and then in the interactive API documentation systems.
+
+The `oauth2_scheme` variable is an instance of `OAuth2PasswordBearer`, but it is also a "callable".
+
+It could be called as:
+
+`oauth2_scheme(some, parameters)`
+
+So, it can be used with `Depends`.
+
+Now you can pass that `oauth2_scheme` in a dependency with `Depends`
+
+`async def read_items(token: Annotated[str, Depends(oauth2_scheme)]):`
+
+FastAPI will know that it can use the class OAuth2PasswordBearer (declared in a dependency) to define the security scheme in OpenAPI because it inherits from fastapi.security.oauth2.OAuth2, which in turn inherits from fastapi.security.base.SecurityBase.
+
+All the security utilities that integrate with OpenAPI (and the automatic API docs) inherit from SecurityBase, that's how FastAPI can know how to integrate them in OpenAPI.
+
+It will go and look in the request for that Authorization header, check if the value is Bearer plus some token, and will return the token as a str.
+
+If it doesn't see an Authorization header, or the value doesn't have a Bearer token, it will respond with a 401 status code error (UNAUTHORIZED) directly.
+
+You don't even have to check if the token exists to return an error. You can be sure that if your function is executed, it will have a str in that token.
+
+### Get Current User
+
+In the previous chapter the security system (which is based on the dependency injection system) was giving the path operation function a token as a str
+
+```py
+@app.get("/items/")
+async def read_items(token: Annotated[str, Depends(oauth2_scheme)]):
+    return {"token": token}
+```
+
+But that is still not that useful.
+
+Let's make it give us the current user.
+
+```py
+from typing import Annotated
+
+from fastapi import Depends, FastAPI
+from fastapi.security import OAuth2PasswordBearer
+from pydantic import BaseModel
+
+app = FastAPI()
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+class User(BaseModel):
+    username: str
+    email: str | None = None
+    full_name: str | None = None
+    disabled: bool | None = None
+
+
+def fake_decode_token(token): # 2 Get the user
+    return User(
+        username=token + "fakedecoded", email="john@example.com", full_name="John Doe"
+    )
+
+
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]): # 1 Create a get_current_user dependency
+    user = fake_decode_token(token) # 2 Get the user
+    return user
+
+
+@app.get("/users/me")
+async def read_users_me(current_user: Annotated[User, Depends(get_current_user)]): # 3 Inject the current user
+    return current_user
+```
+
+### Simple OAuth2 with Password and Bearer
+
+```py
+from typing import Annotated
+
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from pydantic import BaseModel
+
+fake_users_db = {
+    "johndoe": {
+        "username": "johndoe",
+        "full_name": "John Doe",
+        "email": "johndoe@example.com",
+        "hashed_password": "fakehashedsecret",
+        "disabled": False,
+    },
+    "alice": {
+        "username": "alice",
+        "full_name": "Alice Wonderson",
+        "email": "alice@example.com",
+        "hashed_password": "fakehashedsecret2",
+        "disabled": True,
+    },
+}
+
+app = FastAPI()
+
+
+def fake_hash_password(password: str):
+    return "fakehashed" + password
+
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+class User(BaseModel):
+    username: str
+    email: str | None = None
+    full_name: str | None = None
+    disabled: bool | None = None
+
+
+class UserInDB(User):
+    hashed_password: str
+
+
+def get_user(db, username: str):
+    if username in db:
+        user_dict = db[username]
+        return UserInDB(**user_dict)
+
+
+def fake_decode_token(token):
+    # This doesn't provide any security at all
+    # Check the next version
+    user = get_user(fake_users_db, token)
+    return user
+
+
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+    user = fake_decode_token(token)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return user
+
+
+async def get_current_active_user(
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    if current_user.disabled:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
+
+
+@app.post("/token")
+async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+    user_dict = fake_users_db.get(form_data.username)
+    if not user_dict:
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+    user = UserInDB(**user_dict)
+    hashed_password = fake_hash_password(form_data.password)
+    if not hashed_password == user.hashed_password:
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+
+    return {"access_token": user.username, "token_type": "bearer"}
+
+
+@app.get("/users/me")
+async def read_users_me(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+):
+    return current_user
+```
+
+OAuth2PasswordRequestForm is a class dependency that declares a form body with:
+
+- The `username`.
+- The `password`.
+- An optional `scope` field as a big string, composed of strings separated by spaces.
+- An optional `grant_type`.
+- An optional `client_id` (we don't need it for our example).
+- An optional `client_secret` (we don't need it for our example).
+
+> Tip
+>
+> The OAuth2 spec actually requires a field `grant_type` with a fixed value of password, but `OAuth2PasswordRequestForm` doesn't enforce it.
+>
+> If you need to enforce it, use `OAuth2PasswordRequestFormStrict` instead of `OAuth2PasswordRequestForm`.
+
+> Info
+>
+> The `OAuth2PasswordRequestForm` is not a special class for FastAPI as is `OAuth2PasswordBearer`.
+>
+> OAuth2PasswordBearer makes FastAPI know that it is a security scheme. So it is added that way to OpenAPI.
+>
+> But `OAuth2PasswordRequestForm` is just a class dependency that you could have written yourself, or you could have declared `Form` parameters directly.
+>
+> But as it's a common use case, it is provided by FastAPI directly, just to make it easier.
+
+>Tip
+>
+>The instance of the dependency class `OAuth2PasswordRequestForm` won't have an attribute `scope` with the long string separated by spaces, instead, it will have a scopes attribute with the actual `list` of strings for each scope sent.
+>
+>We are not using scopes in this example, but the functionality is there if you need it.
+
+**Return** the token. The response of the token endpoint must be a JSON object.
+
+It should have a `token_type`. In our case, as we are using "Bearer" tokens, the token type should be "bearer".
+
+And it should have an `access_token`, with a string containing our access token.
+
+For this simple example, we are going to just be completely insecure and return the same `username` as the token.
+
+>Tip
+>
+>In the next chapter, you will see a real secure implementation, with password hashing and JWT tokens.
+>
+>But for now, let's focus on the specific details we need.
+
+>Tip
+>
+>By the spec, you should return a JSON with an `access_token` and a `token_type`, the same as in this example.
+>
+>This is something that you have to do yourself in your code, and make sure you use those JSON keys.
+>
+>It's almost the only thing that you have to remember to do correctly yourself, to be compliant with the specifications.
+>
+>For the rest, FastAPI handles it for you.
+
+>Info
+>
+>The additional header `WWW-Authenticate` with value Bearer we are returning here is also part of the spec.
+>
+>Any HTTP (error) status code 401 "UNAUTHORIZED" is supposed to also return a WWW-Authenticate header.
+>
+>In the case of bearer tokens (our case), the value of that header should be Bearer.
+>
+>You can actually skip that extra header and it would still work.
+>
+>But it's provided here to be compliant with the specifications.
+>
+>Also, there might be tools that expect and use it (now or in the future) and that might be useful for you or your users, now or in the future.
+>
+>That's the benefit of standards...
+
+### OAuth2 with Password (and hashing), Bearer with JWT tokens
+
+#### About JWT
+
+JWT means "JSON Web Tokens".
+
+It's a standard to codify a JSON object in a long dense string without spaces. It looks like this:
+
+`eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`
+
+It is not encrypted, so, anyone could recover the information from the contents.
+
+But it's signed. So, when you receive a token that you emitted, you can verify that you actually emitted it.
+
+That way, you can create a token with an expiration of, let's say, 1 week. And then when the user comes back the next day with the token, you know that user is still logged in to your system.
+
+After a week, the token will be expired and the user will not be authorized and will have to sign in again to get a new token. And if the user (or a third party) tried to modify the token to change the expiration, you would be able to discover it, because the signatures would not match.
+
+If you want to play with JWT tokens and see how they work, check <https://jwt.io>
+
+#### Install `PyJWT`
+
+We need to install `PyJWT` to generate and verify the JWT tokens in Python
+
+`pip install pyjwt`
+
+>Info
+>
+>If you are planning to use digital signature algorithms like RSA or ECDSA, you should install the cryptography library dependency pyjwt[crypto].
+>
+>You can read more about it in the PyJWT Installation docs
+
+#### Install passlib
+
+`PassLib` is a great Python package to handle password hashes.
+
+It supports many secure hashing algorithms and utilities to work with them.
+
+The recommended algorithm is "Bcrypt"
+
+`pip install "passlib[bcrypt]"`
+
+>Tip
+>
+>With passlib, you could even configure it to be able to read passwords created by Django, a Flask security plug-in or many others.
+>
+>So, you would be able to, for example, share the same data from a Django application in a database with a FastAPI application. Or gradually migrate a Django application using the same database.
+>
+>And your users would be able to login from your Django app or from your FastAPI app, at the same time.
+
+```py
+from datetime import datetime, timedelta, timezone
+from typing import Annotated
+
+import jwt
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jwt.exceptions import InvalidTokenError
+from passlib.context import CryptContext
+from pydantic import BaseModel
+
+# to get a string like this run:
+# openssl rand -hex 32
+SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+
+fake_users_db = {
+    "johndoe": {
+        "username": "johndoe",
+        "full_name": "John Doe",
+        "email": "johndoe@example.com",
+        "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
+        "disabled": False,
+    }
+}
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str | None = None
+
+
+class User(BaseModel):
+    username: str
+    email: str | None = None
+    full_name: str | None = None
+    disabled: bool | None = None
+
+
+class UserInDB(User):
+    hashed_password: str
+
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+app = FastAPI()
+
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+
+def get_user(db, username: str):
+    if username in db:
+        user_dict = db[username]
+        return UserInDB(**user_dict)
+
+
+def authenticate_user(fake_db, username: str, password: str):
+    user = get_user(fake_db, username)
+    if not user:
+        return False
+    if not verify_password(password, user.hashed_password):
+        return False
+    return user
+
+
+def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        token_data = TokenData(username=username)
+    except InvalidTokenError:
+        raise credentials_exception
+    user = get_user(fake_users_db, username=token_data.username)
+    if user is None:
+        raise credentials_exception
+    return user
+
+
+async def get_current_active_user(
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    if current_user.disabled:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
+
+
+@app.post("/token")
+async def login_for_access_token(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+) -> Token:
+    user = authenticate_user(fake_users_db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return Token(access_token=access_token, token_type="bearer")
+
+
+@app.get("/users/me/", response_model=User)
+async def read_users_me(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+):
+    return current_user
+
+
+@app.get("/users/me/items/")
+async def read_own_items(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+):
+    return [{"item_id": "Foo", "owner": current_user.username}]
+```
