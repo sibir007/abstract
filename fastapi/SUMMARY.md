@@ -56,7 +56,7 @@ It will show a JSON starting with something like:
 ...
 ```
 
-Operation¶
+Operation
 
 "Operation" here refers to one of the HTTP "methods".
 
@@ -4910,6 +4910,8 @@ The recommended algorithm is "Bcrypt"
 >
 >And your users would be able to login from your Django app or from your FastAPI app, at the same time.
 
+#### main.py
+
 ```py
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
@@ -4918,14 +4920,14 @@ import jwt
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
-from passlib.context import CryptContext
+from passlib.context import CryptContext # Hash and verify the passwords
 from pydantic import BaseModel
 
 # to get a string like this run:
 # openssl rand -hex 32
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7" # 2 Handle JWT tokens
+ALGORITHM = "HS256" # 2 Handle JWT tokens
+ACCESS_TOKEN_EXPIRE_MINUTES = 30 # 2 Handle JWT tokens
 
 
 fake_users_db = {
@@ -4939,7 +4941,7 @@ fake_users_db = {
 }
 
 
-class Token(BaseModel):
+class Token(BaseModel): # 2 Handle JWT tokens
     access_token: str
     token_type: str
 
@@ -4959,18 +4961,18 @@ class UserInDB(User):
     hashed_password: str
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")  # Hash and verify the passwords
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 app = FastAPI()
 
 
-def verify_password(plain_password, hashed_password):
+def verify_password(plain_password, hashed_password):  # 1 Hash and verify the passwords
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def get_password_hash(password):
+def get_password_hash(password):  # 1 Hash and verify the passwords
     return pwd_context.hash(password)
 
 
@@ -4980,7 +4982,7 @@ def get_user(db, username: str):
         return UserInDB(**user_dict)
 
 
-def authenticate_user(fake_db, username: str, password: str):
+def authenticate_user(fake_db, username: str, password: str):  # 1 Hash and verify the passwords
     user = get_user(fake_db, username)
     if not user:
         return False
@@ -4989,7 +4991,7 @@ def authenticate_user(fake_db, username: str, password: str):
     return user
 
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
+def create_access_token(data: dict, expires_delta: timedelta | None = None): # 2 Handle JWT tokens
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -5000,7 +5002,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]): # 3 Update the dependencies
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -5028,7 +5030,7 @@ async def get_current_active_user(
     return current_user
 
 
-@app.post("/token")
+@app.post("/token") # 4 Update the /token path operation¶
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
@@ -5059,3 +5061,231 @@ async def read_own_items(
 ):
     return [{"item_id": "Foo", "owner": current_user.username}]
 ```
+
+#### 2 Handle JWT tokens
+
+```sh
+$ openssl rand -hex 32
+09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7
+```
+
+- Copy the output to the variable `SECRET_KEY` (don't use the one in the example).
+- Create a variable `ALGORITHM` with the algorithm used to sign the JWT token and set it to "HS256".
+- Create a variable for the expiration of the token.
+- Define a Pydantic Model that will be used in the token endpoint for the response.
+- Create a utility function to generate a new access token
+
+#### 3 Update the dependencies
+
+- Update get_current_user to receive the same token as before, but this time, using JWT tokens.
+- Decode the received token, verify it, and return the current user.
+- If the token is invalid, return an HTTP error right away.
+
+#### 4 Update the /token path operation¶
+
+- Create a timedelta with the expiration time of the token.
+- Create a real JWT access token and return it.
+
+#### Technical details about the JWT "subject" sub
+
+The JWT specification says that there's a key sub, with the subject of the token.
+
+It's optional to use it, but that's where you would put the user's identification, so we are using it here.
+
+JWT might be used for other things apart from identifying a user and allowing them to perform operations directly on your API.
+
+For example, you could identify a "car" or a "blog post".
+
+Then you could add permissions about that entity, like "drive" (for the car) or "edit" (for the blog).
+
+And then, you could give that JWT token to a user (or bot), and they could use it to perform those actions (drive the car, or edit the blog post) without even needing to have an account, just with the JWT token your API generated for that.
+
+Using these ideas, JWT can be used for way more sophisticated scenarios.
+
+In those cases, several of those entities could have the same ID, let's say foo (a user foo, a car foo, and a blog post foo).
+
+So, to avoid ID collisions, when creating the JWT token for the user, you could prefix the value of the sub key, e.g. with username:. So, in this example, the value of sub could have been: username:johndoe.
+
+The important thing to keep in mind is that the sub key should have a unique identifier across the entire application, and it should be a string.
+
+#### Advanced usage with scopes
+
+OAuth2 has the notion of "scopes".
+
+You can use them to add a specific set of permissions to a JWT token.
+
+Then you can give this token to a user directly or a third party, to interact with your API with a set of restrictions.
+
+You can learn how to use them and how they are integrated into FastAPI later in the Advanced User Guide.
+
+### Middleware
+
+You can add middleware to FastAPI applications.
+
+A "middleware" is a function that works with every request before it is processed by any specific path operation. And also with every response before returning it.
+
+- It takes each request that comes to your application.
+- It can then do something to that request or run any needed code.
+- Then it passes the request to be processed by the rest of the application (by some path operation).
+- It then takes the response generated by the application (by some path operation).
+- It can do something to that response or run any needed code.
+- Then it returns the response.
+
+#### Create a middleware
+
+To create a middleware you use the decorator @app.middleware("http") on top of a function.
+
+The middleware function receives:
+
+- The request.
+- A function call_next that will receive the request as a parameter.
+  - This function will pass the request to the corresponding path operation.
+  - Then it returns the response generated by the corresponding path operation.
+- You can then further modify the response before returning it.
+
+> Tip
+>
+>Keep in mind that custom proprietary headers can be added using the 'X-' prefix.
+>
+>But if you have custom headers that you want a client in a browser to be able to see, you need to add them to your CORS configurations (CORS (Cross-Origin Resource Sharing)) using the parameter expose_headers documented in Starlette's CORS docs.
+
+#### Before and after the response¶
+
+You can add code to be run with the request, before any path operation receives it.
+
+And also after the response is generated, before returning it.
+
+For example, you could add a custom header X-Process-Time containing the time in seconds that it took to process the request and generate a response:
+
+```py
+import time
+
+from fastapi import FastAPI, Request
+
+app = FastAPI()
+
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.perf_counter()
+    response = await call_next(request)
+    process_time = time.perf_counter() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
+
+```
+
+>Tip
+>
+>Here we use time.perf_counter() instead of time.time() because it can be more precise for these use cases. 🤓
+
+#### Other middlewares
+
+You can later read more about other middlewares in the [Advanced User Guide: Advanced Middleware](https://fastapi.tiangolo.com/advanced/middleware/ "Advanced User Guide: Advanced Middleware").
+
+You will read about how to handle CORS with a middleware in the next section.
+
+### CORS (Cross-Origin Resource Sharing)
+
+CORS or "Cross-Origin Resource Sharing" refers to the situations when a frontend running in a browser has JavaScript code that communicates with a backend, and the backend is in a different "origin" than the frontend.
+
+#### Origin
+
+An origin is the combination of protocol (http, https), domain (myapp.com, localhost, localhost.tiangolo.com), and port (80, 443, 8080).
+
+So, all these are different origins:
+
+- `http://localhost`
+- `https://localhost`
+- `http://localhost:8080`
+
+Even if they are all in localhost, they use different protocols or ports, so, they are different "origins".
+
+#### Steps
+
+So, let's say you have a frontend running in your browser at http://localhost:8080, and its JavaScript is trying to communicate with a backend running at http://localhost (because we don't specify a port, the browser will assume the default port 80).
+
+Then, the browser will send an HTTP OPTIONS request to the :80-backend, and if the backend sends the appropriate headers authorizing the communication from this different origin (http://localhost:8080) then the :8080-browser will let the JavaScript in the frontend send its request to the :80-backend.
+
+To achieve this, the :80-backend must have a list of "allowed origins".
+
+In this case, the list would have to include http://localhost:8080 for the :8080-frontend to work correctly.
+
+#### Wildcards
+
+It's also possible to declare the list as "*" (a "wildcard") to say that all are allowed.
+
+But that will only allow certain types of communication, excluding everything that involves credentials: Cookies, Authorization headers like those used with Bearer Tokens, etc.
+
+So, for everything to work correctly, it's better to specify explicitly the allowed origins.
+
+#### Use CORSMiddleware
+
+You can configure it in your FastAPI application using the `CORSMiddleware`.
+
+- Import `CORSMiddleware`.
+- Create a list of allowed origins (as strings).
+- Add it as a "middleware" to your FastAPI application.
+
+You can also specify whether your backend allows:
+
+- Credentials (Authorization headers, Cookies, etc).
+- Specific HTTP methods (POST, PUT) or all of them with the wildcard "*".
+- Specific HTTP headers or all of them with the wildcard "*".
+
+```py
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI()
+
+origins = [
+    "http://localhost.tiangolo.com",
+    "https://localhost.tiangolo.com",
+    "http://localhost",
+    "http://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/")
+async def main():
+    return {"message": "Hello World"}
+```
+
+The default parameters used by the CORSMiddleware implementation are restrictive by default, so you'll need to explicitly enable particular origins, methods, or headers, in order for browsers to be permitted to use them in a Cross-Domain context.
+
+The following arguments are supported:
+
+- allow_origins - A list of origins that should be permitted to make cross-origin requests. E.g. ['https://example.org', 'https://www.example.org']. You can use ['*'] to allow any origin.
+- allow_origin_regex - A regex string to match against origins that should be permitted to make cross-origin requests. e.g. 'https://.*\.example\.org'.
+- allow_methods - A list of HTTP methods that should be allowed for cross-origin requests. Defaults to ['GET']. You can use ['*'] to allow all standard methods.
+- allow_headers - A list of HTTP request headers that should be supported for cross-origin requests. Defaults to []. You can use ['*'] to allow all headers. The Accept, Accept-Language, Content-Language and Content-Type headers are always allowed for simple CORS requests.
+- allow_credentials - Indicate that cookies should be supported for cross-origin requests. Defaults to False. Also, allow_origins cannot be set to ['*'] for credentials to be allowed, origins must be specified.
+- expose_headers - Indicate any response headers that should be made accessible to the browser. Defaults to [].
+- max_age - Sets a maximum time in seconds for browsers to cache CORS responses. Defaults to 600.
+
+The middleware responds to two particular types of HTTP request...
+
+#### CORS preflight requests
+
+These are any OPTIONS request with Origin and Access-Control-Request-Method headers.
+
+In this case the middleware will intercept the incoming request and respond with appropriate CORS headers, and either a 200 or 400 response for informational purposes.
+Simple requests¶
+
+Any request with an Origin header. In this case the middleware will pass the request through as normal, but will include appropriate CORS headers on the response.
+More info¶
+
+For more info about CORS, check the [Mozilla CORS documentation](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
+
+### SQL (Relational) Databases
+
+<https://fastapi.tiangolo.com/tutorial/sql-databases/#sql-relational-databases>
