@@ -5081,7 +5081,7 @@ $ openssl rand -hex 32
 - Decode the received token, verify it, and return the current user.
 - If the token is invalid, return an HTTP error right away.
 
-#### 4 Update the /token path operation¶
+#### 4 Update the /token path operation
 
 - Create a timedelta with the expiration time of the token.
 - Create a real JWT access token and return it.
@@ -5289,3 +5289,63 @@ For more info about CORS, check the [Mozilla CORS documentation](https://develop
 ### SQL (Relational) Databases
 
 <https://fastapi.tiangolo.com/tutorial/sql-databases/#sql-relational-databases>
+
+### Bigger Applications - Multiple Files
+
+#### An example file structure
+
+```sh
+.
+├── app                  # "app" is a Python package
+│   ├── __init__.py      # this file makes "app" a "Python package"
+│   ├── main.py          # "main" module, e.g. import app.main
+│   ├── dependencies.py  # "dependencies" module, e.g. import app.dependencies
+│   └── routers          # "routers" is a "Python subpackage"
+│   │   ├── __init__.py  # makes "routers" a "Python subpackage"
+│   │   ├── items.py     # "items" submodule, e.g. import app.routers.items
+│   │   └── users.py     # "users" submodule, e.g. import app.routers.users
+│   └── internal         # "internal" is a "Python subpackage"
+│       ├── __init__.py  # makes "internal" a "Python subpackage"
+│       └── admin.py     # "admin" submodule, e.g. import app.internal.admin
+```
+
+```py
+# app/routers/users.py
+
+from fastapi import APIRouter # 1 Import APIRouter
+
+router = APIRouter()
+
+
+@router.get("/users/", tags=["users"]) # 2 Path operations with APIRouter
+async def read_users():
+    return [{"username": "Rick"}, {"username": "Morty"}]
+
+
+@router.get("/users/me", tags=["users"]) # 2 Path operations with APIRouter
+async def read_user_me():
+    return {"username": "fakecurrentuser"}
+
+
+@router.get("/users/{username}", tags=["users"]) # 2 Path operations with APIRouter
+async def read_user(username: str):
+    return {"username": username}
+```
+
+```py
+# app/dependencies.py
+
+from typing import Annotated
+
+from fastapi import Header, HTTPException
+
+
+async def get_token_header(x_token: Annotated[str, Header()]):
+    if x_token != "fake-super-secret-token":
+        raise HTTPException(status_code=400, detail="X-Token header invalid")
+
+
+async def get_query_token(token: str):
+    if token != "jessica":
+        raise HTTPException(status_code=400, detail="No Jessica token provided")
+```
