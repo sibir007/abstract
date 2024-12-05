@@ -6940,4 +6940,267 @@ The next sections assume you already read the main [Tutorial - User Guide: Secur
 
 ### OAuth2 scopes
 
-<https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/#oauth2-scopes>
+```py
+from datetime import datetime, timedelta, timezone
+from typing import Annotated
+
+import jwt
+from fastapi import Depends, FastAPI, HTTPException, Security, status
+from fastapi.security import (
+    OAuth2PasswordBearer,
+    OAuth2PasswordRequestForm,
+    SecurityScopes,
+)
+from jwt.exceptions import InvalidTokenError
+from passlib.context import CryptContext
+from pydantic import BaseModel, ValidationError
+
+# to get a string like this run:
+# openssl rand -hex 32
+SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+
+fake_users_db = {
+    "johndoe": {
+        "username": "johndoe",
+        "full_name": "John Doe",
+        "email": "johndoe@example.com",
+        "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
+        "disabled": False,
+    },
+    "alice": {
+        "username": "alice",
+        "full_name": "Alice Chains",
+        "email": "alicechains@example.com",
+        "hashed_password": "$2b$12$gSvqqUPvlXP2tfVFaWK1Be7DlH.PKZbv5H8KnzzVgXXbVxpva.pFm",
+        "disabled": True,
+    },
+}
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str | None = None
+    scopes: list[str] = []
+
+
+class User(BaseModel):
+    username: str
+    email: str | None = None
+    full_name: str | None = None
+    disabled: bool | None = None
+
+
+class UserInDB(User):
+    hashed_password: str
+
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="token",
+    scopes={"me": "Read information about the current user.", "items": "Read items."},
+)
+
+app = FastAPI()
+
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+
+def get_user(db, username: str):
+    if username in db:
+        user_dict = db[username]
+        return UserInDB(**user_dict)
+
+
+def authenticate_user(fake_db, username: str, password: str):
+    user = get_user(fake_db, username)
+    if not user:
+        return False
+    if not verify_password(password, user.hashed_password):
+        return False
+    return user
+
+
+def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+
+async def get_current_user(
+    security_scopes: SecurityScopes, token: Annotated[str, Depends(oauth2_scheme)]
+):
+    if security_scopes.scopes:
+        authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
+    else:
+        authenticate_value = "Bearer"
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": authenticate_value},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        token_scopes = payload.get("scopes", [])
+        token_data = TokenData(scopes=token_scopes, username=username)
+    except (InvalidTokenError, ValidationError):
+        raise credentials_exception
+    user = get_user(fake_users_db, username=token_data.username)
+    if user is None:
+        raise credentials_exception
+    for scope in security_scopes.scopes:
+        if scope not in token_data.scopes:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Not enough permissions",
+                headers={"WWW-Authenticate": authenticate_value},
+            )
+    return user
+
+
+async def get_current_active_user(
+    current_user: Annotated[User, Security(get_current_user, scopes=["me"])],
+):
+    if current_user.disabled:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
+
+
+@app.post("/token")
+async def login_for_access_token(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+) -> Token:
+    user = authenticate_user(fake_users_db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username, "scopes": form_data.scopes},
+        expires_delta=access_token_expires,
+    )
+    return Token(access_token=access_token, token_type="bearer")
+
+
+@app.get("/users/me/", response_model=User)
+async def read_users_me(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+):
+    return current_user
+
+
+@app.get("/users/me/items/")
+async def read_own_items(
+    current_user: Annotated[User, Security(get_current_active_user, scopes=["items"])],
+):
+    return [{"item_id": "Foo", "owner": current_user.username}]
+
+
+@app.get("/status/")
+async def read_system_status(current_user: Annotated[User, Depends(get_current_user)]):
+    return {"status": "ok"}
+```
+
+Dependency tree and scopes¶
+
+Let's review again this dependency tree and the scopes.
+
+As the get_current_active_user dependency has as a sub-dependency on get_current_user, the scope "me" declared at get_current_active_user will be included in the list of required scopes in the security_scopes.scopes passed to get_current_user.
+
+The path operation itself also declares a scope, "items", so this will also be in the list of security_scopes.scopes passed to get_current_user.
+
+Here's how the hierarchy of dependencies and scopes looks like:
+
+- The path operation read_own_items has:
+  - Required scopes `["items"]` with the dependency:
+  - get_current_active_user:
+    - The dependency function get_current_active_user has:
+      - Required scopes `["me"]` with the dependency:
+      - get_current_user:
+        - The dependency function get_current_user has:
+            -No scopes required by itself.
+          - A dependency using oauth2_scheme.
+          - A security_scopes parameter of type SecurityScopes:
+            - This security_scopes parameter has a property scopes with a list containing all these scopes declared above, so:
+              - security_scopes.scopes will contain `["me", "items"]` for the path operation read_own_items.
+              - security_scopes.scopes will contain `["me"]` for the path operation read_users_me, because it is declared in the dependency get_current_active_user.
+              - security_scopes.scopes will contain `[]` (nothing) for the path operation read_system_status, because it didn't declare any Security with scopes, and its dependency, get_current_user, doesn't declare any scopes either.
+
+>Tip
+>
+>The important and "magic" thing here is that get_current_user will have a different list of scopes to check for each path operation.
+>
+>All depending on the scopes declared in each path operation and each dependency in the dependency tree for that specific path operation.
+
+If you open the API docs, you can authenticate and specify which scopes you want to authorize.
+
+If you don't select any scope, you will be "authenticated", but when you try to access `/users/me/` or `/users/me/items/` you will get an error saying that you don't have enough permissions. You will still be able to access `/status/`.
+
+And if you select the scope me but not the scope items, you will be able to access `/users/me/` but not `/users/me/items/`.
+
+That's what would happen to a third party application that tried to access one of these path operations with a token provided by a user, depending on how many permissions the user gave the application.
+
+#### About third party integrations¶
+
+In this example we are using the OAuth2 "password" flow.
+
+This is appropriate when we are logging in to our own application, probably with our own frontend.
+
+Because we can trust it to receive the username and password, as we control it.
+
+But if you are building an OAuth2 application that others would connect to (i.e., if you are building an authentication provider equivalent to Facebook, Google, GitHub, etc.) you should use one of the other flows.
+
+The most common is the implicit flow.
+
+The most secure is the code flow, but it's more complex to implement as it requires more steps. As it is more complex, many providers end up suggesting the implicit flow.
+
+### HTTP Basic Auth
+
+
+For the simplest cases, you can use HTTP Basic Auth.
+
+In HTTP Basic Auth, the application expects a header that contains a username and a password.
+
+If it doesn't receive it, it returns an HTTP 401 "Unauthorized" error.
+
+And returns a header WWW-Authenticate with a value of Basic, and an optional realm parameter.
+
+That tells the browser to show the integrated prompt for a username and password.
+
+Then, when you type that username and password, the browser sends them in the header automatically.
+
+```py
+from typing import Annotated
+
+from fastapi import Depends, FastAPI
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+
+app = FastAPI()
+
+security = HTTPBasic()
+
+
+@app.get("/users/me")
+def read_current_user(credentials: Annotated[HTTPBasicCredentials, Depends(security)]):
+    return {"username": credentials.username, "password": credentials.password}
+```
