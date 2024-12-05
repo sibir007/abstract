@@ -5309,8 +5309,9 @@ For more info about CORS, check the [Mozilla CORS documentation](https://develop
 │       └── admin.py     # "admin" submodule, e.g. import app.internal.admin
 ```
 
+#### app/routers/users.py
+
 ```py
-# app/routers/users.py
 
 from fastapi import APIRouter # 1 Import APIRouter
 
@@ -5332,8 +5333,9 @@ async def read_user(username: str):
     return {"username": username}
 ```
 
+#### app/dependencies.py
+
 ```py
-# app/dependencies.py
 
 from typing import Annotated
 
@@ -5349,3 +5351,1593 @@ async def get_query_token(token: str):
     if token != "jessica":
         raise HTTPException(status_code=400, detail="No Jessica token provided")
 ```
+
+#### app/routers/items.py
+
+```py
+
+rom fastapi import APIRouter, Depends, HTTPException
+
+from ..dependencies import get_token_header
+
+router = APIRouter(
+    prefix="/items",
+    tags=["items"],
+    dependencies=[Depends(get_token_header)],
+    responses={404: {"description": "Not found"}},
+)
+
+
+fake_items_db = {"plumbus": {"name": "Plumbus"}, "gun": {"name": "Portal Gun"}}
+
+
+@router.get("/")
+async def read_items():
+    return fake_items_db
+
+
+@router.get("/{item_id}")
+async def read_item(item_id: str):
+    if item_id not in fake_items_db:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return {"name": fake_items_db[item_id]["name"], "item_id": item_id}
+
+
+@router.put(
+    "/{item_id}",
+    tags=["custom"],
+    responses={403: {"description": "Operation forbidden"}},
+)
+async def update_item(item_id: str):
+    if item_id != "plumbus":
+        raise HTTPException(
+            status_code=403, detail="You can only update the item: plumbus"
+        )
+    return {"item_id": item_id, "name": "The great Plumbus"}
+```
+
+#### app/main.py
+
+```py
+from fastapi import Depends, FastAPI
+
+from .dependencies import get_query_token, get_token_header
+from .internal import admin
+from .routers import items, users
+
+app = FastAPI(dependencies=[Depends(get_query_token)])
+
+
+app.include_router(users.router)
+app.include_router(items.router)
+app.include_router(
+    admin.router,
+    prefix="/admin",
+    tags=["admin"],
+    dependencies=[Depends(get_token_header)],
+    responses={418: {"description": "I'm a teapot"}},
+)
+
+
+@app.get("/")
+async def root():
+    return {"message": "Hello Bigger Applications!"}
+```
+
+#### app/internal/admin.py
+
+```py
+from fastapi import APIRouter
+
+router = APIRouter()
+
+
+@router.post("/")
+async def update_admin():
+    return {"message": "Admin getting schwifty"}
+```
+
+#### fastapi dev app/main.py
+
+<http://127.0.0.1:8000/docs>
+
+#### Include the same router multiple times with different prefix¶
+
+You can also use `.include_router()` multiple times with the same router using different prefixes.
+
+This could be useful, for example, to expose the same API under different prefixes, e.g. /api/v1 and /api/latest.
+
+This is an advanced usage that you might not really need, but it's there in case you do.
+
+#### Include an APIRouter in another
+
+The same way you can include an APIRouter in a FastAPI application, you can include an APIRouter in another APIRouter using:
+
+router.include_router(other_router)
+
+Make sure you do it before including router in the FastAPI app, so that the path operations from other_router are also included.
+
+### Background Tasks
+
+You can define background tasks to be run after returning a response.
+
+This is useful for operations that need to happen after a request, but that the client doesn't really have to be waiting for the operation to complete before receiving the response.
+
+This includes, for example:
+
+-Email notifications sent after performing an action:
+  -As connecting to an email server and sending an email tends to be "slow" (several seconds), you can return the response right away and send the email notification in the background.
+-Processing data:
+  -For example, let's say you receive a file that must go through a slow process, you can return a response of "Accepted" (HTTP 202) and process the file in the background.
+
+```py
+from fastapi import BackgroundTasks, FastAPI
+
+app = FastAPI()
+
+
+def write_notification(email: str, message=""):
+    with open("log.txt", mode="w") as email_file:
+        content = f"notification for {email}: {message}"
+        email_file.write(content)
+
+
+@app.post("/send-notification/{email}")
+async def send_notification(email: str, background_tasks: BackgroundTasks):
+    background_tasks.add_task(write_notification, email, message="some notification")
+    return {"message": "Notification sent in the background"}
+
+```
+
+#### Dependency Injection
+
+Using BackgroundTasks also works with the dependency injection system, you can declare a parameter of type BackgroundTasks at multiple levels: in a path operation function, in a dependency (dependable), in a sub-dependency, etc.
+
+FastAPI knows what to do in each case and how to reuse the same object, so that all the background tasks are merged together and are run in the background afterwards:
+
+```py
+from typing import Annotated
+
+from fastapi import BackgroundTasks, Depends, FastAPI
+
+app = FastAPI()
+
+
+def write_log(message: str):
+    with open("log.txt", mode="a") as log:
+        log.write(message)
+
+
+def get_query(background_tasks: BackgroundTasks, q: str | None = None):
+    if q:
+        message = f"found query: {q}\n"
+        background_tasks.add_task(write_log, message)
+    return q
+
+
+@app.post("/send-notification/{email}")
+async def send_notification(
+    email: str, background_tasks: BackgroundTasks, q: Annotated[str, Depends(get_query)]
+):
+    message = f"message to {email}\n"
+    background_tasks.add_task(write_log, message)
+    return {"message": "Message sent"}
+
+```
+
+In this example, the messages will be written to the log.txt file after the response is sent.
+
+If there was a query in the request, it will be written to the log in a background task.
+
+And then another background task generated at the path operation function will write a message using the email path parameter.
+
+#### Caveat
+
+If you need to perform heavy background computation and you don't necessarily need it to be run by the same process (for example, you don't need to share memory, variables, etc), you might benefit from using other bigger tools like [Celery](https://docs.celeryq.dev/).
+
+They tend to require more complex configurations, a message/job queue manager, like RabbitMQ or Redis, but they allow you to run background tasks in multiple processes, and especially, in multiple servers.
+
+But if you need to access variables and objects from the same FastAPI app, or you need to perform small background tasks (like sending an email notification), you can simply just use BackgroundTasks.
+
+### Metadata and Docs URLs
+
+```py
+from fastapi import FastAPI
+
+# You can write Markdown in the description field and it will be rendered in the output.
+description = """
+ChimichangApp API helps you do awesome stuff. 🚀
+
+## Items
+
+You can **read items**.
+
+## Users
+
+You will be able to:
+
+* **Create users** (_not implemented_).
+* **Read users** (_not implemented_).
+"""
+
+app = FastAPI(
+    title="ChimichangApp",
+    description=description,
+    summary="Deadpool's favorite app. Nuff said.",
+    version="0.0.1",
+    terms_of_service="http://example.com/terms/",
+    contact={
+        "name": "Deadpoolio the Amazing",
+        "url": "http://x-force.example.com/contact/",
+        "email": "dp@x-force.example.com",
+    },
+    license_info={ # License identifier
+        "name": "Apache 2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
+    },
+)
+
+
+@app.get("/items/")
+async def read_items():
+    return [{"name": "Katana"}]
+
+```
+
+#### Metadata for tags
+
+```py
+
+
+from fastapi import FastAPI
+
+tags_metadata = [
+    {
+        "name": "users",
+        "description": "Operations with users. The **login** logic is also here.",
+    },
+    {
+        "name": "items",
+        "description": "Manage items. So _fancy_ they have their own docs.",
+        "externalDocs": {
+            "description": "Items external docs",
+            "url": "https://fastapi.tiangolo.com/",
+        },
+    },
+]
+
+app = FastAPI(openapi_tags=tags_metadata)
+
+
+@app.get("/users/", tags=["users"]) # Use your tags
+async def get_users():
+    return [{"name": "Harry"}, {"name": "Ron"}]
+
+
+@app.get("/items/", tags=["items"]) # Use your tags
+async def get_items():
+    return [{"name": "wand"}, {"name": "flying broom"}]
+```
+
+#### OpenAPI URL
+
+By default, the OpenAPI schema is served at /openapi.json.
+
+But you can configure it with the parameter openapi_url.
+
+For example, to set it to be served at /api/v1/openapi.json:
+
+```py
+from fastapi import FastAPI
+
+app = FastAPI(openapi_url="/api/v1/openapi.json")
+
+
+@app.get("/items/")
+async def read_items():
+    return [{"name": "Foo"}]
+```
+
+If you want to disable the OpenAPI schema completely you can set `openapi_url=None`, that will also disable the documentation user interfaces that use it.
+
+#### Docs URLs
+
+You can configure the two documentation user interfaces included:
+
+- Swagger UI: served at /docs.
+  - You can set its URL with the parameter docs_url.
+  - You can disable it by setting docs_url=None.
+- ReDoc: served at /redoc.
+  - You can set its URL with the parameter redoc_url.
+  - You can disable it by setting redoc_url=None.
+
+For example, to set Swagger UI to be served at /documentation and disable ReDoc:
+
+```py
+from fastapi import FastAPI
+
+app = FastAPI(docs_url="/documentation", redoc_url=None)
+
+
+@app.get("/items/")
+async def read_items():
+    return [{"name": "Foo"}]
+```
+
+### Static Files
+
+```py
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles # 1 Use StaticFiles
+
+app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="static"), name="static") # 1 Use StaticFiles
+```
+
+#### Details
+
+The first `"/static"` refers to the sub-path this "sub-application" will be "mounted" on. So, any path that starts with "/static" will be handled by it.
+
+The `directory="static`" refers to the name of the directory that contains your static files.
+
+The `name="static"` gives it a name that can be used internally by FastAPI.
+
+All these parameters can be different than "static", adjust them with the needs and specific details of your own application.
+
+For more details and options check [Starlette's docs about Static Files](https://www.starlette.io/staticfiles/).
+
+### Testing 
+
+Thanks to [Starlette](https://www.starlette.io/testclient/), testing FastAPI applications is easy and enjoyable.
+
+It is based on [HTTPX](https://www.python-httpx.org/), which in turn is designed based on Requests, so it's very familiar and intuitive.
+
+With it, you can use [pytest](pytest) directly with FastAPI.
+
+```py
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+
+app = FastAPI()
+
+
+@app.get("/")
+async def read_main():
+    return {"msg": "Hello World"}
+
+
+client = TestClient(app)
+
+
+def test_read_main():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json() == {"msg": "Hello World"}
+```
+
+>Tip
+>
+>If you want to call async functions in your tests apart from sending requests to your FastAPI application (e.g. asynchronous database functions), have a look at the [Async Tests](https://fastapi.tiangolo.com/advanced/async-tests/) in the advanced tutorial.
+
+```sh
+.
+├── app
+│   ├── __init__.py
+│   ├── main.py
+│   └── test_main.py
+
+```
+
+```py
+# app/main.py
+from typing import Annotated
+
+from fastapi import FastAPI, Header, HTTPException
+from pydantic import BaseModel
+
+fake_secret_token = "coneofsilence"
+
+fake_db = {
+    "foo": {"id": "foo", "title": "Foo", "description": "There goes my hero"},
+    "bar": {"id": "bar", "title": "Bar", "description": "The bartenders"},
+}
+
+app = FastAPI()
+
+
+class Item(BaseModel):
+    id: str
+    title: str
+    description: str | None = None
+
+
+@app.get("/items/{item_id}", response_model=Item)
+async def read_main(item_id: str, x_token: Annotated[str, Header()]):
+    if x_token != fake_secret_token:
+        raise HTTPException(status_code=400, detail="Invalid X-Token header")
+    if item_id not in fake_db:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return fake_db[item_id]
+
+
+@app.post("/items/", response_model=Item)
+async def create_item(item: Item, x_token: Annotated[str, Header()]):
+    if x_token != fake_secret_token:
+        raise HTTPException(status_code=400, detail="Invalid X-Token header")
+    if item.id in fake_db:
+        raise HTTPException(status_code=409, detail="Item already exists")
+    fake_db[item.id] = item
+    return item
+```
+
+```py
+# app/test_main.py
+from fastapi.testclient import TestClient
+
+from .main import app
+
+client = TestClient(app)
+
+
+def test_read_item():
+    response = client.get("/items/foo", headers={"X-Token": "coneofsilence"})
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": "foo",
+        "title": "Foo",
+        "description": "There goes my hero",
+    }
+
+
+def test_read_item_bad_token():
+    response = client.get("/items/foo", headers={"X-Token": "hailhydra"})
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Invalid X-Token header"}
+
+
+def test_read_nonexistent_item():
+    response = client.get("/items/baz", headers={"X-Token": "coneofsilence"})
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Item not found"}
+
+
+def test_create_item():
+    response = client.post(
+        "/items/",
+        headers={"X-Token": "coneofsilence"},
+        json={"id": "foobar", "title": "Foo Bar", "description": "The Foo Barters"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": "foobar",
+        "title": "Foo Bar",
+        "description": "The Foo Barters",
+    }
+
+
+def test_create_item_bad_token():
+    response = client.post(
+        "/items/",
+        headers={"X-Token": "hailhydra"},
+        json={"id": "bazz", "title": "Bazz", "description": "Drop the bazz"},
+    )
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Invalid X-Token header"}
+
+
+def test_create_existing_item():
+    response = client.post(
+        "/items/",
+        headers={"X-Token": "coneofsilence"},
+        json={
+            "id": "foo",
+            "title": "The Foo ID Stealers",
+            "description": "There goes my stealer",
+        },
+    )
+    assert response.status_code == 409
+    assert response.json() == {"detail": "Item already exists"}
+
+```
+
+### Debugging
+
+#### Call uvicorn
+
+```py
+import uvicorn
+from fastapi import FastAPI
+
+app = FastAPI()
+
+
+@app.get("/")
+def root():
+    a = "a"
+    b = "b" + a
+    return {"hello world": b}
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+```
+
+#### Run your code with your debugger
+
+For example, in Visual Studio Code, you can:
+
+- Go to the "Debug" panel.
+- "Add configuration...".
+- Select "Python"
+- Run the debugger with the option "Python: Current File (Integrated Terminal)".
+
+## Advanced User Guide
+
+### Path Operation Advanced Configuration 
+
+#### Exclude from OpenAPI
+
+```py
+from fastapi import FastAPI
+
+app = FastAPI()
+
+
+@app.get("/items/", include_in_schema=False)
+async def read_items():
+    return [{"item_id": "Foo"}]
+```
+
+#### Advanced description from docstring
+
+You can limit the lines used from the docstring of a path operation function for OpenAPI.
+
+Adding an `\f` (an escaped "form feed" character) causes FastAPI to truncate the output used for OpenAPI at this point.
+
+```py
+from typing import Set, Union
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+class Item(BaseModel):
+    name: str
+    description: Union[str, None] = None
+    price: float
+    tax: Union[float, None] = None
+    tags: Set[str] = set()
+
+
+@app.post("/items/", response_model=Item, summary="Create an item")
+async def create_item(item: Item):
+    """
+    Create an item with all the information:
+
+    - **name**: each item must have a name
+    - **description**: a long description
+    - **price**: required
+    - **tax**: if the item doesn't have tax, you can omit this
+    - **tags**: a set of unique tag strings for this item
+    \f 
+    :param item: User input.
+    """
+    return item
+```
+
+#### Additional Responses
+
+##### Additional Response with model
+
+```py
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+
+
+class Item(BaseModel):
+    id: str
+    value: str
+
+
+class Message(BaseModel):
+    message: str
+
+
+app = FastAPI()
+
+
+@app.get("/items/{item_id}", response_model=Item, responses={404: {"model": Message}})
+async def read_item(item_id: str):
+    if item_id == "foo":
+        return {"id": "foo", "value": "there goes my hero"}
+    return JSONResponse(status_code=404, content={"message": "Item not found"})
+
+```
+
+The generated responses in the OpenAPI for this path operation will be:
+
+```json
+{
+    "responses": {
+        "404": {
+            "description": "Additional Response",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "$ref": "#/components/schemas/Message"
+                    }
+                }
+            }
+        },
+        "200": {
+            "description": "Successful Response",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "$ref": "#/components/schemas/Item"
+                    }
+                }
+            }
+        },
+        "422": {
+            "description": "Validation Error",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "$ref": "#/components/schemas/HTTPValidationError"
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+The schemas are referenced to another place inside the OpenAPI schema:
+
+```json
+{
+    "components": {
+        "schemas": {
+            "Message": {
+                "title": "Message",
+                "required": [
+                    "message"
+                ],
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "title": "Message",
+                        "type": "string"
+                    }
+                }
+            },
+            "Item": {
+                "title": "Item",
+                "required": [
+                    "id",
+                    "value"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "title": "Id",
+                        "type": "string"
+                    },
+                    "value": {
+                        "title": "Value",
+                        "type": "string"
+                    }
+                }
+            },
+            "ValidationError": {
+                "title": "ValidationError",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "type": "object",
+                "properties": {
+                    "loc": {
+                        "title": "Location",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "msg": {
+                        "title": "Message",
+                        "type": "string"
+                    },
+                    "type": {
+                        "title": "Error Type",
+                        "type": "string"
+                    }
+                }
+            },
+            "HTTPValidationError": {
+                "title": "HTTPValidationError",
+                "type": "object",
+                "properties": {
+                    "detail": {
+                        "title": "Detail",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+```
+
+##### Additional media types for the main response
+
+You can use this same responses parameter to add different media types for the same main response.
+
+For example, you can add an additional media type of image/png, declaring that your path operation can return a JSON object (with media type application/json) or a PNG image:
+
+```py
+from typing import Union
+
+from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from pydantic import BaseModel
+
+
+class Item(BaseModel):
+    id: str
+    value: str
+
+
+app = FastAPI()
+
+
+@app.get(
+    "/items/{item_id}",
+    response_model=Item,
+    responses={
+        200: {
+            "content": {"image/png": {}},
+            "description": "Return the JSON item or an image.",
+        }
+    },
+)
+async def read_item(item_id: str, img: Union[bool, None] = None):
+    if img:
+        return FileResponse("image.png", media_type="image/png")
+    else:
+        return {"id": "foo", "value": "there goes my hero"}
+```
+
+##### Combining information
+
+You can also combine response information from multiple places, including the response_model, status_code, and responses parameters.
+
+You can declare a response_model, using the default status code 200 (or a custom one if you need), and then declare additional information for that same response in responses, directly in the OpenAPI schema.
+
+FastAPI will keep the additional information from responses, and combine it with the JSON Schema from your model.
+
+For example, you can declare a response with a status code 404 that uses a Pydantic model and has a custom description.
+
+And a response with a status code 200 that uses your response_model, but includes a custom example:
+
+```py
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+
+
+class Item(BaseModel):
+    id: str
+    value: str
+
+
+class Message(BaseModel):
+    message: str
+
+
+app = FastAPI()
+
+
+@app.get(
+    "/items/{item_id}",
+    response_model=Item,
+    responses={
+        404: {"model": Message, "description": "The item was not found"},
+        200: {
+            "description": "Item requested by ID",
+            "content": {
+                "application/json": {
+                    "example": {"id": "bar", "value": "The bar tenders"}
+                }
+            },
+        },
+    },
+)
+async def read_item(item_id: str):
+    if item_id == "foo":
+        return {"id": "foo", "value": "there goes my hero"}
+    else:
+        return JSONResponse(status_code=404, content={"message": "Item not found"})
+```
+
+##### Combine predefined responses and custom ones
+
+```py
+from typing import Union
+
+from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from pydantic import BaseModel
+
+
+class Item(BaseModel):
+    id: str
+    value: str
+
+
+responses = {
+    404: {"description": "Item not found"},
+    302: {"description": "The item was moved"},
+    403: {"description": "Not enough privileges"},
+}
+
+
+app = FastAPI()
+
+
+@app.get(
+    "/items/{item_id}",
+    response_model=Item,
+    responses={**responses, 200: {"content": {"image/png": {}}}},
+)
+async def read_item(item_id: str, img: Union[bool, None] = None):
+    if img:
+        return FileResponse("image.png", media_type="image/png")
+    else:
+        return {"id": "foo", "value": "there goes my hero"}
+```
+
+#### OpenAPI Extra
+
+<https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/#openapi-extra>
+
+### Additional Status Codes
+
+By default, FastAPI will return the responses using a `JSONResponse`, putting the content you return from your path operation inside of that `JSONResponse`.
+
+It will use the default status code or the one you set in your path operation.
+
+If you want to return additional status codes apart from the main one, you can do that by returning a Response directly, like a JSONResponse, and set the additional status code directly.
+
+For example, let's say that you want to have a path operation that allows to update items, and returns HTTP status codes of 200 "OK" when successful.
+
+But you also want it to accept new items. And when the items didn't exist before, it creates them, and returns an HTTP status code of 201 "Created".
+
+To achieve that, import JSONResponse, and return your content there directly, setting the status_code that you want:
+
+```py
+from typing import Annotated
+
+from fastapi import Body, FastAPI, status
+from fastapi.responses import JSONResponse
+
+app = FastAPI()
+
+items = {"foo": {"name": "Fighters", "size": 6}, "bar": {"name": "Tenders", "size": 3}}
+
+
+@app.put("/items/{item_id}")
+async def upsert_item(
+    item_id: str,
+    name: Annotated[str | None, Body()] = None,
+    size: Annotated[int | None, Body()] = None,
+):
+    if item_id in items:
+        item = items[item_id]
+        item["name"] = name
+        item["size"] = size
+        return item
+    else:
+        item = {"name": name, "size": size}
+        items[item_id] = item
+        return JSONResponse(status_code=status.HTTP_201_CREATED, content=item)
+```
+
+#### OpenAPI and API docs
+
+If you return additional status codes and responses directly, they won't be included in the OpenAPI schema (the API docs), because FastAPI doesn't have a way to know beforehand what you are going to return.
+
+But you can document that in your code, using: [Additional Responses](#### Additional Responses)
+
+### Return a Response Directly
+
+When you return a Response directly its data is not validated, converted (serialized), nor documented automatically.
+
+But you can still document it as described in Additional Responses in OpenAPI
+
+#### Using the jsonable_encoder in a Response
+
+When you create a FastAPI path operation you can normally return any data from it: a dict, a list, a Pydantic model, a database model, etc.
+
+By default, FastAPI would automatically convert that return value to JSON using the jsonable_encoder explained in JSON Compatible Encoder.
+
+Then, behind the scenes, it would put that JSON-compatible data (e.g. a dict) inside of a JSONResponse that would be used to send the response to the client.
+
+But you can return a JSONResponse directly from your path operations.
+
+It might be useful, for example, to return custom headers or cookies.
+
+You cannot put a Pydantic model in a JSONResponse without first converting it to a dict with all the data types (like datetime, UUID, etc) converted to JSON-compatible types.
+
+For those cases, you can use the jsonable_encoder to convert your data before passing it to a response:
+
+```py
+from datetime import datetime
+from typing import Union
+
+from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+
+
+class Item(BaseModel):
+    title: str
+    timestamp: datetime
+    description: Union[str, None] = None
+
+
+app = FastAPI()
+
+
+@app.put("/items/{id}")
+def update_item(id: str, item: Item):
+    json_compatible_item_data = jsonable_encoder(item)
+    return JSONResponse(content=json_compatible_item_data)
+```
+
+#### Returning a custom Response
+
+he example above shows all the parts you need, but it's not very useful yet, as you could have just returned the item directly, and FastAPI would put it in a JSONResponse for you, converting it to a dict, etc. All that by default.
+
+Now, let's see how you could use that to return a custom response.
+
+Let's say that you want to return an XML response.
+
+You could put your XML content in a string, put that in a Response, and return it:
+
+```py
+from fastapi import FastAPI, Response
+
+app = FastAPI()
+
+
+@app.get("/legacy/")
+def get_legacy_data():
+    data = """<?xml version="1.0"?>
+    <shampoo>
+    <Header>
+        Apply shampoo here.
+    </Header>
+    <Body>
+        You'll have to use soap here.
+    </Body>
+    </shampoo>
+    """
+    return Response(content=data, media_type="application/xml")
+
+```
+
+### Custom Response - HTML, Stream, File, others
+
+#### Use ORJSONResponse
+
+```py
+from fastapi import FastAPI
+from fastapi.responses import ORJSONResponse
+
+app = FastAPI()
+
+
+@app.get("/items/", response_class=ORJSONResponse)
+async def read_items():
+    return ORJSONResponse([{"item_id": "Foo"}])
+
+```
+
+#### HTML Response
+
+```py
+
+
+from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
+
+app = FastAPI()
+
+
+@app.get("/items/", response_class=HTMLResponse)
+async def read_items():
+    return """
+    <html>
+        <head>
+            <title>Some HTML in here</title>
+        </head>
+        <body>
+            <h1>Look ma! HTML!</h1>
+        </body>
+    </html>
+    """
+```
+
+If you want to override the response from inside of the function but at the same time document the "media type" in OpenAPI, you can use the response_class parameter AND return a Response object.
+
+```py
+from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
+
+app = FastAPI()
+
+
+def generate_html_response():
+    html_content = """
+    <html>
+        <head>
+            <title>Some HTML in here</title>
+        </head>
+        <body>
+            <h1>Look ma! HTML!</h1>
+        </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content, status_code=200)
+
+
+@app.get("/items/", response_class=HTMLResponse)
+async def read_items():
+    return generate_html_response()
+```
+
+#### Available responses
+
+##### Response
+
+The main Response class, all the other responses inherit from it.
+
+You can return it directly.
+
+It accepts the following parameters:
+
+- content - A str or bytes.
+- status_code - An int HTTP status code.
+- headers - A dict of strings.
+- media_type - A str giving the media type. E.g. "text/html".
+
+FastAPI (actually Starlette) will automatically include a Content-Length header. It will also include a Content-Type header, based on the media_type and appending a charset for text types.
+
+```py
+from fastapi import FastAPI, Response
+
+app = FastAPI()
+
+
+@app.get("/legacy/")
+def get_legacy_data():
+    data = """<?xml version="1.0"?>
+    <shampoo>
+    <Header>
+        Apply shampoo here.
+    </Header>
+    <Body>
+        You'll have to use soap here.
+    </Body>
+    </shampoo>
+    """
+    return Response(content=data, media_type="application/xml")
+```
+
+##### HTMLResponse¶
+
+Takes some text or bytes and returns an HTML response, as you read above.
+
+##### PlainTextResponse
+
+```py
+from fastapi import FastAPI
+from fastapi.responses import PlainTextResponse
+
+app = FastAPI()
+
+
+@app.get("/", response_class=PlainTextResponse)
+async def main():
+    return "Hello World"
+```
+
+##### JSONResponse
+
+Takes some data and returns an application/json encoded response.
+
+This is the default response used in FastAPI, as you read above.
+
+##### ORJSONResponse
+
+A fast alternative JSON response using orjson, as you read above.
+
+This requires installing orjson for example with `pip install orjson`.
+
+##### UJSONResponse
+
+An alternative JSON response using ujson.
+
+This requires installing ujson for example with pip install ujson.
+
+```py
+from fastapi import FastAPI
+from fastapi.responses import UJSONResponse
+
+app = FastAPI()
+
+
+@app.get("/items/", response_class=UJSONResponse)
+async def read_items():
+    return [{"item_id": "Foo"}]
+```
+
+##### RedirectResponse
+
+Returns an HTTP redirect. Uses a 307 status code (Temporary Redirect) by default.
+
+You can return a RedirectResponse directly:
+
+```py
+from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
+
+app = FastAPI()
+
+
+@app.get("/typer")
+async def redirect_typer():
+    return RedirectResponse("https://typer.tiangolo.com")
+```
+
+Or you can use it in the response_class parameter:
+
+```py
+from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
+
+app = FastAPI()
+
+
+@app.get("/fastapi", response_class=RedirectResponse)
+async def redirect_fastapi():
+    return "https://fastapi.tiangolo.com"
+```
+
+If you do that, then you can return the URL directly from your path operation function.
+
+In this case, the status_code used will be the default one for the RedirectResponse, which is 307.
+
+You can also use the status_code parameter combined with the response_class parameter:
+
+```py
+from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
+
+app = FastAPI()
+
+
+@app.get("/pydantic", response_class=RedirectResponse, status_code=302)
+async def redirect_pydantic():
+    return "https://docs.pydantic.dev/"
+```
+
+##### StreamingResponse
+
+Тakes an async generator or a normal generator/iterator and streams the response body.
+
+```py
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+
+app = FastAPI()
+
+
+async def fake_video_streamer():
+    for i in range(10):
+        yield b"some fake video bytes"
+
+
+@app.get("/")
+async def main():
+    return StreamingResponse(fake_video_streamer())
+```
+
+###### Using StreamingResponse with file-like objects
+
+If you have a file-like object (e.g. the object returned by open()), you can create a generator function to iterate over that file-like object.
+
+That way, you don't have to read it all first in memory, and you can pass that generator function to the StreamingResponse, and return it.
+
+This includes many libraries to interact with cloud storage, video processing, and others.
+
+```py
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+
+some_file_path = "large-video-file.mp4"
+app = FastAPI()
+
+
+@app.get("/")
+def main():
+    def iterfile():  # (1)
+        with open(some_file_path, mode="rb") as file_like:  # (2)
+            yield from file_like  # (3)
+
+    return StreamingResponse(iterfile(), media_type="video/mp4")
+```
+
+1. This is the generator function. It's a "generator function" because it contains yield statements inside.
+2. By using a with block, we make sure that the file-like object is closed after the generator function is done. So, after it finishes sending the response.
+3. This yield from tells the function to iterate over that thing named file_like. And then, for each part iterated, yield that part as coming from this generator function (iterfile).
+
+So, it is a generator function that transfers the "generating" work to something else internally.
+
+By doing it this way, we can put it in a with block, and that way, ensure that the file-like object is closed after finishing.
+
+##### FileResponse
+
+Asynchronously streams a file as the response.
+
+Takes a different set of arguments to instantiate than the other response types:
+
+- path - The file path to the file to stream.
+- headers - Any custom headers to include, as a dictionary.
+- media_type - A string giving the media type. If unset, the filename or path will be used to infer a media type.
+- filename - If set, this will be included in the response Content-Disposition.
+
+File responses will include appropriate Content-Length, Last-Modified and ETag headers.
+
+```py
+from fastapi import FastAPI
+from fastapi.responses import FileResponse
+
+some_file_path = "large-video-file.mp4"
+app = FastAPI()
+
+
+@app.get("/")
+async def main():
+    return FileResponse(some_file_path)
+```
+
+You can also use the response_class parameter:
+
+```py
+from fastapi import FastAPI
+from fastapi.responses import FileResponse
+
+some_file_path = "large-video-file.mp4"
+app = FastAPI()
+
+
+@app.get("/", response_class=FileResponse)
+async def main():
+    return some_file_path
+```
+
+##### Custom response class
+
+You can create your own custom response class, inheriting from Response and using it.
+
+For example, let's say that you want to use orjson, but with some custom settings not used in the included ORJSONResponse class.
+
+Let's say you want it to return indented and formatted JSON, so you want to use the orjson option orjson.OPT_INDENT_2.
+
+You could create a CustomORJSONResponse. The main thing you have to do is create a Response.render(content) method that returns the content as bytes:
+
+```py
+from typing import Any
+
+import orjson
+from fastapi import FastAPI, Response
+
+app = FastAPI()
+
+
+class CustomORJSONResponse(Response):
+    media_type = "application/json"
+
+    def render(self, content: Any) -> bytes:
+        assert orjson is not None, "orjson must be installed"
+        return orjson.dumps(content, option=orjson.OPT_INDENT_2)
+
+
+@app.get("/", response_class=CustomORJSONResponse)
+async def main():
+    return {"message": "Hello World"}
+```
+
+Now instead of returning:
+
+```json
+{"message": "Hello World"}
+````
+
+...this response will return:
+
+```json
+{
+  "message": "Hello World"
+}
+```
+
+#### Default response class
+
+When creating a FastAPI class instance or an APIRouter you can specify which response class to use by default.
+
+The parameter that defines this is default_response_class.
+
+In the example below, FastAPI will use ORJSONResponse by default, in all path operations, instead of JSONResponse.
+
+```py
+from fastapi import FastAPI
+from fastapi.responses import ORJSONResponse
+
+app = FastAPI(default_response_class=ORJSONResponse)
+
+
+@app.get("/items/")
+async def read_items():
+    return [{"item_id": "Foo"}]
+```
+
+### Response Cookies
+
+#### Use a Response parameter
+
+You can declare a parameter of type Response in your path operation function.
+
+And then you can set cookies in that temporal response object.
+
+```py
+from fastapi import FastAPI, Response
+
+app = FastAPI()
+
+
+@app.post("/cookie-and-object/")
+def create_cookie(response: Response):
+    response.set_cookie(key="fakesession", value="fake-cookie-session-value")
+    return {"message": "Come to the dark side, we have cookies"}
+```
+
+And then you can return any object you need, as you normally would (a dict, a database model, etc).
+
+And if you declared a response_model, it will still be used to filter and convert the object you returned.
+
+FastAPI will use that temporal response to extract the cookies (also headers and status code), and will put them in the final response that contains the value you returned, filtered by any response_model.
+
+You can also declare the Response parameter in dependencies, and set cookies (and headers) in them.
+
+#### Return a Response directly
+
+You can also create cookies when returning a Response directly in your code.
+
+To do that, you can create a response as described in Return a Response Directly.
+
+Then set Cookies in it, and then return it:
+
+```py
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+
+app = FastAPI()
+
+
+@app.post("/cookie/")
+def create_cookie():
+    content = {"message": "Come to the dark side, we have cookies"}
+    response = JSONResponse(content=content)
+    response.set_cookie(key="fakesession", value="fake-cookie-session-value")
+    return response
+```
+
+Keep in mind that if you return a response directly instead of using the Response parameter, FastAPI will return it directly.
+
+So, you will have to make sure your data is of the correct type. E.g. it is compatible with JSON, if you are returning a JSONResponse.
+
+And also that you are not sending any data that should have been filtered by a response_model.
+
+### Response Headers
+
+#### Use a Response parameter
+
+You can declare a parameter of type Response in your path operation function (as you can do for cookies).
+
+And then you can set headers in that temporal response object.
+
+```py
+from fastapi import FastAPI, Response
+
+app = FastAPI()
+
+
+@app.get("/headers-and-object/")
+def get_headers(response: Response):
+    response.headers["X-Cat-Dog"] = "alone in the world"
+    return {"message": "Hello World"}
+```
+
+And then you can return any object you need, as you normally would (a dict, a database model, etc).
+
+And if you declared a response_model, it will still be used to filter and convert the object you returned.
+
+FastAPI will use that temporal response to extract the headers (also cookies and status code), and will put them in the final response that contains the value you returned, filtered by any response_model.
+
+You can also declare the Response parameter in dependencies, and set headers (and cookies) in them.
+
+#### Return a Response directly
+
+You can also add headers when you return a Response directly.
+
+Create a response as described in Return a Response Directly and pass the headers as an additional parameter:
+
+```py
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+
+app = FastAPI()
+
+
+@app.get("/headers/")
+def get_headers():
+    content = {"message": "Hello World"}
+    headers = {"X-Cat-Dog": "alone in the world", "Content-Language": "en-US"}
+    return JSONResponse(content=content, headers=headers)
+```
+
+#### Custom Headers
+
+Keep in mind that custom proprietary headers can be added using the 'X-' prefix.
+
+But if you have custom headers that you want a client in a browser to be able to see, you need to add them to your CORS configurations (read more in CORS (Cross-Origin Resource Sharing)), using the parameter expose_headers documented in [Starlette's CORS docs](https://www.starlette.io/middleware/#corsmiddleware).
+
+### Response - Change Status Code
+
+You probably read before that you can set a default Response Status Code.
+
+But in some cases you need to return a different status code than the default.
+
+#### Use case
+
+For example, imagine that you want to return an HTTP status code of "OK" 200 by default.
+
+But if the data didn't exist, you want to create it, and return an HTTP status code of "CREATED" 201.
+
+But you still want to be able to filter and convert the data you return with a response_model.
+
+For those cases, you can use a Response parameter.
+
+##### Use a Response parameter
+
+```py
+from fastapi import FastAPI, Response, status
+
+app = FastAPI()
+
+tasks = {"foo": "Listen to the Bar Fighters"}
+
+
+@app.put("/get-or-create-task/{task_id}", status_code=200)
+def get_or_create_task(task_id: str, response: Response):
+    if task_id not in tasks:
+        tasks[task_id] = "This didn't exist before"
+        response.status_code = status.HTTP_201_CREATED
+    return tasks[task_id]
+```
+
+And then you can return any object you need, as you normally would (a dict, a database model, etc).
+
+And if you declared a response_model, it will still be used to filter and convert the object you returned.
+
+FastAPI will use that temporal response to extract the status code (also cookies and headers), and will put them in the final response that contains the value you returned, filtered by any response_model.
+
+You can also declare the Response parameter in dependencies, and set the status code in them. But keep in mind that the last one to be set will win.
+
+### Advanced Dependencies
+
+#### Parameterized dependencies
+
+All the dependencies we have seen are a fixed function or class.
+
+But there could be cases where you want to be able to set parameters on the dependency, without having to declare many different functions or classes.
+
+Let's imagine that we want to have a dependency that checks if the query parameter q contains some fixed content.
+
+But we want to be able to parameterize that fixed content.
+
+#### A "callable" instance
+
+In Python there's a way to make an instance of a class a "callable".
+
+Not the class itself (which is already a callable), but an instance of that class.
+
+To do that, we declare a method `__call__`:
+
+```py
+from typing import Annotated
+
+from fastapi import Depends, FastAPI
+
+app = FastAPI()
+
+
+class FixedContentQueryChecker:
+    def __init__(self, fixed_content: str):
+        self.fixed_content = fixed_content
+
+    def __call__(self, q: str = ""):
+        if q:
+            return self.fixed_content in q
+        return False
+
+
+checker = FixedContentQueryChecker("bar")
+
+
+@app.get("/query-checker/")
+async def read_query_check(fixed_content_included: Annotated[bool, Depends(checker)]):
+    return {"fixed_content_in_query": fixed_content_included}
+```
+
+#### Parameterize the instance
+
+And now, we can use `__init__` to declare the parameters of the instance that we can use to "parameterize" the dependency:
+
+```py
+from typing import Annotated
+
+from fastapi import Depends, FastAPI
+
+app = FastAPI()
+
+
+class FixedContentQueryChecker:
+    def __init__(self, fixed_content: str):
+        self.fixed_content = fixed_content
+
+    def __call__(self, q: str = ""):
+        if q:
+            return self.fixed_content in q
+        return False
+
+
+checker = FixedContentQueryChecker("bar")
+
+
+@app.get("/query-checker/")
+async def read_query_check(fixed_content_included: Annotated[bool, Depends(checker)]):
+    return {"fixed_content_in_query": fixed_content_included}
+```
+
+## Advanced Security
+
+The next sections assume you already read the main [Tutorial - User Guide: Security](### Security)
+
+### OAuth2 scopes
+
+<https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/#oauth2-scopes>
