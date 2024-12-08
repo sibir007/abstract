@@ -6934,11 +6934,11 @@ async def read_query_check(fixed_content_included: Annotated[bool, Depends(check
     return {"fixed_content_in_query": fixed_content_included}
 ```
 
-## Advanced Security
+### Advanced Security
 
 The next sections assume you already read the main [Tutorial - User Guide: Security](### Security)
 
-### OAuth2 scopes
+#### OAuth2 scopes
 
 ```py
 from datetime import datetime, timedelta, timezone
@@ -7160,7 +7160,7 @@ And if you select the scope me but not the scope items, you will be able to acce
 
 That's what would happen to a third party application that tried to access one of these path operations with a token provided by a user, depending on how many permissions the user gave the application.
 
-#### About third party integrations¶
+##### About third party integrations
 
 In this example we are using the OAuth2 "password" flow.
 
@@ -7174,8 +7174,7 @@ The most common is the implicit flow.
 
 The most secure is the code flow, but it's more complex to implement as it requires more steps. As it is more complex, many providers end up suggesting the implicit flow.
 
-### HTTP Basic Auth
-
+#### HTTP Basic Auth
 
 For the simplest cases, you can use HTTP Basic Auth.
 
@@ -7190,9 +7189,10 @@ That tells the browser to show the integrated prompt for a username and password
 Then, when you type that username and password, the browser sends them in the header automatically.
 
 ```py
+import secrets
 from typing import Annotated
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 app = FastAPI()
@@ -7200,7 +7200,1475 @@ app = FastAPI()
 security = HTTPBasic()
 
 
+def get_current_username(
+    credentials: Annotated[HTTPBasicCredentials, Depends(security)],
+):
+    current_username_bytes = credentials.username.encode("utf8")
+    correct_username_bytes = b"stanleyjobson"
+    is_correct_username = secrets.compare_digest(
+        current_username_bytes, correct_username_bytes
+    )
+    current_password_bytes = credentials.password.encode("utf8")
+    correct_password_bytes = b"swordfish"
+    is_correct_password = secrets.compare_digest(
+        current_password_bytes, correct_password_bytes
+    )
+    if not (is_correct_username and is_correct_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Basic"}, # WWW-Authenticate to make the browser show the login prompt again
+        )
+    return credentials.username
+
+
 @app.get("/users/me")
-def read_current_user(credentials: Annotated[HTTPBasicCredentials, Depends(security)]):
-    return {"username": credentials.username, "password": credentials.password}
+def read_current_user(username: Annotated[str, Depends(get_current_username)]):
+    return {"username": username}
 ```
+
+secrets.compare_digest() needs to take bytes or a str that only contains ASCII characters (the ones in English), this means it wouldn't work with characters like á, as in Sebastián.
+
+To handle that, we first convert the username and password to bytes encoding them with UTF-8.
+
+Then we can use secrets.compare_digest() to ensure that credentials.username is "stanleyjobson", and that credentials.password is "swordfish".
+
+### Using the Request Directly 
+
+Let's imagine you want to get the client's IP address/host inside of your path operation function.
+
+For that you need to access the request directly.
+
+```py
+from fastapi import FastAPI, Request
+
+app = FastAPI()
+
+
+@app.get("/items/{item_id}")
+def read_root(item_id: str, request: Request):
+    client_host = request.client.host
+    return {"client_host": client_host, "item_id": item_id}
+```
+
+>Tip
+>
+>Note that in this case, we are declaring a path parameter beside the request parameter.
+>
+>So, the path parameter will be extracted, validated, converted to the specified type and annotated with OpenAPI.
+>
+>The same way, you can declare any other parameter as normally, and additionally, get the Request too.
+
+You can read more details about the [Request object in the official Starlette documentation site](https://www.starlette.io/requests/)
+
+### Using Dataclasses
+
+[Pydantic docs about dataclasses](https://docs.pydantic.dev/latest/concepts/dataclasses/)
+
+### Advanced Middleware
+
+#### HTTPSRedirectMiddleware
+
+Enforces that all incoming requests must either be https or wss.
+
+Any incoming request to http or ws will be redirected to the secure scheme instead.
+
+```py
+from fastapi import FastAPI
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+
+app = FastAPI()
+
+app.add_middleware(HTTPSRedirectMiddleware)
+
+
+@app.get("/")
+async def main():
+    return {"message": "Hello World"}
+```
+
+#### TrustedHostMiddleware
+
+Enforces that all incoming requests have a correctly set Host header, in order to guard against HTTP Host Header attacks.
+
+```py
+from fastapi import FastAPI
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+
+app = FastAPI()
+
+app.add_middleware(
+    TrustedHostMiddleware, allowed_hosts=["example.com", "*.example.com"]
+)
+
+
+@app.get("/")
+async def main():
+    return {"message": "Hello World"}
+```
+
+#### ZipMiddleware
+
+Handles GZip responses for any request that includes "gzip" in the Accept-Encoding header.
+
+The middleware will handle both standard and streaming responses.
+
+```py
+from fastapi import FastAPI
+from fastapi.middleware.gzip import GZipMiddleware
+
+app = FastAPI()
+
+app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=5)
+
+
+@app.get("/")
+async def main():
+    return "somebigcontent"
+```
+
+#### Other middlewares
+
+There are many other ASGI middlewares.
+
+For example:
+
+- [Uvicorn's ProxyHeadersMiddleware](https://github.com/encode/uvicorn/blob/master/uvicorn/middleware/proxy_headers.py)
+- [MessagePack](https://github.com/florimondmanca/msgpack-asgi)
+
+To see other available middlewares check [Starlette's Middleware docs](https://www.starlette.io/middleware/) and the [ASGI Awesome List](https://github.com/florimondmanca/awesome-asgi).
+
+### Sub Applications - Mounts
+
+If you need to have two independent FastAPI applications, with their own independent OpenAPI and their own docs UIs, you can have a main app and "mount" one (or more) sub-application(s).
+
+<https://fastapi.tiangolo.com/advanced/sub-applications/#sub-applications-mounts>
+
+### Behind a Proxy
+
+<https://fastapi.tiangolo.com/advanced/behind-a-proxy/#behind-a-proxy>
+
+### Templates 
+
+`pip install jinja2` - Install dependencies
+
+```py
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2TemplatesUsing Jinja2Templates
+
+app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+templates = Jinja2Templates(directory="templates") # 1 Using Jinja2Templates
+
+
+@app.get("/items/{id}", response_class=HTMLResponse)
+async def read_item(request: Request, id: str):
+    return templates.TemplateResponse( # 1 Using Jinja2Templates
+        request=request, name="item.html", context={"id": id}
+    )
+```
+
+```html
+<!-- templates/item.html -->
+<html>
+<head>
+    <title>Item Details</title>
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+</head>
+<body>
+    <h1><a href="{{ url_for('read_item', id=id) }}">Item ID: {{ id }}</a></h1> 
+</body>
+</html>
+```
+
+```css
+/* static/styles.css */
+h1 {
+    color: green;
+}
+```
+
+#### Template Context Values
+
+In the HTML that contains:
+
+`Item ID: {{ id }}`
+
+...it will show the id taken from the "context" dict you passed:
+
+`{"id": id}
+`
+For example, with an ID of 42, this would render:
+
+`Item ID: 42`
+
+#### Template url_for Arguments
+
+You can also use url_for() inside of the template, it takes as arguments the same arguments that would be used by your path operation function.
+
+So, the section with:
+
+`<a href="{{ url_for('read_item', id=id) }}">`
+
+...will generate a link to the same URL that would be handled by the path operation function read_item(id=id).
+
+For example, with an ID of 42, this would render:
+
+`<a href="/items/42">`
+
+#### Templates and static files
+
+You can also use url_for() inside of the template, and use it, for example, with the StaticFiles you mounted with the name="static".
+
+`<link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">`
+
+#### More details
+
+For more details, including how to test templates, check [Starlette's docs on templates](https://www.starlette.io/templates/)
+
+### WebSockets
+
+`pip install websockets` - Install WebSockets
+
+#### Using Depends and others
+
+In WebSocket endpoints you can import from fastapi and use:
+
+- Depends
+- Security
+- Cookie
+- Header
+- Path
+- Query
+
+```py
+from typing import Annotated
+
+from fastapi import (
+    Cookie,
+    Depends,
+    FastAPI,
+    Query,
+    WebSocket,
+    WebSocketException,
+    status,
+)
+from fastapi.responses import HTMLResponse
+
+app = FastAPI()
+
+html = """
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chat</title>
+    </head>
+    <body>
+        <h1>WebSocket Chat</h1>
+        <form action="" onsubmit="sendMessage(event)">
+            <label>Item ID: <input type="text" id="itemId" autocomplete="off" value="foo"/></label>
+            <label>Token: <input type="text" id="token" autocomplete="off" value="some-key-token"/></label>
+            <button onclick="connect(event)">Connect</button>
+            <hr>
+            <label>Message: <input type="text" id="messageText" autocomplete="off"/></label>
+            <button>Send</button>
+        </form>
+        <ul id='messages'>
+        </ul>
+        <script>
+        var ws = null;
+            function connect(event) {
+                var itemId = document.getElementById("itemId")
+                var token = document.getElementById("token")
+                ws = new WebSocket("ws://localhost:8000/items/" + itemId.value + "/ws?token=" + token.value);
+                ws.onmessage = function(event) {
+                    var messages = document.getElementById('messages')
+                    var message = document.createElement('li')
+                    var content = document.createTextNode(event.data)
+                    message.appendChild(content)
+                    messages.appendChild(message)
+                };
+                event.preventDefault()
+            }
+            function sendMessage(event) {
+                var input = document.getElementById("messageText")
+                ws.send(input.value)
+                input.value = ''
+                event.preventDefault()
+            }
+        </script>
+    </body>
+</html>
+"""
+
+
+@app.get("/")
+async def get():
+    return HTMLResponse(html)
+
+
+async def get_cookie_or_token(
+    websocket: WebSocket,
+    session: Annotated[str | None, Cookie()] = None,
+    token: Annotated[str | None, Query()] = None,
+):
+    if session is None and token is None:
+        raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION)
+    return session or token
+
+
+@app.websocket("/items/{item_id}/ws")
+async def websocket_endpoint(
+    *,
+    websocket: WebSocket,
+    item_id: str,
+    q: int | None = None,
+    cookie_or_token: Annotated[str, Depends(get_cookie_or_token)],
+):
+    await websocket.accept()
+    while True:
+        data = await websocket.receive_text()
+        await websocket.send_text(
+            f"Session cookie or query token value is: {cookie_or_token}"
+        )
+        if q is not None:
+            await websocket.send_text(f"Query parameter q is: {q}")
+        await websocket.send_text(f"Message text was: {data}, for item ID: {item_id}")
+```
+
+#### Handling disconnections and multiple clients
+
+When a WebSocket connection is closed, the a`wait websocket.receive_text()` will raise a `WebSocketDisconnect` exception, which you can then catch and handle like in this example.
+
+```py
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.responses import HTMLResponse
+
+app = FastAPI()
+
+html = """
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chat</title>
+    </head>
+    <body>
+        <h1>WebSocket Chat</h1>
+        <h2>Your ID: <span id="ws-id"></span></h2>
+        <form action="" onsubmit="sendMessage(event)">
+            <input type="text" id="messageText" autocomplete="off"/>
+            <button>Send</button>
+        </form>
+        <ul id='messages'>
+        </ul>
+        <script>
+            var client_id = Date.now()
+            document.querySelector("#ws-id").textContent = client_id;
+            var ws = new WebSocket(`ws://localhost:8000/ws/${client_id}`);
+            ws.onmessage = function(event) {
+                var messages = document.getElementById('messages')
+                var message = document.createElement('li')
+                var content = document.createTextNode(event.data)
+                message.appendChild(content)
+                messages.appendChild(message)
+            };
+            function sendMessage(event) {
+                var input = document.getElementById("messageText")
+                ws.send(input.value)
+                input.value = ''
+                event.preventDefault()
+            }
+        </script>
+    </body>
+</html>
+"""
+
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: list[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
+
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            await connection.send_text(message)
+
+
+manager = ConnectionManager()
+
+
+@app.get("/")
+async def get():
+    return HTMLResponse(html)
+
+
+@app.websocket("/ws/{client_id}")
+async def websocket_endpoint(websocket: WebSocket, client_id: int):
+    await manager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await manager.send_personal_message(f"You wrote: {data}", websocket)
+            await manager.broadcast(f"Client #{client_id} says: {data}")
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+        await manager.broadcast(f"Client #{client_id} left the chat")
+```
+
+#### [The WebSocket class](https://www.starlette.io/websockets/)
+
+WebSockets present a mapping interface, so you can use them in the same way as a scope.
+
+For instance: `websocket['path']` will return the ASGI path.
+
+##### URL
+
+The websocket URL is accessed as `websocket.url`.
+
+The property is actually a subclass of str, and also exposes all the components that can be parsed out of the URL.
+
+For example: `websocket.url.path`, `websocket.url.port`, `websocket.url.scheme`.
+
+##### Headers
+
+Headers are exposed as an immutable, case-insensitive, multi-dict.
+
+For example: `websocket.headers['sec-websocket-version']`
+
+##### Query Parameters
+
+Query parameters are exposed as an immutable multi-dict.
+
+For example: `websocket.query_params['search']`
+
+##### Path Parameters
+
+Router path parameters are exposed as a dictionary interface.
+
+For example: `websocket.path_params['username']`
+
+##### Accepting the connection
+
+- `await websocket.accept(subprotocol=None, headers=None)`
+
+##### Sending data
+
+- `await websocket.send_text(data)`
+- `await websocket.send_bytes(data)`
+- `await websocket.send_json(data)`
+
+JSON messages default to being sent over text data frames, from version 0.10.0 onwards. Use `websocket.send_json(data, mode="binary")` to send JSON over binary data frames.
+
+##### Receiving data
+
+- `await websocket.receive_text()`
+- `await websocket.receive_bytes()`
+- `await websocket.receive_json()`
+
+May raise `starlette.websockets.WebSocketDisconnect()`.
+
+JSON messages default to being received over text data frames, from version 0.10.0 onwards. Use `websocket.receive_json(data, mode="binary")` to receive JSON over binary data frames.
+Iterating data
+
+- `websocket.iter_text()`
+- `websocket.iter_bytes()`
+- `websocket.iter_json()`
+
+Similar to `receive_text`, `receive_bytes`, and `receive_json` but returns an async iterator.
+
+```py
+from starlette.websockets import WebSocket
+
+
+async def app(scope, receive, send):
+    websocket = WebSocket(scope=scope, receive=receive, send=send)
+    await websocket.accept()
+    async for message in websocket.iter_text():
+        await websocket.send_text(f"Message text was: {message}")
+    await websocket.close()
+```
+
+When `starlette.websockets.WebSocketDisconnect` is raised, the iterator will exit.
+
+##### Closing the connection
+
+- `await websocket.close(code=1000, reason=None)`
+
+##### Sending and receiving messages
+
+If you need to send or receive raw ASGI messages then you should use `websocket.send()` and `websocket.receive()` rather than using the raw send and receive callables. This will ensure that the websocket's state is kept correctly updated.
+
+- `await websocket.send(message)`
+- `await websocket.receive()`
+
+##### Send Denial Response
+
+If you call `websocket.close()` before calling `websocket.accept()` then the server will automatically send a HTTP 403 error to the client.
+
+If you want to send a different error response, you can use the `websocket.send_denial_response()` method. This will send the response and then close the connection.
+
+- `await websocket.send_denial_response(response)`
+
+This requires the ASGI server to support the WebSocket Denial Response extension. If it is not supported a RuntimeError will be raised.
+
+#### Class-based WebSocket handling
+
+<https://www.starlette.io/endpoints/#websocketendpoint>
+
+### Lifespan Events
+
+You can define logic (code) that should be executed before the application starts up. This means that this code will be executed once, before the application starts receiving requests.
+
+The same way, you can define logic (code) that should be executed when the application is shutting down. In this case, this code will be executed once, after having handled possibly many requests.
+
+Because this code is executed before the application starts taking requests, and right after it finishes handling requests, it covers the whole application lifespan (the word "lifespan" will be important in a second 😉).
+
+This can be very useful for setting up resources that you need to use for the whole app, and that are shared among requests, and/or that you need to clean up afterwards. For example, a database connection pool, or loading a shared machine learning model.
+
+#### Use Case
+
+Let's start with an example use case and then see how to solve it with this.
+
+Let's imagine that you have some machine learning models that you want to use to handle requests. 🤖
+
+The same models are shared among requests, so, it's not one model per request, or one per user or something similar.
+
+Let's imagine that loading the model can take quite some time, because it has to read a lot of data from disk. So you don't want to do it for every request.
+
+You could load it at the top level of the module/file, but that would also mean that it would load the model even if you are just running a simple automated test, then that test would be slow because it would have to wait for the model to load before being able to run an independent part of the code.
+
+That's what we'll solve, let's load the model before the requests are handled, but only right before the application starts receiving requests, not while the code is being loaded.
+
+##### Lifespan
+
+```py
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+
+
+def fake_answer_to_everything_ml_model(x: float):
+    return x * 42
+
+
+ml_models = {}
+
+
+@asynccontextmanager # Async Context Manager
+async def lifespan(app: FastAPI): # Lifespan function
+    # Load the ML model
+    ml_models["answer_to_everything"] = fake_answer_to_everything_ml_model
+    yield
+    # Clean up the ML models and release the resources
+    ml_models.clear()
+
+
+app = FastAPI(lifespan=lifespan)
+
+
+@app.get("/predict")
+async def predict(x: float):
+    result = ml_models["answer_to_everything"](x)
+    return {"result": result}
+
+```
+
+Here we are simulating the expensive startup operation of loading the model by putting the (fake) model function in the dictionary with machine learning models before the yield. This code will be executed before the application starts taking requests, during the startup.
+
+And then, right after the yield, we unload the model. This code will be executed after the application finishes handling requests, right before the shutdown. This could, for example, release resources like memory or a GPU.
+
+##### Alternative Events (deprecated)
+
+>Warning
+>
+>The recommended way to handle the startup and shutdown is using the lifespan parameter of the FastAPI app as described above. If you provide a lifespan parameter, startup and shutdown event handlers will no longer be called. It's all lifespan or all events, not both.
+>
+>You can probably skip this part.
+
+
+```py
+from fastapi import FastAPI
+
+app = FastAPI()
+
+
+@app.on_event("shutdown")
+def shutdown_event():
+    with open("log.txt", mode="a") as log:
+        log.write("Application shutdown")
+
+
+@app.get("/items/")
+async def read_items():
+    return [{"name": "Foo"}]
+
+```
+
+```py
+from fastapi import FastAPI
+
+app = FastAPI()
+
+items = {}
+
+
+@app.on_event("startup")
+async def startup_event():
+    items["foo"] = {"name": "Fighters"}
+    items["bar"] = {"name": "Tenders"}
+
+
+@app.get("/items/{item_id}")
+async def read_items(item_id: str):
+    return items[item_id]
+```
+
+### Testing WebSockets 
+
+You can use the same TestClient to test WebSockets.
+
+For this, you use the TestClient in a with statement, connecting to the WebSocket:
+
+```py
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+from fastapi.websockets import WebSocket
+
+app = FastAPI()
+
+
+@app.get("/")
+async def read_main():
+    return {"msg": "Hello World"}
+
+
+@app.websocket("/ws")
+async def websocket(websocket: WebSocket):
+    await websocket.accept()
+    await websocket.send_json({"msg": "Hello WebSocket"})
+    await websocket.close()
+
+
+def test_read_main():
+    client = TestClient(app)
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json() == {"msg": "Hello World"}
+
+
+def test_websocket():
+    client = TestClient(app)
+    with client.websocket_connect("/ws") as websocket:
+        data = websocket.receive_json()
+        assert data == {"msg": "Hello WebSocket"}
+```
+
+### Testing Events: startup - shutdown
+
+```py
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+
+app = FastAPI()
+
+items = {}
+
+
+@app.on_event("startup")
+async def startup_event():
+    items["foo"] = {"name": "Fighters"}
+    items["bar"] = {"name": "Tenders"}
+
+
+@app.get("/items/{item_id}")
+async def read_items(item_id: str):
+    return items[item_id]
+
+
+def test_read_items():
+    with TestClient(app) as client:
+        response = client.get("/items/foo")
+        assert response.status_code == 200
+        assert response.json() == {"name": "Fighters"}
+```
+
+### Testing Dependencies with Overrides 
+
+There are some scenarios where you might want to override a dependency during testing.
+
+You don't want the original dependency to run (nor any of the sub-dependencies it might have).
+
+Instead, you want to provide a different dependency that will be used only during tests (possibly only some specific tests), and will provide a value that can be used where the value of the original dependency was used.
+
+```py
+from typing import Annotated
+
+from fastapi import Depends, FastAPI
+from fastapi.testclient import TestClient
+
+app = FastAPI()
+
+
+async def common_parameters(q: str | None = None, skip: int = 0, limit: int = 100):
+    return {"q": q, "skip": skip, "limit": limit}
+
+
+@app.get("/items/")
+async def read_items(commons: Annotated[dict, Depends(common_parameters)]):
+    return {"message": "Hello Items!", "params": commons}
+
+
+@app.get("/users/")
+async def read_users(commons: Annotated[dict, Depends(common_parameters)]):
+    return {"message": "Hello Users!", "params": commons}
+
+
+client = TestClient(app)
+
+
+async def override_dependency(q: str | None = None):
+    return {"q": q, "skip": 5, "limit": 10}
+
+
+app.dependency_overrides[common_parameters] = override_dependency
+
+
+def test_override_in_items():
+    response = client.get("/items/")
+    assert response.status_code == 200
+    assert response.json() == {
+        "message": "Hello Items!",
+        "params": {"q": None, "skip": 5, "limit": 10},
+    }
+
+
+def test_override_in_items_with_q():
+    response = client.get("/items/?q=foo")
+    assert response.status_code == 200
+    assert response.json() == {
+        "message": "Hello Items!",
+        "params": {"q": "foo", "skip": 5, "limit": 10},
+    }
+
+
+def test_override_in_items_with_params():
+    response = client.get("/items/?q=foo&skip=100&limit=200")
+    assert response.status_code == 200
+    assert response.json() == {
+        "message": "Hello Items!",
+        "params": {"q": "foo", "skip": 5, "limit": 10},
+    }
+```
+
+### Async Tests
+
+<https://fastapi.tiangolo.com/advanced/async-tests/#async-tests>
+
+```sh
+.
+├── app
+│   ├── __init__.py
+│   ├── main.py
+│   └── test_main.py
+```
+
+```py
+# main.py
+from fastapi import FastAPI
+
+app = FastAPI()
+
+
+@app.get("/")
+async def root():
+    return {"message": "Tomato"}
+```
+
+```py
+# test_main.py
+import pytest
+from httpx import ASGITransport, AsyncClient
+
+from .main import app
+
+
+@pytest.mark.anyio
+async def test_root():
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
+        response = await ac.get("/")
+    assert response.status_code == 200
+    assert response.json() == {"message": "Tomato"}
+```
+
+### Settings and Environment Variables 
+
+`pip install pydantic-settings`
+
+```py
+from fastapi import FastAPI
+from pydantic_settings import BaseSettings
+
+
+class Settings(BaseSettings):
+    app_name: str = "Awesome API"
+    admin_email: str
+    items_per_user: int = 50
+
+
+settings = Settings()
+app = FastAPI()
+
+
+@app.get("/info")
+async def info():
+    return {
+        "app_name": settings.app_name,
+        "admin_email": settings.admin_email,
+        "items_per_user": settings.items_per_user,
+    }
+```
+
+#### Settings in another module
+
+```py
+# config.py
+from pydantic_settings import BaseSettings
+
+
+class Settings(BaseSettings):
+    app_name: str = "Awesome API"
+    admin_email: str
+    items_per_user: int = 50
+
+
+settings = Settings()
+```
+
+```py
+# main.py
+from fastapi import FastAPI
+
+from .config import settings
+
+app = FastAPI()
+
+
+@app.get("/info")
+async def info():
+    return {
+        "app_name": settings.app_name,
+        "admin_email": settings.admin_email,
+        "items_per_user": settings.items_per_user,
+    }
+```
+
+#### Settings in a dependency
+
+```py
+# main.py
+from functools import lru_cache
+from typing import Annotated
+
+from fastapi import Depends, FastAPI
+
+from .config import Settings
+
+app = FastAPI()
+
+
+@lru_cache
+def get_settings():
+    return Settings()
+
+
+@app.get("/info")
+async def info(settings: Annotated[Settings, Depends(get_settings)]):
+    return {
+        "app_name": settings.app_name,
+        "admin_email": settings.admin_email,
+        "items_per_user": settings.items_per_user,
+    }
+```
+
+#### Settings and testing
+
+```py
+from fastapi.testclient import TestClient
+
+from .config import Settings
+from .main import app, get_settings
+
+client = TestClient(app)
+
+
+def get_settings_override():
+    return Settings(admin_email="testing_admin@example.com")
+
+
+app.dependency_overrides[get_settings] = get_settings_override
+
+
+def test_app():
+    response = client.get("/info")
+    data = response.json()
+    assert data == {
+        "app_name": "Awesome API",
+        "admin_email": "testing_admin@example.com",
+        "items_per_user": 50,
+    }
+```
+
+#### Reading a .env file
+
+```sh
+# .env
+ADMIN_EMAIL="deadpool@example.com"
+APP_NAME="ChimichangApp"
+```
+
+```py
+# config.py
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    app_name: str = "Awesome API"
+    admin_email: str
+    items_per_user: int = 50
+
+    model_config = SettingsConfigDict(env_file=".env")
+```
+
+### OpenAPI Callbacks
+
+<https://fastapi.tiangolo.com/advanced/openapi-callbacks/#openapi-callbacks>
+
+#### An app with callbacks
+
+Let's see all this with an example.
+
+Imagine you develop an app that allows creating invoices.
+
+These invoices will have an id, title (optional), customer, and total.
+
+The user of your API (an external developer) will create an invoice in your API with a POST request.
+
+Then your API will (let's imagine):
+
+- Send the invoice to some customer of the external developer.
+- Collect the money.
+- Send a notification back to the API user (the external developer).
+  - This will be done by sending a POST request (from your API) to some external API provided by that external developer (this is the "callback").
+
+```py
+from typing import Union
+
+from fastapi import APIRouter, FastAPI
+from pydantic import BaseModel, HttpUrl
+
+app = FastAPI()
+
+
+class Invoice(BaseModel):
+    id: str
+    title: Union[str, None] = None
+    customer: str
+    total: float
+
+
+class InvoiceEvent(BaseModel):
+    description: str
+    paid: bool
+
+
+class InvoiceEventReceived(BaseModel):
+    ok: bool
+
+
+invoices_callback_router = APIRouter()
+
+
+@invoices_callback_router.post(
+    "{$callback_url}/invoices/{$request.body.id}", response_model=InvoiceEventReceived
+)
+def invoice_notification(body: InvoiceEvent):
+    pass
+
+
+@app.post("/invoices/", callbacks=invoices_callback_router.routes)
+def create_invoice(invoice: Invoice, callback_url: Union[HttpUrl, None] = None):
+    """
+    Create an invoice.
+
+    This will (let's imagine) let the API user (some external developer) create an
+    invoice.
+
+    And this path operation will:
+
+    * Send the invoice to the client.
+    * Collect the money from the client.
+    * Send a notification back to the API user (the external developer), as a callback.
+        * At this point is that the API will somehow send a POST request to the
+            external API with the notification of the invoice event
+            (e.g. "payment successful").
+    """
+    # Send the invoice, collect the money, send the notification (the callback)
+    return {"msg": "Invoice received"}
+```
+
+### OpenAPI Webhooks
+
+There are cases where you want to tell your API users that your app could call their app (sending a request) with some data, normally to notify of some type of event.
+
+This means that instead of the normal process of your users sending requests to your API, it's your API (or your app) that could send requests to their system (to their API, their app).
+
+This is normally called a webhook.
+
+#### Webhooks steps
+
+The process normally is that you define in your code what is the message that you will send, the body of the request.
+
+You also define in some way at which moments your app will send those requests or events.
+
+And your users define in some way (for example in a web dashboard somewhere) the URL where your app should send those requests.
+
+All the logic about how to register the URLs for webhooks and the code to actually send those requests is up to you. You write it however you want to in your own code.
+
+#### An app with webhooks
+
+```py
+from datetime import datetime
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+class Subscription(BaseModel):
+    username: str
+    monthly_fee: float
+    start_date: datetime
+
+
+@app.webhooks.post("new-subscription")
+def new_subscription(body: Subscription):
+    """
+    When a new user subscribes to your service we'll send you a POST request with this
+    data to the URL that you register for the event `new-subscription` in the dashboard.
+    """
+
+
+@app.get("/users/")
+def read_users():
+    return ["Rick", "Morty"]
+```
+
+### Including WSGI - Flask, Django, others
+
+You can mount WSGI applications as you saw with [Sub Applications- Mounts](https://fastapi.tiangolo.com/advanced/sub-applications/), [Behind a Proxy](https://fastapi.tiangolo.com/advanced/behind-a-proxy/).
+
+For that, you can use the WSGIMiddleware and use it to wrap your WSGI application, for example, Flask, Django, etc.
+
+#### Using WSGIMiddleware
+
+```py
+from fastapi import FastAPI
+from fastapi.middleware.wsgi import WSGIMiddleware
+from flask import Flask, request
+from markupsafe import escape
+
+flask_app = Flask(__name__)
+
+
+@flask_app.route("/")
+def flask_main():
+    name = request.args.get("name", "World")
+    return f"Hello, {escape(name)} from Flask!"
+
+
+app = FastAPI()
+
+
+@app.get("/v2")
+def read_main():
+    return {"message": "Hello World"}
+
+
+app.mount("/v1", WSGIMiddleware(flask_app))
+```
+
+If you run it and go to http://localhost:8000/v1/ you will see the response from Flask:
+
+```txt
+Hello, World from Flask!
+```
+
+And if you go to http://localhost:8000/v2 you will see the response from FastAPI:
+
+```json
+{
+    "message": "Hello World"
+}
+```
+
+### Generate Clients
+
+As FastAPI is based on the OpenAPI specification, you get automatic compatibility with many tools, including the automatic API docs (provided by Swagger UI).
+
+One particular advantage that is not necessarily obvious is that you can generate clients (sometimes called SDKs ) for your API, for many different programming languages.
+
+#### OpenAPI Client Generators
+
+There are many tools to generate clients from OpenAPI.
+
+A common tool is [OpenAPI Generator](https://openapi-generator.tech/).
+
+If you are building a frontend, a very interesting alternative is [openapi-ts](https://github.com/hey-api/openapi-ts).
+
+#### Generate a TypeScript Frontend Client
+
+```py
+from fastapi import FastAPI
+from fastapi.routing import APIRoute
+from pydantic import BaseModel
+
+
+def custom_generate_unique_id(route: APIRoute):
+    return f"{route.tags[0]}-{route.name}"
+
+
+app = FastAPI(generate_unique_id_function=custom_generate_unique_id)
+
+
+class Item(BaseModel):
+    name: str
+    price: float
+
+
+class ResponseMessage(BaseModel):
+    message: str
+
+
+class User(BaseModel):
+    username: str
+    email: str
+
+
+@app.post("/items/", response_model=ResponseMessage, tags=["items"])
+async def create_item(item: Item):
+    return {"message": "Item received"}
+
+
+@app.get("/items/", response_model=list[Item], tags=["items"])
+async def get_items():
+    return [
+        {"name": "Plumbus", "price": 3},
+        {"name": "Portal Gun", "price": 9001},
+    ]
+
+
+@app.post("/users/", response_model=ResponseMessage, tags=["users"])
+async def create_user(user: User):
+    return {"message": "User received"}
+```
+
+#### Generate a TypeScript Client
+
+```sh
+npm install @hey-api/openapi-ts --save-dev # Install openapi-ts
+```
+
+package.json file
+
+```json
+{
+  "name": "frontend-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "generate-client": "openapi-ts --input http://localhost:8000/openapi.json --output ./src/client --client axios"
+  },
+  "author": "",
+  "license": "",
+  "devDependencies": {
+    "@hey-api/openapi-ts": "^0.27.38",
+    "typescript": "^4.6.2"
+  }
+}
+```
+
+```sh
+npm run generate-client # Generate Client Code
+frontend-app@1.0.0 generate-client /home/user/code/frontend-app
+> openapi-ts --input http://localhost:8000/openapi.json --output ./src/client --client axios
+```
+
+#### Preprocess the OpenAPI Specification for the Client Generator
+
+```py
+import json
+from pathlib import Path
+
+file_path = Path("./openapi.json")
+openapi_content = json.loads(file_path.read_text())
+
+for path_data in openapi_content["paths"].values():
+    for operation in path_data.values():
+        tag = operation["tags"][0]
+        operation_id = operation["operationId"]
+        to_remove = f"{tag}-"
+        new_operation_id = operation_id[len(to_remove) :]
+        operation["operationId"] = new_operation_id
+
+file_path.write_text(json.dumps(openapi_content))
+```
+
+package.json
+
+```json
+{
+  "name": "frontend-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "generate-client": "openapi-ts --input ./openapi.json --output ./src/client --client axios"
+  },
+  "author": "",
+  "license": "",
+  "devDependencies": {
+    "@hey-api/openapi-ts": "^0.27.38",
+    "typescript": "^4.6.2"
+  }
+}
+```
+
+## FastAPI CLI
+
+When you install FastAPI (e.g. with `pip install "fastapi[standard]")`, it includes a package called `fastapi-cli`, this package provides the `fastapi` command in the terminal.
+
+`fastapi dev main.py`
+
+Running fastapi dev initiates development mode.
+
+By default, auto-reload is enabled, automatically reloading the server when you make changes to your code. This is resource-intensive and could be less stable than when it's disabled. You should only use it for development. It also listens on the IP address 127.0.0.1, which is the IP for your machine to communicate with itself alone (localhost).
+
+`fastapi run main.py`
+
+Executing fastapi run starts FastAPI in production mode by default.
+
+By default, auto-reload is disabled. It also listens on the IP address 0.0.0.0, which means all the available IP addresses, this way it will be publicly accessible to anyone that can communicate with the machine. This is how you would normally run it in production, for example, in a container.
+
+In most cases you would (and should) have a "termination proxy" handling HTTPS for you on top, this will depend on how you deploy your application, your provider might do this for you, or you might need to set it up yourself.
+
+## Deployment
+
+### About FastAPI versions
+
+#### Pin your fastapi version
+
+If you use a requirements.txt file you could specify the version with:
+
+`fastapi[standard]==0.112.0`
+
+Or you could also pin it with:
+
+`fastapi[standard]>=0.112.0,<0.113.0`
+
+#### Upgrading the FastAPI versions¶
+
+You should add tests for your app.
+
+With FastAPI it's very easy (thanks to Starlette), check the docs: [Testing](https://fastapi.tiangolo.com/tutorial/testing/)
+
+After you have tests, then you can upgrade the FastAPI version to a more recent one, and make sure that all your code is working correctly by running your tests.
+
+If everything is working, or after you make the necessary changes, and all your tests are passing, then you can pin your `fastapi` to that new recent version.
+
+#### About Starlette
+
+You shouldn't pin the version of starlette.
+
+Different versions of FastAPI will use a specific newer version of Starlette.
+
+So, you can just let FastAPI use the correct Starlette version.
+
+#### About Pydantic
+
+Pydantic includes the tests for FastAPI with its own tests, so new versions of Pydantic (above 1.0.0) are always compatible with FastAPI.
+
+You can pin Pydantic to any version above 1.0.0 that works for you.
+
+For example:
+
+`pydantic>=2.7.0,<3.0.0`
+
+### About HTTPS
+
+<https://fastapi.tiangolo.com/deployment/https/#certificate-renewal>
+
+### Run a Server Manually
+
+`fastapi run main.py`
+
+#### ASGI Servers
+
+- [Uvicorn](https://www.uvicorn.org/): a high performance ASGI server.
+- [Hypercorn](https://hypercorn.readthedocs.io/): an ASGI server compatible with HTTP/2 and Trio among other features.
+- [Daphne](https://github.com/django/daphne): the ASGI server built for Django Channels.
+- [Granian](https://github.com/emmett-framework/granian): A Rust HTTP server for Python applications.
+- [NGINX Unit](https://unit.nginx.org/howto/fastapi/): NGINX Unit is a lightweight and versatile web application runtime.
+
+#### Install the Server Program
+
+`pip install "uvicorn[standard]"`
+
+#### Run the Server Program
+
+`uvicorn main:app --host 0.0.0.0 --port 80`
+
+### Deployment Concepts
+
+These examples run the server program (e.g Uvicorn), starting a single process, listening on all the IPs (0.0.0.0) on a predefined port (e.g. 80).
+
+This is the basic idea. But you will probably want to take care of some additional things, like:
+
+- Security - HTTPS
+- Running on startup
+- Restarts
+- Replication (the number of processes running)
+- Memory
+- Previous steps before starting
+
+<https://fastapi.tiangolo.com/deployment/concepts/#resource-utilization>
+
+### Deploy FastAPI on Cloud Providers
+
+- [Platform.sh](https://docs.platform.sh/languages/python.html?utm_source=fastapi-signup&utm_medium=banner&utm_campaign=FastAPI-signup-June-2023)
+- [Porter](https://docs.porter.run/language-specific-guides/fastapi)
+- [Coherence](https://www.withcoherence.com/?utm_medium=advertising&utm_source=fastapi&utm_campaign=website)
+- [Render](https://docs.render.com/deploy-fastapi?utm_source=deploydoc&utm_medium=referral&utm_campaign=fastapi)
+
+### Server Workers - Uvicorn with Workers
+
+`fastapi run --workers 4 main.py`
+
+`uvicorn main:app --host 0.0.0.0 --port 8080 --workers 4`
+
+### FastAPI in Containers - Docker 
+
+```sh
+.
+├── app
+│   ├── __init__.py
+│   └── main.py
+├── Dockerfile
+└── requirements.txt
+```
+
+requirements.txt
+
+```text
+fastapi[standard]>=0.113.0,<0.114.0
+pydantic>=2.7.0,<3.0.0
+```
+
+```sh
+pip install -r requirements.txt
+```
+
+```py
+# main.py
+
+from typing import Union
+
+from fastapi import FastAPI
+
+app = FastAPI()
+
+
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+
+
+@app.get("/items/{item_id}")
+def read_item(item_id: int, q: Union[str, None] = None):
+    return {"item_id": item_id, "q": q}
+```
+
+```Dockerfile
+
+FROM python:3.9
+
+
+WORKDIR /code
+
+
+COPY ./requirements.txt /code/requirements.txt
+
+
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+
+
+COPY ./app /code/app
+
+
+CMD ["fastapi", "run", "app/main.py", "--port", "80"]
+
+# If you are running your container behind a TLS Termination Proxy (load balancer) like Nginx or Traefik, add the option --proxy-headers, this will tell Uvicorn (through the FastAPI CLI) to trust the headers sent by that proxy telling it that the application is running behind HTTPS, etc
+# CMD ["fastapi", "run", "app/main.py", "--proxy-headers", "--port", "80"] 
+```
+
+```sh
+docker build -t myimage . # Build the Docker Image
+```
+
+```sh
+docker run -d --name mycontainer -p 80:80 myimage # Start the Docker Container
+```
+
+```sh
+http://192.168.99.100/items/5?q=somequery
+{"item_id": 5, "q": "somequery"}
+```
+
+#### Containers with Multiple Processes and Special Cases
+
+```Dockerfile
+FROM python:3.9
+
+WORKDIR /code
+
+COPY ./requirements.txt /code/requirements.txt
+
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+
+COPY ./app /code/app
+
+
+CMD ["fastapi", "run", "app/main.py", "--port", "80", "--workers", "4"]
+```
+
+## How To - Recipes
+
+<https://fastapi.tiangolo.com/how-to/general/>
