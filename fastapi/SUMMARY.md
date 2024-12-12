@@ -491,7 +491,7 @@ What we will do is wrap that with Annotated, so it becomes:
 
 Both of those versions mean the same thing, q is a parameter that can be a str or None, and by default, it is None.
 
-`q: Annotated[str | None, Query(max_length=50)`
+`q: Annotated[str | None, Query(max_length=50)]`
 
 Default value is still None, so the parameter is still optional. We are telling FastAPI that we want it to have additional validation for this value, we want it to have maximum 50 characters
 
