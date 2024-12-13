@@ -750,3 +750,276 @@ event: start - tag: root
 ```
 
 ### Namespaces
+
+```py
+# The ElementTree API avoids namespace prefixes wherever possible and deploys the real namespace (the URI) instead:
+
+>>> xhtml = etree.Element("{http://www.w3.org/1999/xhtml}html")
+>>> body = etree.SubElement(xhtml, "{http://www.w3.org/1999/xhtml}body")
+>>> body.text = "Hello World"
+
+>>> prettyprint(xhtml)
+<html:html xmlns:html="http://www.w3.org/1999/xhtml">
+  <html:body>Hello World</html:body>
+</html:html>
+
+# The notation that ElementTree uses was originally brought up by James Clark. It has the major advantage of providing a universally qualified name for a tag, regardless of any prefixes that may or may not have been used or defined in a document. By moving the indirection of prefixes out of the way, it makes namespace aware code much clearer and easier to get right.
+
+# As you can see from the example, prefixes only become important when you serialise the result. However, the above code looks somewhat verbose due to the lengthy namespace names. And retyping or copying a string over and over again is error prone. It is therefore common practice to store a namespace URI in a global variable. To adapt the namespace prefixes for serialisation, you can also pass a mapping to the Element factory function, e.g. to define the default namespace:
+
+>>> XHTML_NAMESPACE = "http://www.w3.org/1999/xhtml"
+>>> XHTML = "{%s}" % XHTML_NAMESPACE
+
+>>> NSMAP = {None : XHTML_NAMESPACE} # the default namespace (no prefix)
+
+>>> xhtml = etree.Element(XHTML + "html", nsmap=NSMAP) # lxml only!
+>>> body = etree.SubElement(xhtml, XHTML + "body")
+>>> body.text = "Hello World"
+
+>>> prettyprint(xhtml)
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <body>Hello World</body>
+</html>
+
+# You can also use the QName helper class to build or split qualified tag names:
+
+>>> tag = etree.QName('http://www.w3.org/1999/xhtml', 'html')
+>>> print(tag.localname)
+html
+>>> print(tag.namespace)
+http://www.w3.org/1999/xhtml
+>>> print(tag.text)
+{http://www.w3.org/1999/xhtml}html
+
+>>> tag = etree.QName('{http://www.w3.org/1999/xhtml}html')
+>>> print(tag.localname)
+html
+>>> print(tag.namespace)
+http://www.w3.org/1999/xhtml
+
+>>> root = etree.Element('{http://www.w3.org/1999/xhtml}html')
+>>> tag = etree.QName(root)
+>>> print(tag.localname)
+html
+
+>>> tag = etree.QName(root, 'script')
+>>> print(tag.text)
+{http://www.w3.org/1999/xhtml}script
+>>> tag = etree.QName('{http://www.w3.org/1999/xhtml}html', 'script')
+>>> print(tag.text)
+{http://www.w3.org/1999/xhtml}script
+
+# lxml.etree allows you to look up the current namespaces defined for a node through the .nsmap property:
+
+>>> xhtml.nsmap
+{None: 'http://www.w3.org/1999/xhtml'}
+# Note, however, that this includes all prefixes known in the context of an Element, not only those that it defines itself.
+
+>>> root = etree.Element('root', nsmap={'a': 'http://a.b/c'})
+>>> child = etree.SubElement(root, 'child',
+...                          nsmap={'b': 'http://b.c/d'})
+>>> len(root.nsmap)
+1
+>>> len(child.nsmap)
+2
+>>> child.nsmap['a']
+'http://a.b/c'
+>>> child.nsmap['b']
+'http://b.c/d'
+
+# Therefore, modifying the returned dict cannot have any meaningful impact on the Element. Any changes to it are ignored.
+
+# Namespaces on attributes work alike, but as of version 2.3, lxml.etree will ensure that the attribute uses a prefixed namespace declaration. This is because unprefixed attribute names are not considered being in a namespace by the XML namespace specification (section 6.2), so they may end up losing their namespace on a serialise-parse roundtrip, even if they appear in a namespaced element.
+
+>>> body.set(XHTML + "bgcolor", "#CCFFAA")
+
+>>> prettyprint(xhtml)
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <body xmlns:html="http://www.w3.org/1999/xhtml" html:bgcolor="#CCFFAA">Hello World</body>
+</html>
+
+>>> print(body.get("bgcolor"))
+None
+>>> body.get(XHTML + "bgcolor")
+'#CCFFAA'
+
+# You can also use XPath with fully qualified names:
+
+>>> find_xhtml_body = etree.ETXPath(      # lxml only !
+...     "//{%s}body" % XHTML_NAMESPACE)
+>>> results = find_xhtml_body(xhtml)
+
+>>> print(results[0].tag)
+{http://www.w3.org/1999/xhtml}body
+
+# For convenience, you can use "*" wildcards in all iterators of lxml.etree, both for tag names and namespaces:
+
+>>> for el in xhtml.iter('*'): print(el.tag)   # any element
+{http://www.w3.org/1999/xhtml}html
+{http://www.w3.org/1999/xhtml}body
+
+>>> for el in xhtml.iter('{http://www.w3.org/1999/xhtml}*'): print(el.tag)
+{http://www.w3.org/1999/xhtml}html
+{http://www.w3.org/1999/xhtml}body
+
+>>> for el in xhtml.iter('{*}body'): print(el.tag)
+{http://www.w3.org/1999/xhtml}body
+
+# To look for elements that do not have a namespace, either use the plain tag name or provide the empty namespace explicitly:
+
+>>> [ el.tag for el in xhtml.iter('{http://www.w3.org/1999/xhtml}body') ]
+['{http://www.w3.org/1999/xhtml}body']
+>>> [ el.tag for el in xhtml.iter('body') ]
+[]
+>>> [ el.tag for el in xhtml.iter('{}body') ]
+[]
+>>> [ el.tag for el in xhtml.iter('{}*') ]
+[]
+```
+
+### The E-factory
+
+```py
+# The E-factory provides a simple and compact syntax for generating XML and HTML:
+
+>>> from lxml.builder import E
+
+>>> def CLASS(*args):  # class is a reserved word in Python
+...     return {"class":' '.join(args)}
+
+>>> html = page = (
+...   E.html(       # create an Element called "html"
+...     E.head(
+...       E.title("This is a sample document")
+...     ),
+...     E.body(
+...       E.h1("Hello!", CLASS("title")),
+...       E.p("This is a paragraph with ", E.b("bold"), " text in it!"),
+...       E.p("This is another paragraph, with a", "\n      ",
+...         E.a("link", href="http://www.python.org"), "."),
+...       E.p("Here are some reserved characters: <spam&egg>."),
+...       etree.XML("<p>And finally an embedded XHTML fragment.</p>"),
+...     )
+...   )
+... )
+
+>>> prettyprint(page)
+<html>
+  <head>
+    <title>This is a sample document</title>
+  </head>
+  <body>
+    <h1 class="title">Hello!</h1>
+    <p>This is a paragraph with <b>bold</b> text in it!</p>
+    <p>This is another paragraph, with a
+      <a href="http://www.python.org">link</a>.</p>
+    <p>Here are some reserved characters: &lt;spam&amp;egg&gt;.</p>
+    <p>And finally an embedded XHTML fragment.</p>
+  </body>
+</html>
+
+# Element creation based on attribute access makes it easy to build up a simple vocabulary for an XML language:
+
+>>> from lxml.builder import ElementMaker  # lxml only !
+
+>>> E = ElementMaker(namespace="http://my.de/fault/namespace",
+...                  nsmap={'p' : "http://my.de/fault/namespace"})
+
+>>> DOC = E.doc
+>>> TITLE = E.title
+>>> SECTION = E.section
+>>> PAR = E.par
+
+>>> my_doc = DOC(
+...   TITLE("The dog and the hog"),
+...   SECTION(
+...     TITLE("The dog"),
+...     PAR("Once upon a time, ..."),
+...     PAR("And then ...")
+...   ),
+...   SECTION(
+...     TITLE("The hog"),
+...     PAR("Sooner or later ...")
+...   )
+... )
+
+>>> prettyprint(my_doc)
+<p:doc xmlns:p="http://my.de/fault/namespace">
+  <p:title>The dog and the hog</p:title>
+  <p:section>
+    <p:title>The dog</p:title>
+    <p:par>Once upon a time, ...</p:par>
+    <p:par>And then ...</p:par>
+  </p:section>
+  <p:section>
+    <p:title>The hog</p:title>
+    <p:par>Sooner or later ...</p:par>
+  </p:section>
+</p:doc>
+
+# One such example is the module lxml.html.builder, which provides a vocabulary for HTML.
+
+# When dealing with multiple namespaces, it is good practice to define one ElementMaker for each namespace URI. Again, note how the above example predefines the tag builders in named constants. That makes it easy to put all tag declarations of a namespace into one Python module and to import/use the tag name constants from there. This avoids pitfalls like typos or accidentally missing namespaces.
+```
+
+### ElementPath
+
+```py
+# The ElementTree library comes with a simple XPath-like path language called ElementPath. The main difference is that you can use the {namespace}tag notation in ElementPath expressions. However, advanced features like value comparison and functions are not available.
+
+# In addition to a full XPath implementation, lxml.etree supports the ElementPath language in the same way ElementTree does, even using (almost) the same implementation. The API provides four methods here that you can find on Elements and ElementTrees:
+
+# iterfind() iterates over all Elements that match the path expression
+# findall() returns a list of matching Elements
+# find() efficiently returns only the first match
+# findtext() returns the .text content of the first match
+# Here are some examples:
+
+>>> root = etree.XML("<root><a x='123'>aText<b/><c/><b/></a></root>")
+
+# Find a child of an Element:
+
+>>> print(root.find("b"))
+None
+>>> print(root.find("a").tag)
+a
+
+# Find an Element anywhere in the tree:
+
+>>> print(root.find(".//b").tag)
+b
+>>> [ b.tag for b in root.iterfind(".//b") ]
+['b', 'b']
+
+# Find Elements with a certain attribute:
+
+>>> print(root.findall(".//a[@x]")[0].tag)
+a
+>>> print(root.findall(".//a[@y]"))
+[]
+
+# In lxml 3.4, there is a new helper to generate a structural ElementPath expression for an Element:
+
+>>> tree = etree.ElementTree(root)
+>>> a = root[0]
+>>> print(tree.getelementpath(a[0]))
+a/b[1]
+>>> print(tree.getelementpath(a[1]))
+a/c
+>>> print(tree.getelementpath(a[2]))
+a/b[2]
+>>> tree.find(tree.getelementpath(a[2])) == a[2]
+True
+
+# As long as the tree is not modified, this path expression represents an identifier for a given element that can be used to find() it in the same tree later. Compared to XPath, ElementPath expressions have the advantage of being self-contained even for documents that use namespaces.
+
+# The .iter() method is a special case that only finds specific tags in the tree by their name, not based on a path. That means that the following commands are equivalent in the success case:
+
+>>> print(root.find(".//b").tag)
+b
+>>> print(next(root.iterfind(".//b")).tag)
+b
+>>> print(next(root.iter("b")).tag)
+b
+
+# Note that the .find() method simply returns None if no match is found, whereas the other two examples would raise a StopIteration exception.
