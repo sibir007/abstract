@@ -3772,3 +3772,797 @@ wait -f 46671
 `tree -hupf` - Для получения дополнительной информации о файлах дополним команду tree опциями -h (показывает размер), -u (указывает на аккаунт, с которого файл был создан), -p (так мы узнаем, что можно делать с каждым конкретным файлом — только просматривать или также изменять его содержимое). Также используем параметр -f, чтобы видеть полный путь к каждому документу.
 
 `tree -f -P '*studio*' --prune` - Полезный лайфхак — если объединить опции -P и -f, можно быстро находить файлы, затерявшиеся в памяти компьютера
+
+## ps
+
+```sh
+$ ps опции
+
+$ ps опции | grep параметр
+```
+
+опции
+
+- -A, -e, (a) - выбрать все процессы;
+- -a - выбрать все процессы, кроме фоновых;
+- -d, (g) - выбрать все процессы, даже фоновые, кроме процессов сессий;
+- -N - выбрать все процессы кроме указанных;
+- -С - выбирать процессы по имени команды;
+- -G - выбрать процессы по ID группы;
+- -p, (p) - выбрать процессы PID;
+- --ppid - выбрать процессы по PID родительского процесса;
+- -s - выбрать процессы по ID сессии;
+- -t, (t) - выбрать процессы по tty;
+- -u, (U) - выбрать процессы пользователя.
+
+Опции форматирования:
+
+- -с - отображать информацию планировщика;
+- -f - вывести максимум доступных данных, например, количество потоков;
+- -F - аналогично -f, только выводит ещё больше данных;
+- -l - длинный формат вывода;
+- -j, (j) - вывести процессы в стиле Jobs, минимум информации;
+- -M, (Z) - добавить информацию о безопасности;
+- -o, (o) - позволяет определить свой формат вывода;
+- --sort, (k) - выполнять сортировку по указанной колонке;
+- -L, (H)- отображать потоки процессов в колонках LWP и NLWP;
+- -m, (m) - вывести потоки после процесса;
+- -V, (V) - вывести информацию о версии;
+- -H - отображать дерево процессов;
+
+## Attach to a processes output for viewing
+
+```sh
+cd /proc/1199
+cd fd
+
+# This fd directory hold the file-descriptors objects that your program is using (0: stdin, 1: stdout, 2: stderr) and just tail -f the one you need - in this case, stdout):
+$ tail -f 1
+```
+
+## tail
+
+```sh
+tail опции файл
+```
+
+### Options
+
+- `-c` - выводить указанное количество байт с конца файла;
+- `-f` - обновлять информацию по мере появления новых строк в файле;
+- `-n` - выводить указанное количество строк из конца файла;
+- `--pid` - используется с опцией -f, позволяет завершить работу утилиты, когда завершится указанный процесс;
+- `-q` - не выводить имена файлов;
+- `--retry` - повторять попытки открыть файл, если он недоступен;
+- `-v` - выводить подробную информацию о файле;
+
+### Using
+
+```sh
+# выводим последние десять строк файла:
+
+ tail /var/log/syslog
+
+# Если вам недостаточно 10 строк и нужно намного больше, то вы можете увеличить этот параметр с помощью опции -n:
+
+ tail -n 100 /var/log/syslog
+
+# Когда вы хотите отслеживать появление новых строк в файле, добавьте опцию -f:
+
+ tail -f /var/log/syslog
+
+#  Вы можете открыть несколько файлов одновременно, просто перечислив их в параметрах:
+
+ tail /var/log/syslog /var/log/Xorg.0.log
+
+ # С помощью опции -s вы можете задать частоту обновления файла. По умолчанию данные обновляются раз в секунду, но вы можете настроить, например, обновление раз в пять секунд:
+
+ tail -f -s 5 /var/log/syslog
+
+ # При открытии нескольких файлов будет выводиться имя файла перед участком кода. Если вы хотите убрать этот заголовок, добавьте опцию -q:
+
+ tail -q var/log/syslog /var/log/Xorg.0.log
+
+ #Если вас интересует не число строк, а именно число байт, то вы можете их указать с помощью опции -c:
+
+ tail -c 500 /var/log/syslog
+
+# Для удобства, вы можете выбирать не все строки, а отфильтровать интересующие вас:
+
+ tail -f /var/log/syslog | grep err
+
+ # Особенно, это полезно при анализе логов веб сервера или поиске ошибок в реальном времени. Если файл не открывается, вы можете использовать опцию retry чтобы повторять попытки:
+
+ tail -f --retry /var/log/syslog | grep err
+
+ # по умолчанию опция -f или --follow отслеживает файл по его имени, но вы можете включить режим отслеживания по дескриптору файла, тогда даже если имя измениться, вы будете получать всю информацию:
+
+ tail --follow=descriptor /var/log/syslog | grep err
+ ```
+
+## Автозагрузка сервисов в Ubuntu
+
+### Управление автозагрузкой сервисов в Linux
+
+список уровней загрузки и соответствующие им цели:
+
+- Run level 0 (poweroff.target, runlevel0.target) - выключение компьютера.
+- Run level 1 (rescue.target, runlevel1.target) - режим восстановления.
+- Run level 3 (multi-user.target, runlevel3.target) - текстовый режим.
+- Run level 5 (graphical.target) - загрузка графического окружения.
+- Run level 6 (reboot.target, runlevel6.target) - перезагрузка системы.
+
+При добавлении сервиса в автозагрузку Systemd просто создает символическую ссылку на файл юнита в папке соответствующего уровня загрузки. А при каком уровне загрузки должен запускаться юнит указано в его конфигурации.
+
+При старте системы, если это рабочая станция с графическим окружением Systemd запускает все сервисы для multi-user.target и затем graphical.target. Для серверов без графического окружения запускается только multi-user.target, а теперь давайте более подробно рассмотрим всё на практике.
+
+### 1. Список сервисов добавленных в автозагрузку
+
+```sh
+systemctl list-unit-files --type=service --state=enabled
+```
+
+### 2. Проверка состояния
+
+Для того чтобы проверить находится ли сервис уже в автозагрузке используйте команду is-enabled. Например:
+
+```sh
+sudo systemctl is-enabled nginx
+```
+
+С помощью команды status вы можете посмотреть находится ли сервис в автоазагрузке, а также проверить запущен ли он в данный момент и посмотреть последние логи:
+
+```sh
+sudo systemctl status nginx
+```
+
+### 3. Добавление в автозагрузку
+
+Добавить сервис в автозагрузку можно с помощью команды enable:
+
+```sh
+sudo systemctl enable имя_сервиса
+```
+
+Например, для того чтобы добавить в автозагрзку веб-сервер Nginx используйте такую команду:
+
+```sh
+sudo systemctl enable nginx
+```
+
+Если сервис ещё не запущен, то вы можете комбинировать команду enable с опцией `--now` для того чтобы запустить его прямо сейчас:
+
+```sh
+sudo systemctl enable --now nginx
+```
+
+Большинство системных сервисов, в том числе Nginx загружаются при уровне загрузки 3 (multi-user.target). Вы можете убедится, что в папке /etc/systemd/system/multi-user.target.wants есть ссылка на этот юнит:
+
+```sh
+ls -l /etc/systemd/system/multi-user.target.wants | grep nginx
+```
+
+### 4. Удаление из автозагрузки
+
+Удалить сервис из автозагрузки можно, указав опцию disable:
+
+```sh
+sudo systemctl disable имя_сервиса
+```
+
+## Переменные окружения
+
+Если смотреть более широко, переменная окружения может быть трех типов:
+
+1. Локальные переменные окружения. Эти переменные определены только для текущей сессии. Они будут безвозвратно стерты после завершения сессии, будь то удаленный доступ или эмулятор терминала. Они не хранятся ни в каких файлах, а создаются и удаляются с помощью специальных команд.
+
+2. Пользовательские переменные оболочки. Эти переменные оболочки в Linux определяются для конкретного пользователя и загружаются каждый раз когда он входит в систему при помощи локального терминала, или же подключается удаленно. Такие переменные, как правило, хранятся в файлах конфигурации: `.bashrc`, `.bash_profile`, `.bash_login`, `.profile` или в других файлах, размещенных в директории пользователя.
+
+3. Системные переменные окружения. Эти переменные доступны во всей системе, для всех пользователей. Они загружаются при старте системы из системных файлов конфигурации:  `/etc/environment`, `/etc/profile`, `/etc/profile.d/` `/etc/bash.bashrc`.
+
+Конфигурационные файлы переменных окружения Linux
+Здесь мы кратко рассмотрим различные конфигурационные файлы, перечисленные выше, которые используются для настройки переменных окружения для всей системы или конкретного пользователя.
+
+`.bashrc`
+Это файл переменных конкретного пользователя. Загружается каждый раз, когда пользователь создает терминальный сеанс, то есть проще говоря, открывает новый терминал. Все переменные окружения, созданные в этом файле вступают в силу каждый раз когда началась новая терминальная сессия.
+
+`.bash_profile`
+Эти переменные вступают в силу каждый раз когда пользователь подключается удаленно по SSH. Если этот файл отсутствует система будет искать .bash_login или .profile.
+
+`/etc/environment`
+Этот файл для создания, редактирования и удаления каких-либо переменных окружения на системном уровне. Переменные окружения, созданные в этом файле доступны для всей системы, для каждого пользователя и даже при удаленном подключении.
+
+`/etc/bash.bashrc`
+Системный bashrc. Этот файл выполняется для каждого пользователя, каждый раз когда он создает новую терминальную сессию. Это работает только для локальных пользователей, при подключении через интернет, такие переменные не будут видны.
+
+`/etc/profile`
+Системный файл profile. Все переменные из этого файла, доступны любому пользователю в системе, только если он вошел удаленно. Но они не будут доступны, при создании локальной терминальной сессии, то есть если вы просто откроете терминал.
+
+Все переменные окружения Linux созданные с помощью этих файлов, могут быть удалены всего лишь удалением их оттуда. Только после каждого изменения, нужно либо выйти и зайти в систему, либо выполнить эту команду:
+
+` source имя_файла`
+
+### Добавление пользовательских и системных переменных окружения в Linux
+
+Теперь, когда вы знаете немного теории, перейдем к практике. Локальные переменные окружения в Linux можно создавать следующими командами:
+
+`var=значение`
+`export var=значение`
+
+Эти переменные будут доступны только для текущей терминальной сессии.
+
+Для удаления переменных окружения можно использовать несколько команд:
+
+1. Использование env
+По умолчанию с помощью env можно посмотреть все установленные переменные среды. Но с опцией -i она позволяет временно удалить все переменные оболочки и выполнить команду без переменных.
+
+`$ env -i [переменная=значение] команда`
+
+Var - это любая переменная, которую вы хотите передать этой команде.
+
+Такая команда запустит оболочку вообще без переменных окружения:
+
+`env -i bash`
+
+После запуска такого окружения, не будет доступно никаких переменных, но после выхода все вернется на свои места.
+
+2. Использование unset
+Это другой способ удаления переменных окружения Linux. Unset удаляет переменную по имени до конца текущей сессии:
+
+` unset имя_переменной`
+
+3. Установить значение переменной в ''
+Это самый простой способ удаления переменных окружения в Linux, устанавливая пустое значение переменной, вы удаляете ее до конца текущей сессии.
+
+Замечание: С помощью таких способов вы можете изменять значения системных или пользовательских переменных, но они будут актуальны только для текущего сеанса.
+
+Создание пользовательских и системных переменных окружения
+В этом разделе рассмотрим как установить и удалить системные и пользовательские переменные не только для текущего сеанса, а так чтобы эффект сохранялся после перезагрузки.
+
+1. Устанавливаем и удаляем локальные переменные в Linux
+Давайте создадим локальную переменную VAR и установим ей любое значение, затем удалим ее с помощью unset и убедимся что она удалена:
+
+```sh
+ VAR1='Losst'
+
+ echo $VAR1
+
+ unset VAR1
+
+ echo $VAR1
+ ```
+
+Другой способ создать переменную - команда export. Удалим ее присвоив пустое значение:
+
+```sh
+ export VAR='Losst'
+
+echo $VAR
+
+VAR=
+
+echo $VAR
+```
+
+Теперь создадим переменную VAR2 также зададим ей значение. А потом временно удалим все локальные переменные выполнив env -i. Она запустит оболочку без каких-либо переменных. После ввода exit все переменные будут восстановлены.
+
+```sh
+ VAR2='Losst'
+
+ echo $VAR2
+
+ env -i bash
+
+ echo $VAR2
+```
+
+Установка и удаление пользовательских переменных
+Отредактируйте файл .bashrc, в вашей домашней директории, добавив команду export, для экспортирования нужной переменной. Затем выполните команду source для применения изменений. Создадим, например, переменную CD:
+
+ `vi .bashrc`
+
+Добавьте такую строчку (o, затем вставить, затем Esc и :wq):
+
+```sh
+export CD='This is Losst Home'
+
+# Теперь осталось обновить конфигурацию:
+
+ source .bashrc
+
+ echo $CD
+```
+
+```sh
+# Для удаления этой переменной просто удалите ее из .bashrc.
+
+# Теперь добавим переменную окружения с помощью .bash_profile. Эта переменная, как вы уже знаете будет доступна только при удаленном входе:
+
+ vi .bash_profile
+
+# Добавьте строчку:
+
+export VAR2='This is Losst Home'
+
+# И выполните эти команды, чтобы применить изменения и проверить добавление переменной:
+
+ source .bash_profile
+
+ echo $VAR2
+
+# Переменная недоступна, так как вы создали локальную терминальную сессию, теперь подключитесь по ssh:
+
+ ssh user@localhost
+
+ echo $VAR2
+```
+
+Удалить эту переменную окружения можно так же как и в предыдущем случае, удалив ее из файла.
+
+Замечание: Эти переменные доступны всегда, но не для всех пользователей.
+
+Установка и удаление системных переменных окружения
+Создадим переменную, доступную для всех пользователей, во всех терминальных сессиях, кроме удаленных, добавлением ее в /etc/bash.profile:
+
+```sh
+ vi /etc/bash.profile
+
+export VAR='This is system-wide variable'
+
+# Затем обновляем:
+
+ source /etc/bash.bashrc
+
+# Теперь эта переменная доступна для всех пользователей, во всех терминалах:
+
+ echo $VAR
+
+ sudo su
+
+ echo $VAR
+
+ su -
+
+ echo $VAR
+```
+
+Если вы хотите сделать переменную окружения доступной для всех пользователей, которые подключаются к этой машине удаленно, отредактируйте файл /etc/profile:
+
+```sh
+
+ vi /etc/profile
+
+export VAR1='This is system-wide variable for only remote sessions'
+
+# Обновите конфигурацию, и проверьте доступность переменной, она будет доступна только удаленно:
+
+ source /etc/profile
+
+ echo $VAR1
+
+# Если нужно добавить переменную окружения в Linux, так чтобы она была доступна и удаленно, и для локальных сессий, экспортируйте ее в /etc/environment:
+
+ vi /etc/environment
+
+export VAR12='I am available everywhere'
+
+# Проверяем:
+
+ source /etc/environment
+
+ echo $VAR12
+
+ sudo su
+
+ echo $VAR12
+
+ exit
+
+ ssh localhost
+
+ echo $VAR12
+```
+
+## VPS config
+
+### Настройка
+
+#### Обновления
+
+После покупки vps обычно вы получаете пароль от рута и ip адрес вашего севера, используйте их для входа.
+
+`ssh root@your_ip`
+
+Подключаемся на сервер, нажимаем yes и вводим пароль.
+
+`apt update && apt dist-upgrade -y && reboot`
+
+Обновляем данные о пакетах, апгрейдим все что есть на сервере и перезагружаемся, после чего заново входим на сервер.
+
+Я использую apt dist-upgrade, вместо apt upgrade потому что это безопаснее и надежнее, подробнее можно почитать тут
+
+#### Создание пользователя и настройка sudo
+
+`useradd -m super -G sudo -s /bin/bash`
+
+Создаем пользователя по имени super для работы с правами на sudo, собственной директорией и с bash в шелла.
+
+Отдельного пользователя для работы мы делаем, так как работать из под рута небезопасно из-за неограниченных привилегий.
+
+`visudo`
+
+Правим sudo конфиг через специальную тулзу, встроенную в sudo. Здесь нам нужно исправить несколько вещей:
+
+1. Даем возможность пользователям группы sudo использовать sudo без ввода пароля, добавляя NOPASSWD, так как мы не будем устанавливать пароли.
+
+```sh
+# Allow members of group sudo to execute any command
+%sudo   ALL=(ALL:ALL) NOPASSWD:ALL
+```
+
+2. Запрещаем использовать дополнительные конфиги для безопасности, поэтому комментируем удаляем эту строчку.
+
+`#includedir /etc/sudoers.d`
+
+3. Запрещаем группе admin использовать sudo, комментируя эту строчку.
+
+```sh
+# Members of the admin group may gain root privileges
+#%admin ALL=(ALL) ALL
+```
+
+итоговый /etc/sudoers
+
+```sh
+#
+# This file MUST be edited with the 'visudo' command as root.
+#
+# Please consider adding local content in /etc/sudoers.d/ instead of
+# directly modifying this file.
+#
+# See the man page for details on how to write a sudoers file.
+#
+Defaults	env_reset
+Defaults	mail_badpass
+Defaults	secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
+
+# Host alias specification
+
+# User alias specification
+
+# Cmnd alias specification
+
+# User privilege specification
+root	ALL=(ALL:ALL) ALL
+
+# Members of the admin group may gain root privileges
+#%admin ALL=(ALL) ALL
+
+# Allow members of group sudo to execute any command
+%sudo   ALL=(ALL:ALL) NOPASSWD:ALL
+
+# See sudoers(5) for more information on "#include" directives:
+```
+
+Заходим под созданным пользователем в его домашнюю директорию для дальнейшей настройки.
+
+```sh
+su super
+cd
+```
+
+Ставим маску на все создаваемые файлы, чтобы максимально ограничить доступ к ним.
+
+`echo 'umask 0077' >> .bashrc`
+
+Создаем папку для хранения ssh ключей и оставляем доступ только пользователю. Почему именно 700 можно почитать [здесь](https://www.redhat.com/sysadmin/linux-file-permissions-explained)
+
+`mkdir .ssh && chmod 700 .ssh`
+
+#### Настройка ssh
+
+Для безопасного входа на сервер нам нужно сгенерировать ssh ключи, чтобы использовать их вместо паролей. На этом этапе нужно две консоли, одна на сервере, а другая на локале.
+
+Генерируем ssh ключи на локальном компьютере, не на сервере! И получаем два ключа в папке ~/.ssh/: публичный(у него на конце .pub), который мы грузим на сервер, и приватный, который мы никуда никогда не загружаем!
+
+```sh
+# locale
+ssh-keygen -t rsa -b 4096
+```
+
+Альтернативный способ:
+
+```sh
+# locale
+ssh-keygen -t ed25519
+```
+
+При использовании альтернативного способа все делается так же, кроме того что ключ по умолчанию называется id_ed25519 . Про различие алгоритмов можно почитать [тут](https://security.stackexchange.com/a/101045)
+
+Загружаем полученный на предыдущем шаге ключ на сервер в папку нашего пользователя.
+
+```sh
+# locale
+scp .ssh/id_rsa.pub root@your_ip:/home/super/.ssh/
+```
+
+В консоли которая уже на сервере 'передаем' загруженный ключ под нашего пользователя, т.к. загружали мы его под рутом, ограничиваем права доступа к нему и переименовываем в authorized_key.
+
+
+```sh
+# server
+sudo chown super:super .ssh/id_rsa.pub && chmod 600 .ssh/id_rsa.pub && mv .ssh/id_rsa.pub .ssh/authorized_keys
+```
+
+Проверяем, что удачно можем авторизоваться на сервере с помощью ключа под нашим пользователем и продолжаем настройку.
+
+```sh
+# locale
+ssh -i .ssh/id_rsa super@your_ip
+```
+
+Выключаем пользователя root, чтобы никаким способом нельзя было работать из под него. Меняем его shell на /usr/sbin/nologin, должно получиться вот так:
+
+```sh
+# server
+sudo vi /etc/passwd
+
+root:x:0:0:root:/root:/usr/sbin/nologin
+```
+
+Теперь нам нужно настроить ssh сервер
+
+```sh
+# server
+sudo vi /etc/ssh/sshd_config
+```
+
+Нам нужно исправить следующие строчки:
+
+1. Меняем порт на нестандартный
+
+`Port 2220`
+
+2. Явно запрещаем авторизацию под root, меняя yes на no
+
+`PermitRootLogin no`
+
+3. Запрещаем авторизацию по паролю, оставляя только по ключу:
+
+```sh
+# To disable tunneled clear text passwords, change to no here!
+PasswordAuthentication no
+PermitEmptyPasswords no
+```
+
+4. Ставим принудительную авторизацию по ключу
+
+```sh
+PubkeyAuthentication yes
+```
+
+Из комментария @aruslantsev
+
+Еще стоит проверить, что в конфиге явно указано
+
+`KbdInteractiveAuthentication no`
+
+или
+
+`ChallengeResponseAuthentication no`.
+
+Иначе такая команда может привести к удивительным результатам:
+
+`ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no example.com`
+
+Выходим и сохраняем конфиг, после чего перезапускаем ssh сервер.
+
+```sh
+# server
+sudo systemctl restart sshd
+```
+
+Итоговый /etc/ssh/sshd_config
+
+```sh
+#	$OpenBSD: sshd_config,v 1.103 2018/04/09 20:41:22 tj Exp $
+
+# This is the sshd server system-wide configuration file.  See
+# sshd_config(5) for more information.
+
+# This sshd was compiled with PATH=/usr/bin:/bin:/usr/sbin:/sbin
+
+# The strategy used for options in the default sshd_config shipped with
+# OpenSSH is to specify options with their default value where
+# possible, but leave them commented.  Uncommented options override the
+# default value.
+
+Include /etc/ssh/sshd_config.d/*.conf
+
+Port 2220
+#AddressFamily any
+#ListenAddress 0.0.0.0
+#ListenAddress ::
+
+#HostKey /etc/ssh/ssh_host_rsa_key
+#HostKey /etc/ssh/ssh_host_ecdsa_key
+#HostKey /etc/ssh/ssh_host_ed25519_key
+
+# Ciphers and keying
+#RekeyLimit default none
+
+# Logging
+#SyslogFacility AUTH
+#LogLevel INFO
+
+# Authentication:
+
+#LoginGraceTime 2m
+PermitRootLogin no
+#StrictModes yes
+#MaxAuthTries 6
+#MaxSessions 10
+
+PubkeyAuthentication yes
+
+# Expect .ssh/authorized_keys2 to be disregarded by default in future.
+#AuthorizedKeysFile	.ssh/authorized_keys .ssh/authorized_keys2
+
+#AuthorizedPrincipalsFile none
+
+#AuthorizedKeysCommand none
+#AuthorizedKeysCommandUser nobody
+
+# For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
+#HostbasedAuthentication no
+# Change to yes if you don't trust ~/.ssh/known_hosts for
+# HostbasedAuthentication
+#IgnoreUserKnownHosts no
+# Don't read the user's ~/.rhosts and ~/.shosts files
+IgnoreRhosts yes
+
+# To disable tunneled clear text passwords, change to no here!
+PasswordAuthentication no
+PermitEmptyPasswords no
+
+# Change to yes to enable challenge-response passwords (beware issues with
+# some PAM modules and threads)
+ChallengeResponseAuthentication no
+KbdInteractiveAuthentication no
+
+# Kerberos options
+#KerberosAuthentication no
+#KerberosOrLocalPasswd yes
+#KerberosTicketCleanup yes
+#KerberosGetAFSToken no
+
+# GSSAPI options
+#GSSAPIAuthentication no
+#GSSAPICleanupCredentials yes
+#GSSAPIStrictAcceptorCheck yes
+#GSSAPIKeyExchange no
+
+# Set this to 'yes' to enable PAM authentication, account processing,
+# and session processing. If this is enabled, PAM authentication will
+# be allowed through the ChallengeResponseAuthentication and
+# PasswordAuthentication.  Depending on your PAM configuration,
+# PAM authentication via ChallengeResponseAuthentication may bypass
+# the setting of "PermitRootLogin without-password".
+# If you just want the PAM account and session checks to run without
+# PAM authentication, then enable this but set PasswordAuthentication
+# and ChallengeResponseAuthentication to 'no'.
+UsePAM yes
+
+#AllowAgentForwarding yes
+#AllowTcpForwarding yes
+#GatewayPorts no
+X11Forwarding yes
+#X11DisplayOffset 10
+#X11UseLocalhost yes
+#PermitTTY yes
+PrintMotd no
+#PrintLastLog yes
+#TCPKeepAlive yes
+#PermitUserEnvironment no
+#Compression delayed
+#ClientAliveInterval 0
+#ClientAliveCountMax 3
+#UseDNS no
+#PidFile /var/run/sshd.pid
+#MaxStartups 10:30:100
+#PermitTunnel no
+#ChrootDirectory none
+#VersionAddendum none
+
+# no default banner path
+Banner /etc/ssh/banner
+
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_*
+
+# override default of no subsystems
+Subsystem	sftp	/usr/lib/openssh/sftp-server
+
+# Example of overriding settings on a per-user basis
+#Match User anoncvs
+#	X11Forwarding no
+#	AllowTcpForwarding no
+#	PermitTTY no
+#	ForceCommand cvs server
+```
+
+Настраиваем ssh config, чтобы каждый раз не прописывать ip адрес, путь до ключа и пользователя.
+
+```sh
+# locale
+vi .ssh/config
+
+Host pet
+  # Меняем на свой ip
+  HostName your_ip
+  # Меняем на своего пользователя
+  User super
+  IdentitiesOnly yes
+  IdentityFile ~/.ssh/id_rsa
+  # Меняем на свой порт, если не меняли порт, то ставим 22
+  Port 2220
+```
+
+Теперь мы можем подключаться на сервер с помощью команды:
+
+`ssh pet`
+
+#### Подключаемся на сервер и продолжаем настройку.
+
+##### Установка доп. программ
+
+`sudo apt install git ufw nmap net-tools curl`
+
+Устанавливаем дефолтные тулзы для работы.
+
+`ufw` - надстройка над iptables, упрощает настройку файрволла сервера.
+
+`git` - часто необходим для скачивания и развертывания программ на сервере, лишним не будет.
+
+`nmap` - для 'простукивания' портов, помогает проверить что на сервере лишние порты не открыты.
+
+`net-tools` - сюда входит популярный `ifconfig` и `netstat`, часто облегчает работу.
+
+`curl` - для выполнения http запросов прямо из консоли.
+
+(Опционально) Если нужен докер, то инструкция [здеcь](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
+
+##### Firewall
+
+Разрешаем подключение по ssh.
+
+```sh
+# Если меняли порт ssh
+sudo ufw allow 2220/tcp
+
+# Если не меняли
+sudo ufw allow ssh
+```
+
+Запрещаем все входящие подключения и разрешаем все выходящие.
+
+```sh
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+```
+
+Включаем firewall.
+
+`sudo ufw enable`
+
+На этом базовая настройка сервера закончена, надеюсь туториал вам помог :-)
+
+
+### Из комментариев
+
+Fail2ban
+
+@aborouhin Раз уж мы про безопасность - то можно добавить к списку для установки и настройки fail2ban.
+
+Вот здесь [есть](https://linuxize.com/post/install-configure-fail2ban-on-ubuntu-20-04/) хорошая инструкция по настройке fail2ban на ssh. Если кратко, то он автоматически банит подключение с ip адреса при опеределнном количестве неудачных попыток авторизации, что помогает против ботов.
+

@@ -75,6 +75,21 @@ using the xargs Linux utility
 `docker rm --volumes redis`
 Remove a container and its volumes (-v, --volumes)
 
+### docker container logs
+
+Retrieve logs until a specific point in time (--until)
+
+`docker logs -f --until=2s test`
+
+#### Options
+
+- `--details` Show extra details provided to logs
+- `-f`, `--follow` Follow log output
+- `--since` Show logs since timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)
+- `-n`, `--tail` Number of lines to show from the end of the logs. Default all
+- `-t`, `--timestamps` Show timestamps
+- `--until` API 1.35+ Show logs before a timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)
+
 ## docker compose
 
 ### Key commands

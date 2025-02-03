@@ -79,7 +79,6 @@ sudo docker compose -f docker-compose.ap.prod.yml up
 
 ## Запуск в DEV режиме
 
-
 ```bash
 sudo docker compose -f docker-compose.ap.dev.yml up
 ```
@@ -87,4 +86,103 @@ sudo docker compose -f docker-compose.ap.dev.yml up
 ```bash
 sudo docker run --rm -it -p 8080:8080  -v ./db_data:/app/db_data  -v ./.env:/app/.env -v ./config.py:/app/config.py -v ./config_logging.py:/app/config_logging.py -v ./logs:/app/logs sibir007/adminproject:latest
 ```
+
+## Запуск в DEMO режиме
+
+```bash
+/etc/adminproject/
+├── db_data
+├── db_data_cach
+│   ├── activity_db.db
+│   ├── admin_db.db
+│   ├── analytics.db
+│   ├── shop.db
+│   └── social_gamification_db.db
+├── scripts
+│   ├── chesk_and_reload_data.sh
+│   └── up_admp_servese_and_write_time.sh
+├── config_logging.py
+├── config.py
+├── .env
+├── docker-compose.ap.prod.demo.yml
+└── logs
+```
+
+```bash
+# Как отправить файл по SSH с локального компьютера на сервер
+
+scp /home/test.doc username@servername:/directory
+scp .env config.py config_logging.py docker-compose.ap.prod.demo.yml root@45.156.23.171:/etc/adminproject/
+scp db_data_cach/* root@45.156.23.171:/etc/adminproject/db_data_cach/
+scp scripts/chesk_and_reload_data.sh scripts/up_admp_servese_and_write_time.sh  root@45.156.23.171:/etc/adminproject/scripts
+
+# послу копирования на ремот сервер chesk_and_reload_data.sh нужно заменить work_dir=/home/dima/python/projects/adminproject на work_dir=/еtc/adminproject
+
+```
+
+```bash
+# Как скачать файлы с удаленного сервера на компьютер
+
+scp username@servername:/directory/test.doc /home
+
+```
+
+```bash
+sudo docker build -t sibir007/adminproject_demo:latest -f Dockerfile.adminproject .
+```
+
+```bash
+sudo docker image push sibir007/adminproject_demo:latest
+```
+
+```bash
+sudo docker image pull sibir007/adminproject_demo:latest
+```
+
+```bash
+# если необходим мониторинг и перезапуск сервиса в случае модификации
+#  файлов баз данных то этим не пользоваться - запускать через скрипт
+#  up_admp_servese_and_write_time.sh
+sudo docker compose -f docker-compose.ap.prod.demo.yml up
+sudo docker compose -f docker-compose.ap.prod.demo.yml up &
+docker compose -f docker-compose.ap.prod.demo.yml up --remove-orphans
+docker compose -f docker-compose.ap.prod.demo.yml stop adminproject
+docker compose -f docker-compose.ap.prod.demo.yml start adminproject
+```
+
+```bash
+# запуск если необходимо перезапускать сервис при модификации бд
+# запуска скрипта запуска
+
+root@dima-Nitro-AN515-52:~#  /etc/adminproject/scripts/up_admp_servese_and_write_time.sh
+---------------copy data start--------------
+---------------copy data end--------------
+---------------up servise start--------------
+[+] Running 1/0
+ ✔ Container adminproject_demo_container  Created              0.0s 
+Attaching to adminproject_demo_container
+
+# скрипт копирует содержимое db_data_cach в db_data и создаёт файл 
+# modificaton_data.txt в который записывает дату и время копирования, 
+# и запускает сервис adminproject, в дальнейшем modificaton_data.txt
+# используется для отслеживания модификации дб и перзапуска сервиса
+
+```
+
+```bash
+# настройка мониторинга и перезагрузки сервиса в случае модификации db проекта
+# edit crontable
+crontab -e
+# add records in crontable
+*/10 * * * * /etc/adminproject/scripts/chesk_and_reload_data.sh # удалённый сервер
+*/2 * * * * /home/dima/python/projects/adminproject/scripts/chesk_and_reload_data.sh # репозиторий
+# скрипт chesk_and_reload_data.sh в заданные промежутки времени проверяет соответствие
+# даты и времени указанного в db_data/modificaton_data.txt и времени модификации файлов
+# баз данных в db_data/* если находит несоответствие (что свидетельствует о том что дб
+# была модифицирована) то останавливает контейнер, производит замену баз данных в db_data из db_data_cach и снова запускает контейнер
+```
+
+
+<http://45.156.23.171:8080>
+<http://213.232.204.164:8080>
 
