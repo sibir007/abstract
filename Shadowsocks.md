@@ -1,8 +1,170 @@
 # Shadowsocks
 
+## shadowsocks-libev
+
+### Pull the image
+
+`$ docker pull shadowsocks/shadowsocks-libev`
+
+This pulls the latest release of shadowsocks-libev.
+
+You can also choose to pull a previous release or to try the bleeding edge build:
+
+`$ docker pull shadowsocks/shadowsocks-libev:<tag>`
+`$ docker pull shadowsocks/shadowsocks-libev:edge`
+
+A list of supported tags can be found at Docker Hub.
+
+### Start a container
+
+```sh
+$ docker run -p 8388:8388 -p 8388:8388/udp -d --restart always shadowsocks/shadowsocks-libev:latest
+```
+
+This starts a container of the latest release with all the default settings, which is equivalent to
+
+```sh
+$ ss-server -s 0.0.0.0 -p 8388 -k "$(hostname)" -m aes-256-gcm -t 300 -d "8.8.8.8,8.8.4.4" -u
+```
+
+Note: It's the hostname in the container that is used as the password, not that of the host.
+
+With custom port
+
+In most cases you'll want to change a thing or two, for instance the port which the server listens on. This is done by changing the -p arguments.
+
+Here's an example to start a container that listens on 28388 (both TCP and UDP):
+
+```sh
+$ docker run -p 28388:8388 -p 28388:8388/udp -d --restart always shadowsocks/shadowsocks-libev
+```
+
+With custom password
+
+Another thing you may want to change is the password. To change that, you can pass your own password as an environment variable when starting the container.
+
+Here's an example to start a container with 9MLSpPmNt as the password:
+
+```sh
+$ docker run -e PASSWORD=9MLSpPmNt -p 8388:8388 -p 8388:8388/udp -d --restart always shadowsocks/shadowsocks-libev
+```
+⚠️ Click here to generate a strong password to protect your server.
+
+With password as a mounted file or a Docker secret (swarm only)
+Instead of hardcoding a password to the docker-compose file or docker run command, you can mount in a file that contains the password. To do so, pass the path that you mounted to the container as the PASSWORD_FILE environment variable.
+
+If you are running Docker Swarm, you can also utilize Docker secrets. To do so, pass the name of the secret as the PASSWORD_SECRET environment variable. If you specify both PASSWORD_FILE and PASSWORD_SECRET, the latter will take effect.
+
+This is a sample docker-compose.yml file that uses the external Docker secret named shadowsocks as the password.
+
+```yml
+shadowsocks:
+  image: shadowsocks/shadowsocks-libev
+  ports:
+    - "8388:8388"
+  environment:
+    - METHOD=aes-256-gcm
+    - PASSWORD_SECRET=shadowsocks
+  secrets:
+    - shadowsocks
+```
+
+This is a sample docker service create command that uses the external Docker secret named shadowsocks as the password.
+
+```sh
+docker service create -e PASSWORD_SECRET=shadowsocks -p 8388:8388 -p 8388:8388/udp --secret shadowsocks shadowsocks/shadowsocks-libev
+```
+
+With other customizations
+
+Besides PASSWORD, the image also defines the following environment variables that you can customize:
+
+SERVER_ADDR: the IP/domain to bind to, defaults to 0.0.0.0
+SERVER_ADDR_IPV6: the IPv6 address to bind to, defaults to ::0
+METHOD: encryption method to use, defaults to aes-256-gcm
+TIMEOUT: defaults to 300
+DNS_ADDRS: DNS servers to redirect NS lookup requests to, defaults to 8.8.8.8,8.8.4.4
+TZ: Timezone, defaults to UTC
+
+Additional arguments supported by ss-server can be passed with the environment variable ARGS, for instance to start in verbose mode:
+
+```sh
+$ docker run -e ARGS=-v -p 8388:8388 -p 8388:8388/udp -d --restart always shadowsocks/shadowsocks-libev:latest
+```
+
+### Use docker-compose to manage (optional)
+
+It is very handy to use docker-compose to manage docker containers. You can download the binary at https://github.com/docker/compose/releases.
+
+This is a sample docker-compose.yml file.
+
+```yml
+shadowsocks:
+  image: shadowsocks/shadowsocks-libev
+  ports:
+    - "8388:8388"
+  environment:
+    - METHOD=aes-256-gcm
+    - PASSWORD=9MLSpPmNt
+  restart: always
+```
+
+It is highly recommended that you setup a directory tree to make things easy to manage.
+
+```sh
+$ mkdir -p ~/fig/shadowsocks/
+$ cd ~/fig/shadowsocks/
+$ curl -sSLO https://github.com/shadowsocks/shadowsocks-libev/raw/master/docker/alpine/docker-compose.yml
+$ docker-compose up -d
+$ docker-compose ps
+```
+
+### Finish
+
+At last, download shadowsocks client here. Don't forget to share internet with your friends.
+
+```json
+{
+    "server": "your-vps-ip",
+    "server_port": 8388,
+    "local_address": "0.0.0.0",
+    "local_port": 1080,
+    "password": "9MLSpPmNt",
+    "timeout": 600,
+    "method": "aes-256-gcm"
+}
+```
+
 ## shadowsocks-rust
 
 ### Run the container
+
+#### Use IPv6 for the default bridge network
+
+Docker containers do not have access to IPv6 by default: Make sure to disable IPv6 Route in the client or [enable IPv6 access to docker containers](https://docs.docker.com/config/daemon/ipv6/#use-ipv6-for-the-default-bridge-network).
+
+The following steps show you how to use IPv6 on the default bridge network.
+
+1. Edit the Docker daemon configuration file, located at /etc/docker/daemon.json. Configure the following parameters:
+
+```json
+{
+  "ipv6": true,
+  "fixed-cidr-v6": "2001:db8:1::/64"
+}
+```
+
+- ipv6 enables IPv6 networking on the default network.
+- fixed-cidr-v6 assigns a subnet to the default bridge network, enabling dynamic IPv6 address allocation.
+- ip6tables enables additional IPv6 packet filter rules, providing network isolation and port mapping. It is enabled by-default, but can be disabled.
+
+2. Save the configuration file.
+
+3. Restart the Docker daemon for your changes to take effect.
+
+ `sudo systemctl restart docker`
+
+### Docker
 
 ```sh
 # client
@@ -39,7 +201,6 @@ pwgen -1 -s -y # использовать в нем один специальн�
 pwgen -n 10 # генерация паролей linux длиной в десять символов
 
 ```
-
 
 ShadowSocks' configuration file. Example
 
@@ -85,6 +246,47 @@ cargo build --release
 После выполнения этих команд и завершения сборки проекта, в каталоге `./target/release/` можно будет найти бинарные файлы: `sslocal`, `ssserver`, `ssmanager`, `ssservice` и `ssurl`.
 
 Примечание: если вы планируете использовать бинарные файлы на машине, архитектура/ОС которой отличаются от ваших текущих, вам необходимо использовать кросс-компиляцию. Подробнее об этом можно прочесть здесь: https://rust-lang.github.io/rustup/cross-compilation.html
+
+### Install using snap
+
+```sh
+# Install from snapstore
+snap install shadowsocks-rust
+
+# List services
+snap services shadowsocks-rust
+
+# Enable and start shadowsocks-rust.sslocal-daemon snap service
+snap start --enable shadowsocks-rust.sslocal-daemon
+
+# Show generated systemd service status
+systemctl status snap.shadowsocks-rust.sslocal-daemon.service
+
+# Override generated systemd service (configure startup options)
+systemctl edit snap.shadowsocks-rust.sslocal-daemon.service
+
+## NOTE: you can pass args to sslocal:
+##  [Service]
+##  ExecStart=
+##  ExecStart=/usr/bin/snap run shadowsocks-rust.sslocal-daemon -b "127.0.0.1:1080" --server-url "ss://...."
+
+# Restart generated systemd service to apply changes
+systemctl restart snap.shadowsocks-rust.sslocal-daemon.service
+
+# ... and show service status
+systemctl status snap.shadowsocks-rust.sslocal-daemon.service
+```
+
+### install from crates.io
+
+Install from crates.io:
+
+```sh
+# Install from crates.io
+cargo install shadowsocks-rust
+```
+
+then you can find sslocal and ssserver in $CARGO_HOME/bin.
 
 #### Описание бинарных файлов
 
@@ -155,6 +357,8 @@ config_l.json
 Например, это могут быть такие файлы:
 
 ```conf
+; shadowsocks-rust-server.service
+
 [Unit]
 Description=Shadowsocks-rust Custom Server Service
 Documentation=https://github.com/shadowsocks/shadowsocks-rust
@@ -165,9 +369,15 @@ Type=simple
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 ExecStart=/usr/bin/ssservice server --log-without-time -c /etc/shadowsocks-rust/config_s.json
+User=root
  
 [Install]
 WantedBy=multi-user.target
+```
+
+```conf
+; shadowsocks-rust-local.service
+
 [Unit]
 Description=Shadowsocks-rust Custom Client Service
 Documentation=https://github.com/shadowsocks/shadowsocks-rust
