@@ -271,3 +271,6 @@ sudo /opt/nekoray/nekobox
 
 https://play.google.com/store/apps/details?id=com.v2ray.ang&hl=en_US
 https://github.com/2dust/v2rayNG
+https://github.com/2dust/v2rayNG/releases
+
+realme c 67 набор команд процессора ARMv8.2-A
