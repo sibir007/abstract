@@ -558,7 +558,7 @@ In stack the execution data of the functions are stored as stack frames. Each fr
 Typical data that are stored on stack are local variables(value types or primitives, primitive constants), pointers and function frames.
 
 If the size of the data operated by the program is not known at the compilation stage, the data will be allocated in the heap. When you put data on the heap, you request a certain amount of space. The memory allocator finds an empty spot in the heap that is big enough, marks it as being in use, and returns a pointer, which is the address of that location. This process is called allocating on the heap and is sometimes abbreviated as just allocating (pushing values onto the stack is not considered allocating). Because the pointer to the heap is a known, fixed size, you can store the pointer on the stack, but when you want the actual data, you must follow the pointer.
-Unlike the stack, where memory space is freed automatically after a function exits, heap memory space must be cleared explicitly when the data stored in it is no longer needed, which is called "memory management."
+Unlike the stack, where memory space is freed automatically after a function exits, heap memory space must be cleared explicitly when the data stored in it is no longer needed, which is called "memory management".
 
 ##### 51. What's the difference between stack and heap
 
@@ -615,31 +615,141 @@ Ownership is a set of rules that govern how a Rust program manages memory.
 - There can only be one owner at a time.
 - When the owner goes out of scope, the value will be dropped.
 
-##### 53. How does a variable become an owner?
+##### 53. how does memory allocation happen in Rust?
 
-We declare a variable and assign its value. The value can be simple or composite, i.e. consist of several values, in this case the variable with its value is pushed into the stack, if the data is dynamic, i.e. the size of the data is not known at compile time, then a request is made to the allocator and a reference to the area in the heap is placed into the stack.
-
-##### 53. What happens when we assign a variable to another variable?
-
-
+We declare a variable and assign its value. The value can be simple or composite, i.e. consist of several values, but all value must be scalar, i.e. its size known at compile time, in this case the variable with its value is pushed into the stack, if the data is not scalar, dynamic, i.e. the size of the data is not known at compile time, then a request is made to the allocator and a reference to the area in the heap is placed into the stack.
 
 ##### 53. What is scope?
 
 A scope is the range within a program for which an item is valid
 
+##### 54. how does memory free happen in Rust?
+
+When a variable goes out of scope, Rust calls a special method `drop`, it frees heep.
+When we assign a completely new value to an existing variable, Rust will call drop and free the original value’s memory immediately.
+
+##### 53. What happens when we assign a variable to another variable?
+
+when one variable is assigned to another variable, a shallow copy of the first variable's value is created and bound to the second variable. If the variable's value includes a value or values ​​of dynamic types, i.e. types whose values ​​are stored on the heap, then the first variable becomes invalid and a reference to it further in the code causes a compilation error.
+
+##### 54. What is Move?
+
+when we assign a variable to another variable and the value of that variable is stored on the heap, a shallow copy is created, i.e. the stack data is copied, including pointers to the data on the heap, but the value on the heap is not copied, and rust marks the original variable as invalid, this process is called "Move" transfer ownership.
+
+By by means of "Move" occurs transfer ownership.
+
+
 ##### 54. where in a code a variable is valid?
 
-variable is valid from the point at which it’s declared until the end of the current scope or
+variable is valid from the point at which it’s declared until the end of the current scope or until it is assigned to another variable, if its value is stored on the heap
+
+##### 55. What is ownership pattern?
+
+assigning a value to another variable moves it. When a variable that includes data on the heap goes out of scope, the value will be cleaned up by drop unless ownership of the data has been moved to another variable.
+
+
+##### 55 What do deep copy i.e. not only copy of stack data, bat heep data
+
+we can use a method called `clone`
 
 ```rust
-    {                      // s is not valid here, it’s not yet declared
-        let s = "hello";   // s is valid from this point forward
+let s1 = String::from("hello");
+let s2 = s1.clone();
 
-        // do stuff with s
-    } 
+println!("s1 = {s1}, s2 = {s2}");
 ```
 
-- When variable comes into scope, it is valid.
-- It remains valid until it goes out of scope.
+##### 56 what happens when we assign a variable whose value type implements the Copy trait, to another variable?
+
+variables that use it do not move, but rather are trivially copied, making them still valid after assignment to another variable.
+
+##### 57 what happens when we annotate a type with Copy if the type, or any of its parts, has implemented the Drop trait?
+
+we’ll get a compile-time error
+
+##### 58. What types implement the Copy trait?
+
+A general rule: any group of simple scalar values can implement Copy, and nothing that requires allocation or is some form of resource can implement Copy. Here are some of the types that implement Copy:
+
+- All the integer types, such as u32.
+- The Boolean type, bool, with values true and false.
+- All the floating-point types, such as f64.
+- The character type, char.
+- Tuples, if they only contain types that also implement Copy. For example, (i32, i32) implements Copy, but (i32, String) does not.
+
+##### 59. What happen when we passing a value to a function?
+
+Passing a variable to a function will move or copy, variable depending on the type of data bound to the variable, just as it happens with assignment
+
+Returning values from function can also transfer ownership
+
+#### References and Borrowing
+
+##### 60. What is reference?
+
+A reference is an address we can follow to access the data stored at that address; that data is owned by some other variable. Unlike a pointer, a reference is guaranteed to point to a valid value of a particular type for the life of that reference.
+
+```rust
+fn main() {
+    let s1 = String::from("hello");
+
+    let len = calculate_length(&s1);
+
+    println!("The length of '{s1}' is {len}.");
+}
+
+fn calculate_length(s: &String) -> usize {
+    s.len()
+}
+```
+
+##### 61. why do we need to pass a reference and not a value?
+
+By means passing reference we do not transfer Ownership. We can refer to some value without taking ownership of it. Because reference does not own value, the value it points to will not be dropped when the reference stops being used. When functions have references as parameters instead of the actual values, we won’t need to return the values in order to give back ownership, because we never had ownership.
+
+
+```rust
+fn calculate_length(s: &String) -> usize { // s is a reference to a String
+    s.len()
+} // Here, s goes out of scope. But because it does not have ownership of what
+  // it refers to, it is not dropped.
+```
+
+##### What is Borrowing?
+
+creating a reference called borrowing
+
+##### what happens if we try to modify something we’re borrowing? 
+
+```rust
+fn main() {
+    let s = String::from("hello");
+
+    change(&s);
+}
+
+fn change(some_string: &String) {
+    some_string.push_str(", world");
+}
+```
+
+Just as variables are immutable by default, so are references. We’re not allowed to modify something we have a reference to - we get a compile error.
+
+##### What needs to be done to create a mutable reference?
+
+We must create variable whit keyword 'mut' and pass a reference whit '&mut' key.
+a function that takes a mutable reference must declare the parameter type with &mut keyword
+
+```rust
+fn main() {
+    let mut s = String::from("hello");
+
+    change(&mut s);
+}
+
+fn change(some_string: &mut String) {
+    some_string.push_str(", world");
+}
+```
 
 
