@@ -551,13 +551,14 @@ fn main() {
 
 #### Ownership
 
-##### 49. What Is Ownership?
+##### 49. Why do you need to manage memory?
 
-Ownership is a set of rules that govern how a Rust program manages memory. All programs have to manage the way they use a computer’s memory while running. Some languages have garbage collection that regularly looks for no-longer-used memory as the program runs; in other languages, the programmer must explicitly allocate and free the memory. Rust uses a third approach: memory is managed through a system of ownership with a set of rules that the compiler checks. If any of the rules are violated, the program won’t compile.
+The program operates on data during execution. The data that the program operates on is stored in memory. Depending on the nature of the data, there are two types of storage: stack and heap.
+In stack the execution data of the functions are stored as stack frames. Each frame is a block of space where the data required for that function is stored. For example, every time a function declares a new variable, it is "pushed" onto the topmost block in the stack. Then every time a function exits, the topmost block is cleared, thus all of the variables pushed onto the stack by that function, are cleared. The size of the data stored on the stack must be known at compile time.
+Typical data that are stored on stack are local variables(value types or primitives, primitive constants), pointers and function frames.
 
-##### 50. How called parts of memory available to code to use at runtime?
-
-__stack__ and __heap__
+If the size of the data operated by the program is not known at the compilation stage, the data will be allocated in the heap. When you put data on the heap, you request a certain amount of space. The memory allocator finds an empty spot in the heap that is big enough, marks it as being in use, and returns a pointer, which is the address of that location. This process is called allocating on the heap and is sometimes abbreviated as just allocating (pushing values onto the stack is not considered allocating). Because the pointer to the heap is a known, fixed size, you can store the pointer on the stack, but when you want the actual data, you must follow the pointer.
+Unlike the stack, where memory space is freed automatically after a function exits, heap memory space must be cleared explicitly when the data stored in it is no longer needed, which is called "memory management."
 
 ##### 51. What's the difference between stack and heap
 
@@ -570,7 +571,6 @@ Pushing to the stack is faster than allocating on the heap because the allocator
 Accessing data in the heap is slower than accessing data on the stack because you have to follow a pointer to get there. Contemporary processors are faster if they jump around less in memory.
 
 When your code calls a function, the values passed into the function (including, potentially, pointers to data on the heap) and the function’s local variables get pushed onto the stack. When the function is over, those values get popped off the stack.
-
 
 ##### 51.1 What is Stack?
 
@@ -597,6 +597,17 @@ Heap is used for dynamic memory allocation and unlike stack, the program needs t
 - This is where you would encounter out of memory errors if your application tries to use more memory than the allocated heap(Though there are many other factors at play here like GC, compacting).
 - Generally, there is no limit on the size of the value that can be stored on the heap. Of course, there is the upper limit of how much memory is allocated to the application.
 
+##### 49. What are the methods of memory management?
+
+Some languages have garbage collection that regularly looks for no-longer-used memory as the program runs; in other languages, the programmer must explicitly allocate and free the memory. Rust uses a third approach: memory is managed through a system of ownership with a set of rules that the compiler checks. If any of the rules are violated, the program won’t compile.
+
+##### 50. What is the problem associated with memory management?
+
+In most languages without a GC, it’s our responsibility to identify when memory is no longer being used and to call code to explicitly free it. Doing this correctly a difficult programming problem. If we forget, we’ll waste memory. If we do it too early, we’ll have an invalid variable. If we do it twice, that’s a bug too. We need to pair exactly one allocate with exactly one free.
+
+##### 49. What Is Ownership?
+
+Ownership is a set of rules that govern how a Rust program manages memory.
 
 ##### 52. Ownership Rules?
 
@@ -604,13 +615,21 @@ Heap is used for dynamic memory allocation and unlike stack, the program needs t
 - There can only be one owner at a time.
 - When the owner goes out of scope, the value will be dropped.
 
+##### 53. How does a variable become an owner?
+
+We declare a variable and assign its value. The value can be simple or composite, i.e. consist of several values, in this case the variable with its value is pushed into the stack, if the data is dynamic, i.e. the size of the data is not known at compile time, then a request is made to the allocator and a reference to the area in the heap is placed into the stack.
+
+##### 53. What happens when we assign a variable to another variable?
+
+
+
 ##### 53. What is scope?
 
 A scope is the range within a program for which an item is valid
 
 ##### 54. where in a code a variable is valid?
 
-variable is valid from the point at which it’s declared until the end of the current scope
+variable is valid from the point at which it’s declared until the end of the current scope or
 
 ```rust
     {                      // s is not valid here, it’s not yet declared
