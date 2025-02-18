@@ -549,6 +549,10 @@ fn main() {
 
 ### 4. Understanding Ownership
 
+##### What concepts ensure memory safety in Rust programs at compile time
+
+ownership, borrowing, and slices 
+
 #### Ownership
 
 ##### 49. Why do you need to manage memory?
@@ -846,10 +850,218 @@ let slice = &s[3..];
 
 drop both values to take a slice of the entire string. So these are equal:
 
-
+```rust
 let s = String::from("hello");
 
 let len = s.len();
 
 let slice = &s[0..len];
 let slice = &s[..];
+```
+
+##### How  rewrite first_word to return a slice?
+
+```rust
+fn first_word(s: &String) -> &str {
+    let bytes = s.as_bytes();
+
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return &s[0..i];
+        }
+    }
+
+    &s[..]
+}
+```
+
+##### What type string literal?
+
+```rust
+//string literal type - string slice
+&str
+```
+
+##### How we can pass a String to string slice?
+
+We can pass String to string slice as slice or as reference to the String
+
+```rust
+fn main() {
+    let my_string = String::from("hello world");
+
+    // `first_word` works on slices of `String`s, whether partial or whole
+    let word = first_word(&my_string[0..6]);
+    let word = first_word(&my_string[..]);
+    // `first_word` also works on references to `String`s, which are equivalent
+    // to whole slices of `String`s
+    let word = first_word(&my_string);
+
+    let my_string_literal = "hello world";
+
+    // `first_word` works on slices of string literals, whether partial or whole
+    let word = first_word(&my_string_literal[0..6]);
+    let word = first_word(&my_string_literal[..]);
+
+    // Because string literals *are* string slices already,
+    // this works too, without the slice syntax!
+    let word = first_word(my_string_literal);
+}
+fn first_word(s: &String) -> &str {
+    let bytes = s.as_bytes();
+
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return &s[0..i];
+        }
+    }
+
+    &s[..]
+}
+```
+
+### 5. Using Structs to Structure Related Data
+
+##### What is Struct?
+
+A struct, or structure, is a custom data type that lets you package together and name multiple related values that make up a meaningful group.
+
+#### 5.1 Defining and Instantiating Structs
+
+##### What is the similarity structs and tuples?
+
+that both hold multiple related values. Like tuples, the pieces of a struct can be different types.
+
+##### What is the difference structs and tuples?
+
+Unlike with tuples, in a struct you’ll name each piece of data so it’s clear what the values mean.
+
+##### How are structures over tuples more flexible?
+
+Unlike with tuples, in a struct you’ll name each piece of data so it’s clear what the values mean. Adding these names means that structs are more flexible than tuples: you don’t have to rely on the order of the data to specify or access the values of an instance.
+
+##### How define Struct?
+
+To define a struct, we enter the keyword struct and name the entire struct. A struct’s name should describe the significance of the pieces of data being grouped together. Then, inside curly brackets, we define the names and types of the pieces of data, which we call fields.
+
+```rust
+struct User {
+    active: bool,
+    username: String,
+    email: String,
+    sign_in_count: u64,
+}
+```
+
+##### What are Struct fields?
+
+The Struct fields are names with data type that are defined inside curly brackets
+
+##### How is defined Struct used?
+
+after we’ve defined struct, we create an instance of that struct by specifying concrete values for each of the fields.
+
+##### How we create instance of the struct?
+
+We create an instance by stating the name of the struct and then add curly brackets containing key: value pairs, where the keys are the names of the fields and the values are the data we want to store in those fields
+
+```rust
+fn main() {
+    let user1 = User {
+        active: true,
+        username: String::from("someusername123"),
+        email: String::from("someone@example.com"),
+        sign_in_count: 1,
+    };
+}
+```
+
+##### In what order do we specify field when creating struct?
+
+We don’t have to specify the fields in the same order in which we declared them in the struct. We specify field in any order.
+
+
+##### How to get a specific value from a struct?
+
+To get a specific value from a struct, we use dot notation
+
+```rust
+user1.email = String::from("anotheremail@example.com");
+```
+
+##### What is needed to be able to change the value of the Struct field?
+
+in order to be able to change the value of a field of a structure instance, the structure instance must be mutable
+
+```rust
+fn main() {
+    let mut user1 = User {
+        active: true,
+        username: String::from("someusername123"),
+        email: String::from("someone@example.com"),
+        sign_in_count: 1,
+    };
+
+    user1.email = String::from("anotheremail@example.com");
+}
+```
+
+##### What is 'field init shorthand' syntax?
+
+when we use the build function to create a struct instance, we must pass the struct instance field values ​​to the parameters of this function, which will later be assigned to the instance fields.
+
+```rust
+fn build_user(email: String, username: String) -> User {
+    User {
+        active: true,
+        username: username,
+        email: email,
+        sign_in_count: 1,
+    }
+}
+```
+
+If the instance field names and the function parameter names are the same, we may not set the corresponding values ​​opposite the structure instance field names.
+
+```rust
+fn build_user(email: String, username: String) -> User {
+    User {
+        active: true,
+        username,
+        email,
+        sign_in_count: 1,
+    }
+}
+```
+
+##### What is 'struct update' syntax?
+
+It’s often useful to create a new instance of a struct that includes most of the values from another instance, but changes some
+
+```rust
+fn main() {
+    // --snip--
+
+    let user2 = User {
+        active: user1.active,
+        username: user1.username,
+        email: String::from("another@example.com"),
+        sign_in_count: user1.sign_in_count,
+    };
+}
+```
+
+Using struct update syntax, we can achieve the same effect with less code, The syntax .. specifies that the remaining fields not explicitly set should have the same value as the fields in the given instance.
+
+```rust
+fn main() {
+    // --snip--
+
+    let user2 = User {
+        email: String::from("another@example.com"),
+        ..user1
+    };
+}
+```
+
+we specify the fields with new values ​​and then two dots with name of the instance of the structure the values of the fields which we want to use for the rest of the fields of the new instance
