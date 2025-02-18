@@ -752,4 +752,104 @@ fn change(some_string: &mut String) {
 }
 ```
 
+##### What is a reference’s scope
 
+a reference’s scope starts from where it is introduced and continues through the last time that reference is used
+
+this code will compile because the last usage of the immutable references, the println!, occurs before the mutable reference is introduced:
+
+```rust
+    let mut s = String::from("hello");
+
+    let r1 = &s; // no problem
+    let r2 = &s; // no problem
+    println!("{r1} and {r2}");
+    // variables r1 and r2 will not be used after this point
+
+    let r3 = &mut s; // no problem
+    println!("{r3}");
+```
+
+##### What restriction have a mutable references?
+
+if you have a mutable reference to a value, you can have no other references to that value within the scope of the first reference.
+
+##### What is a dangling pointer?
+
+Dangling pointer—a pointer that references a location in memory that may have been given to someone else—by freeing some memory while preserving a pointer to that memory
+
+##### How the problem of dangling pointer solved in Rust?
+
+In Rust, by contrast, the compiler guarantees that references will never be dangling references: if you have a reference to some data, the compiler will ensure that the data will not go out of scope before the reference to the data does.
+
+```rust
+fn dangle() -> &String { // dangle returns a reference to a String
+
+    let s = String::from("hello"); // s is a new String
+
+    &s // we return a reference to the String, s
+} // Here, s goes out of scope, and is dropped. Its memory goes away.
+  // Danger!
+```
+
+##### Rules of References?
+
+- At any given time, you can have either one mutable reference or any number of immutable references.
+- References must always be valid.
+
+#### The Slice Type
+
+##### What is Slice?
+
+Slice are reference a contiguous sequence of elements in a collection.
+
+##### Does Slice have Ownership?
+
+A slice is a kind of reference, so it does not have ownership.
+
+##### What is String Slices?
+
+A string slice is a reference to part of a String, and it looks like this:
+
+```rust
+    let s = String::from("hello world");
+
+    let hello = &s[0..5];
+    let world = &s[6..11];
+```
+
+##### How in Slice to start at index 0?
+
+ drop the value before the two periods. In other words, these are equal:
+
+```rust
+let s = String::from("hello");
+
+let slice = &s[0..2];
+let slice = &s[..2];
+```
+
+##### How to go to the last index in slice?
+
+drop the trailing number. That means these are equal:
+
+```rust
+let s = String::from("hello");
+
+let len = s.len();
+
+let slice = &s[3..len];
+let slice = &s[3..];
+```
+
+##### How to get all String in Slice?
+
+drop both values to take a slice of the entire string. So these are equal:
+
+
+let s = String::from("hello");
+
+let len = s.len();
+
+let slice = &s[0..len];
+let slice = &s[..];
