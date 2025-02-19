@@ -642,7 +642,6 @@ when we assign a variable to another variable and the value of that variable is 
 
 By by means of "Move" occurs transfer ownership.
 
-
 ##### 54. where in a code a variable is valid?
 
 variable is valid from the point at which it’s declared until the end of the current scope or until it is assigned to another variable, if its value is stored on the heap
@@ -650,7 +649,6 @@ variable is valid from the point at which it’s declared until the end of the c
 ##### 55. What is ownership pattern?
 
 assigning a value to another variable moves it. When a variable that includes data on the heap goes out of scope, the value will be cleaned up by drop unless ownership of the data has been moved to another variable.
-
 
 ##### 55 What do deep copy i.e. not only copy of stack data, bat heep data
 
@@ -1064,4 +1062,68 @@ fn main() {
 }
 ```
 
-we specify the fields with new values ​​and then two dots with name of the instance of the structure the values of the fields which we want to use for the rest of the fields of the new instance
+we specify the fields with new values ​​and then two dots with name of the instance of the struct the values of the fields which we want to use for the rest of the fields of the new instance.
+
+If struct field data are heap-allocated it will be moved to fields of the new instance and sours struct instance will become invalid, it will not be possible to use it further.
+
+##### What is Tuple Structs?
+
+Tuple structs have the added meaning the struct name provides but don’t have names associated with their fields; rather, they just have the types of the fields. Tuple structs are useful when you want to give the whole tuple a name and make the tuple a different type from other tuples, and when naming each field as in a regular struct would be verbose or redundant.
+
+##### How define Tuple Struct?
+
+To define a tuple struct, start with the struct keyword and the struct name followed by the types in the tuple.
+
+```rust
+struct Color(i32, i32, i32);
+struct Point(i32, i32, i32);
+
+fn main() {
+    let black = Color(0, 0, 0);
+    let origin = Point(0, 0, 0);
+}
+```
+
+we cannot use instances of different structure types interchangeably even if they have the same element types
+
+##### What is Unit-Like Structs?
+
+This is struct that don’t have any fields?
+
+```rust
+struct AlwaysEqual;
+
+fn main() {
+    let subject = AlwaysEqual;
+}
+```
+
+##### How define Unit-Like Struct?
+
+we use the struct keyword, the name we want, and then a semicolon
+
+##### What are Unit-Like Structs for?
+
+Unit-like structs can be useful when you need to implement a trait on some type but don’t have any data that you want to store in the type itself
+
+##### Is it possible to create a structure that stores references to data that someone else owned?
+
+It’s possible, but to do so requires the use of lifetimes. Lifetimes ensure that the data referenced by a struct is valid for as long as the struct is.
+
+```rust
+struct User {
+    active: bool,
+    username: &str,
+    email: &str,
+    sign_in_count: u64,
+}
+
+fn main() {
+    let user1 = User {
+        active: true,
+        username: "someusername123", //error: expected named lifetime parameter
+        email: "someone@example.com", //error: expected named lifetime parameter
+        sign_in_count: 1,
+    };
+}
+```
