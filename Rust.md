@@ -1378,7 +1378,7 @@ Enums allow you to define a type by enumerating its possible variants. enums giv
 
 #### 6.1 Defining an Enum
 
-##### What define Enum?
+##### How define Enum?
 
 We write keyword `enum` followed by name of enum and in curly brackets we list instance name of that enum.
 
@@ -1388,4 +1388,251 @@ enum IpAddrKind {
     V6,
 }
 ```
+
+we can embed variety types in enum variant when define it. This can make in different ways
+
+- named field, like a struct does
+- one ore more types
+
+in this cases we must pass relevant value to enum variant when creating it.
+
+```rust
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(i32, i32, i32),
+}
+```
+
+##### what called enum instances?
+
+enum variants
+
+##### How can we get an enum variant?
+
+We write enum name, two colons and instance name
+
+```rust
+    let four = IpAddrKind::V4;
+    let six = IpAddrKind::V6;
+```
+
+##### Do can we used enum type as function parameter?
+
+We can used enum type as any other type as function parameter
+
+```rust
+fn route(ip_kind: IpAddrKind) {}
+
+route(IpAddrKind::V4);
+route(IpAddrKind::V6);
+```
+
+##### How we can define method in enum?
+
+This is being done as with struct: impl followed enum name and curly brackets whit method definition. The body of the method would use 'self' to get the value that we called the method on.
+
+##### What is Null value?
+
+Null value is value that currently invalid or absent for some reason.
+
+##### How in Rust implementing Null value?
+
+In rust Null value implemented by using `enum Option<T>`. This enum encode the concept of a value being present or absent.
+
+```rust
+enum Option<T> {
+    None,
+    Some(T),
+}
+```
+
+`enum Option<T>` have two variant None - that represent absent value; and Some(T) - that represent present value some type T. This variants included in prelude thus its not need bring into scope explicitly
+
+##### How do we can use Options variants?
+
+```rust
+    let some_number = Some(5);
+    let some_char = Some('e');
+
+    let absent_number: Option<i32> = None;
+```
+
+we can not annotate type of Some variable i.e. rust can infer in, can do with using None type
+
+##### For what using `Options<T>` type?
+
+you have to convert an `Option<T>` to a T before you can perform T operations with it. Generally, this helps catch one of the most common issues with null: assuming that something isn’t null when it actually is.
+
+Eliminating the risk of incorrectly assuming a not-null value helps you to be more confident in your code. In order to have a value that can possibly be null, you must explicitly opt in by making the type of that value `Option<T>`. Then, when you use that value, you are required to explicitly handle the case when the value is null. Everywhere that a value has a type that isn’t an `Option<T>`, you can safely assume that the value isn’t null. This was a deliberate design decision for Rust to limit null’s pervasiveness and increase the safety of Rust code.
+
+So how do you get the T value out of a Some variant when you have a value of type `Option<T>` so that you can use that value? The `Option<T>` enum has a large number of methods that are useful in a variety of situations; you can check them out in [its documentation](https://doc.rust-lang.org/std/option/enum.Option.html). Becoming familiar with the methods on `Option<T>` will be extremely useful in your journey with Rust.
+
+#### 6.2 The match Control Flow Construct
+
+
+##### What is `match`?
+
+Rust has an extremely powerful control flow construct called match that allows you to compare a value against a series of patterns and then execute code based on which pattern matches
+
+```rust
+enum Coin {
+    Penny,
+    Nickel,
+    Dime,
+    Quarter,
+}
+
+fn value_in_cents(coin: Coin) -> u8 {
+    match coin {
+        Coin::Penny => 1,
+        Coin::Nickel => 5,
+        Coin::Dime => 10,
+        Coin::Quarter => 25,
+    }
+}
+```
+
+##### How `match` works?
+
+- First we list the match keyword followed by an expression. Expression can be evaluate to any type.
+- Next are the match arms in curly brackets. 
+- An arm has two parts: a pattern and some code to run, separates the => operator. 
+- Each arm is separated from the next with a comma.
+- When the match expression executes, it compares the resultant value against the pattern of each arm, in order
+- If a pattern matches the value, the code associated with that pattern is executed. 
+- If that pattern doesn’t match the value, execution continues to the next arm,
+- We can have as many arms as we need
+- The code associated with each arm is an expression, and the resultant value of the expression is the value that gets returned for the entire match expression.
+- We don’t typically use curly brackets if the match arm code is short. 
+- If you want to run multiple lines of code in a match arm, you must use curly brackets, and the comma following the arm is then optional.
+
+```rust
+fn value_in_cents(coin: Coin) -> u8 {
+    match coin {
+        Coin::Penny => {
+            println!("Lucky penny!");
+            1
+        }
+        Coin::Nickel => 5,
+        Coin::Dime => 10,
+        Coin::Quarter => 25,
+    }
+}
+```
+
+#####  How to extract values out of enum variants? 
+
+Another useful feature of match arms is that they can bind to the parts of the values that match the pattern. This is how we can extract values out of enum variants.
+
+```rust
+#[derive(Debug)] // so we can inspect the state in a minute
+enum UsState {
+    Alabama,
+    Alaska,
+    // --snip--
+}
+
+enum Coin {
+    Penny,
+    Nickel,
+    Dime,
+    Quarter(UsState),
+}
+
+fn value_in_cents(coin: Coin) -> u8 {
+    match coin {
+        Coin::Penny => 1,
+        Coin::Nickel => 5,
+        Coin::Dime => 10,
+        Coin::Quarter(state) => {
+            println!("State quarter from {state:?}!");
+            25
+        }
+    }
+}
+```
+If we were to call value_in_cents(Coin::Quarter(UsState::Alaska)), coin would be Coin::Quarter(UsState::Alaska). When we compare that value with each of the match arms, none of them match until we reach Coin::Quarter(state). At that point, the binding for state will be the value UsState::Alaska. We can then use that binding in the println! expression, thus getting the inner state value out of the Coin enum variant for Quarter.
+
+#####  How to extract values out of `Option<T>` enum? 
+
+Matching with `Option<T>`
+
+```rust
+    fn plus_one(x: Option<i32>) -> Option<i32> {
+        match x {
+            None => None,
+            Some(i) => Some(i + 1),
+        }
+    }
+
+    let five = Some(5);
+    let six = plus_one(five);
+    let none = plus_one(None);
+```
+
+##### Do we match all possibilities in match expression?
+
+the arms patterns must cover all possibilities. If aur match code do not cover all possibilities, this is a bug and it won't compile:
+
+```rust
+    fn plus_one(x: Option<i32>) -> Option<i32> {
+        match x {
+            Some(i) => Some(i + 1),
+        }
+    } // error[E0004]: non-exhaustive patterns: `None` not covered
+```
+
+##### What are the method for match all possibilities in match expression?
+
+- use `other` keyword in last arm pattern.
+
+```rust
+    let dice_roll = 9;
+    match dice_roll {
+        3 => add_fancy_hat(),
+        7 => remove_fancy_hat(),
+        other => move_player(other),
+    }
+
+    fn add_fancy_hat() {}
+    fn remove_fancy_hat() {}
+    fn move_player(num_spaces: u8) {}
+```
+
+- use `_` in last arm pattern
+
+```rust
+    let dice_roll = 9;
+    match dice_roll {
+        3 => add_fancy_hat(),
+        7 => remove_fancy_hat(),
+        _ => reroll(),
+    }
+
+    fn add_fancy_hat() {}
+    fn remove_fancy_hat() {}
+    fn reroll() {}
+```
+
+##### What is difference between usage `other` and `_` keyword in `match`
+
+If we using `other` rust will pass it in code part of match arm, and we can using its value inside
+
+If we using `_` - this suggests what we do not want using its value in code
+
+```rust
+    let dice_roll = 9;
+    match dice_roll {
+        3 => add_fancy_hat(),
+        7 => remove_fancy_hat(),
+        _ => (),
+    }
+
+    fn add_fancy_hat() {}
+    fn remove_fancy_hat() {}
+```
+
+#### 6.3 Concise Control Flow with if let and let else
 
