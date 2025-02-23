@@ -1,5 +1,9 @@
 # Roust
 
+## The Rust API Guidelines.
+
+<https://rust-lang.github.io/api-guidelines/>
+
 ## install
 
 `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
@@ -1584,7 +1588,7 @@ the arms patterns must cover all possibilities. If aur match code do not cover a
     } // error[E0004]: non-exhaustive patterns: `None` not covered
 ```
 
-##### What are the method for match all possibilities in match expression?
+##### What are methods for match all possibilities in match expression?
 
 - use `other` keyword in last arm pattern.
 
@@ -1777,6 +1781,10 @@ A package is a bundle of one or more crates that provides a set of functionality
 
 A package must contain at least one crate, whether that’s a library or binary crate.
 
+##### How many library crates can have package?
+
+only one library crate
+
 ##### How many binary crates can have package?
 
 A package can contain as many binary crates as you like, but at most only one library crate. 
@@ -1784,3 +1792,330 @@ A package can contain as many binary crates as you like, but at most only one li
 ##### What is Cargo?
 
 Cargo is actually a package that contains the binary crate for the command-line tool you’ve been using to build your code. The Cargo package also contains a library crate that the binary crate depends on. Other projects can depend on the Cargo library crate to use the same logic the Cargo command-line tool uses.
+
+##### How create package?
+
+`cargo new package-name`
+
+##### what structure of package directory created 'cargo new'?
+
+Cargo.toml, src/main.rs
+
+##### How cargo understands what a package contain binary crate?
+
+Cargo follows a convention that src/main.rs is the crate root of a binary crate with the same name as the package
+
+##### How cargo understands what a package contain library crate?
+
+Cargo knows that if the package directory contains src/lib.rs, the package contains a library crate with the same name as the package, and src/lib.rs is its crate root
+
+##### How a package can have multiple binary crate?
+
+A package can have multiple binary crates by placing files in the src/bin directory: each file will be a separate binary crate?
+
+#### 7.2 Defining Modules to Control Scope and Privacy
+
+Here, we create a binary crate named `backyard` that illustrates these rules. The crate’s directory, also named `backyard`, contains these files and directories:
+
+```sh
+backyard
+├── Cargo.lock
+├── Cargo.toml
+└── src
+    ├── garden
+    │   └── vegetables.rs
+    ├── garden.rs
+    └── main.rs
+```
+
+The crate root file in this case is `src/main.rs`, and it contains:
+
+```rust
+// Filename: `src/main.rs`
+
+use crate::garden::vegetables::Asparagus;
+
+pub mod garden;
+
+fn main() {
+    let plant = Asparagus {};
+    println!("I'm growing {plant:?}!");
+}
+```
+
+The `pub mod garden`; line tells the compiler to include the code it finds in `src/garden.rs`, which is:
+
+```rust
+// Filename: src/garden.rs
+pub mod vegetables;
+```
+
+Here, `pub mod vegetables`; means the code in `src/garden/vegetables.rs` is included too. That code is:
+
+```rust
+#[derive(Debug)]
+pub struct Asparagus {}
+```
+
+##### What is first a compiler does when it compiles a crate?
+
+When compiling a crate, the compiler first looks in the crate root file (usually src/lib.rs for a library crate or src/main.rs for a binary crate) for code to compile.
+
+##### Where compiler look for module code for module declared in crate root, i.e. src/lib.rs or src/main.rs?
+
+if we declare module, say `mod mod_name;`, the compiler  will look for the module’s code in these places:
+
+- Inline, within curly brackets that replace the semicolon following `mod mod_name`
+- In the file `src/mod_name.rs`
+- In the file `src/mod_name/mod.rs`
+
+##### Where compiler look for module code for module declared in any file other than crate root, i.e. code for submodule?
+
+if we declare sub module, say `mod sub_mod_name;` in file `src/parent_mod.rs`, the compiler  will look for the sub module’s code in these places:
+
+- Inline, directly following mod `mod sub_mod_name`, within curly brackets instead of the semicolon
+- In the file `src/parent_mod/sub_mod_name.rs`
+- In the file `src/parent_mod/sub_mod_name/mod.rs`
+
+##### When and How we can refer to code in module?
+
+- When - Module should be part of our crate
+- How - if we have type `SomeType` in `src/parent_mod/sub_mod.rs` we cat refer to in as `crate::parent_mod::sub_mod::SomeType` if the privacy rules allow.
+
+##### How to do within module public?
+
+Code within a module is private from its parent modules by default. To make a module public, declare it with pub mod instead of mod. To make items within a public module public as well, use pub before their declarations.
+
+##### For what is used `use` keyword?
+
+Within a scope, the `use` keyword creates shortcuts to items to reduce repetition of long paths. In any scope that can refer to `crate::parent_mod::sub_mod::SomeType`, you can create a shortcut with `use crate::parent_mod::sub_mod::SomeType`; and from then on you only need to write `Asparagus` to make use of that type in the scope.
+
+##### For what is used modules?
+
+Modules let us organize code within a crate for readability and easy reuse. Modules also allow us to control the privacy of items because code within a module is private by default.
+
+By using modules, we can group related definitions together and name why they’re related. Programmers using this code can navigate the code based on the groups rather than having to read through all the definitions, making it easier to find the definitions relevant to them. Programmers adding new functionality to this code would know where to place the code to keep the program organized.
+
+##### For what is used private items?
+
+Private items are internal implementation details not available for outside use. 
+
+##### For what is make modules and the items within them public.
+
+We can choose to make modules and the items within them public, which exposes them to allow external code to use and depend on them.
+
+##### How we can create library crate?
+
+`cargo new restaurant --lib`
+
+##### How we can structure crate?
+
+we can organize its functions into nested modules. We define a module with the mod keyword followed by the name of the module (in this case, front_of_house). The body of the module then goes inside curly brackets. Inside modules, we can place other modules, as in this case with the modules hosting and serving. Modules can also hold definitions for other items, such as structs, enums, constants, traits, and functions.
+
+```rust
+// Filename: src/lib.rs
+
+mod front_of_house {
+    mod hosting {
+        fn add_to_waitlist() {}
+
+        fn seat_at_table() {}
+    }
+
+    mod serving {
+        fn take_order() {}
+
+        fn serve_order() {}
+
+        fn take_payment() {}
+    }
+}
+```
+
+##### Why `src/main.rs` and `src/lib.rs` are called crate roots?
+
+The reason for their name is that the contents of either of these two files form a module named crate at the root of the crate’s module structure, known as the module tree
+
+```sh
+crate
+ └── front_of_house
+     ├── hosting
+     │   ├── add_to_waitlist
+     │   └── seat_at_table
+     └── serving
+         ├── take_order
+         ├── serve_order
+         └── take_payment
+```
+
+##### What is module tree?
+
+module tree is crate’s module structure.
+This tree shows how some of the modules nest inside other modules; for example, hosting nests inside front_of_house. The tree also shows that some modules are siblings, meaning they’re defined in the same module; hosting and serving are siblings defined within front_of_house. If module A is contained inside module B, we say that module A is the child of module B and that module B is the parent of module A. Notice that the entire module tree is rooted under the implicit module named crate.
+
+##### What does means that some modules a *siblings*?
+
+This means that this modules are defined in the same module
+
+##### What does means that some module a child of other module?
+
+ If module A is contained inside module B, we say that module A is the child of module B.
+
+##### What does means that some module a parent of other module?
+
+ If module A is contained inside module B, we say that module B is the parent of module A.
+
+#### 7.3 Paths for Referring to an Item in the Module Tree
+
+##### For what using Paths?
+
+Paths used to show Rust where to find an item in module tree. To call a function, we need to know its path.
+
+##### What forms does Path have?
+
+A path can take two forms:
+
+- An absolute path is the full path starting from a crate root; for code from an external crate, the absolute path begins with the crate name, and for code from the current crate, it starts with the literal `crate`.
+- A relative path starts from the current module and uses `self`, `super`, or `an` identifier in the current module.
+
+Both absolute and relative paths are followed by one or more identifiers separated by double colons (`::`).
+
+```rust
+Filename: src/lib.rs
+
+mod front_of_house {
+    pub mod hosting { // This code will does not compile unless specified pub!
+        pub fn add_to_waitlist() {}  // This code will does not compile unless specified pub!
+    }
+}
+
+pub fn eat_at_restaurant() {
+    // Absolute path
+    crate::front_of_house::hosting::add_to_waitlist();
+
+    // Relative path
+    front_of_house::hosting::add_to_waitlist();
+}
+```
+
+##### What is absolute path?
+
+An absolute path is the full path starting from a crate root; for code from an external crate, the absolute path begins with the crate name, and for code from the current crate, it starts with the literal `crate`.
+
+Path are followed by one or more identifiers separated by double colons (`::`).
+
+##### What is relative path?
+
+A relative path starts from the current module and uses `self`, `super`, or `an` identifier in the current module.
+
+Path are followed by one or more identifiers separated by double colons (`::`).
+
+##### How to choose whether to use a relative or absolute path?
+
+This is a decision you’ll make based on your project, and it depends on whether you’re more likely to move item definition code separately from or together with the code that uses the item.
+
+For example, if we moved the front_of_house module and the eat_at_restaurant function into a module named customer_experience, we’d need to update the absolute path to add_to_waitlist, but the relative path would still be valid. However, if we moved the eat_at_restaurant function separately into a module named dining, the absolute path to the add_to_waitlist call would stay the same, but the relative path would need to be updated. 
+
+Our preference in general is to specify absolute paths because it’s more likely we’ll want to move code definitions and item calls independently of each other.
+
+##### What a items in Rust?
+
+functions, methods, structs, enums, modules, and constants.
+
+##### What is the default visibility of items in Rust
+
+In Rust, all items (functions, methods, structs, enums, modules, and constants) are private to parent modules by default. Items in a parent module can’t use the private items inside child modules, but items in child modules can use the items in their ancestor modules.
+
+##### Can child items use the items it their ancestor modules?
+
+items in child modules can use the items in their ancestor modules, but items in a parent module can’t use the private items inside child modules. This is because child modules wrap and hide their implementation details, but the child modules can see the context in which they’re defined.
+
+##### What make item private?
+
+If you want to make an item like a function or struct private, you put it in a module.
+
+##### How  to expose inner parts of child modules’ code?
+
+Using the `pub` keyword to make an item public.
+
+##### How to construct relative paths that begin in the parent module?
+
+by using `super` at the start of the path
+
+```rust
+// Filename: src/lib.rs
+
+fn deliver_order() {}
+
+mod back_of_house {
+    fn fix_incorrect_order() {
+        cook_order();
+        super::deliver_order();
+    }
+
+    fn cook_order() {}
+}
+```
+
+This is like starting a filesystem path with the `..` syntax. Using super allows us to reference an item that we know is in the parent module, which can make rearranging the module tree easier when the module is closely related to the parent but the parent might be moved elsewhere in the module tree someday.
+
+##### what are the default fields of a structure?
+
+Private
+
+##### How to create an struct instance from struct whit a private fields?
+
+This struct must provide a public associated function that construct an instance.
+
+```rust
+mod back_of_house {
+    pub struct Breakfast {
+        pub toast: String,
+        seasonal_fruit: String,
+    }
+
+    impl Breakfast {
+        pub fn summer(toast: &str) -> Breakfast {
+            Breakfast {
+                toast: String::from(toast),
+                seasonal_fruit: String::from("peaches"),
+            }
+        }
+
+pub fn eat_at_restaurant() {
+    // Order a breakfast in the summer with Rye toast
+    let mut meal = back_of_house::Breakfast::summer("Rye");
+    // Change our mind about what bread we'd like
+    meal.toast = String::from("Wheat");
+    println!("I'd like {} toast please", meal.toast);
+
+    // The next line won't compile if we uncomment it; we're not allowed
+    // to see or modify the seasonal fruit that comes with the meal
+    // meal.seasonal_fruit = String::from("blueberries");
+}
+    
+```
+
+##### what are the default enum variants?
+
+Public
+
+##### How to make enum variants public?
+
+if we make an enum public, all of its variants are then public
+
+```rust
+mod back_of_house {
+    pub enum Appetizer {
+        Soup,
+        Salad,
+    }
+}
+
+pub fn eat_at_restaurant() {
+    let order1 = back_of_house::Appetizer::Soup;
+    let order2 = back_of_house::Appetizer::Salad;
+}
+```
+
+#### 7.4 Bringing Paths into Scope with the use Keyword
