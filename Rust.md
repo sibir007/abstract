@@ -2158,7 +2158,28 @@ mod customer {
 }
 ```
 
-#### How bringing two items with the same name into scope with use statements?
+##### How do I make a name obtained with the "use" keyword available to code in another scope?
+
+When we bring a name into scope with the use keyword, the name available in the new scope is private. To enable the code that calls our code to refer to that name as if it had been defined in that code’s scope, we can combine pub and use. This technique is called re-exporting because we’re bringing an item into scope but also making that item available for others to bring into their scope
+
+```rust
+// Filename: src/lib.rs
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+pub use crate::front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+}
+```
+
+Before this change, external code would have to call the add_to_waitlist function by using the path restaurant::front_of_house::hosting::add_to_waitlist(), which also would have required the front_of_house module to be marked as pub. Now that this pub use has re-exported the hosting module from the root module, external code can use the path restaurant::hosting::add_to_waitlist() instead.
+
+#### How bringing two items with the same name into scope with `use` statements?
 
 1. we specify `use` whit path to module where name is and then required name specify with prefix module name
 
@@ -2190,4 +2211,121 @@ mod customer {
    }
    ```
 
+##### How to use External Packages?
+
+We most specify package_name = package_version in Cargo.toml file as dependencies. This tells Cargo to download the package and any dependencies from crates.io and make it available to our project. Then we can use paths and `use` keyword to bring the crate API available to our code. If the crate is included in standard library we don't need specify it in Cargo.toml.
+
+##### How we can bring multiple items defined in the same crate or same module into scope by using one line?
+
+We must use nested paths. We do this by specifying the common part of the path, followed by two colons, and then curly brackets around a list of the parts of the paths that differ
+
+```rust
+// Filename: src/main.rs
+// --snip--
+use std::cmp::Ordering;
+use std::io;
+// --snip--
+
+// Filename: src/main.rs
+// --snip--
+use std::{cmp::Ordering, io};
+// --snip--
+```
+
+##### When we can use 'self' into 'use' statement?
+
+if some paths have common part and this part is entirely one path we can merge these paths by using 'nested path' where in curly brackets common part is indicated as 'self'
+
+```rust
+// Filename: src/lib.rs
+use std::io;
+use std::io::Write;
+
+// Filename: src/lib.rs
+
+use std::io::{self, Write};
+```
+
+##### How we can brings all public items defined in path into scope?
+
+We must specify that path followed by the * glob operator.
+
+```rust
+use std::collections::*;
+```
+
+#### Separating Modules into Different Files
+
+##### How we can extract module defined in file to its own file?
+
+First. We must create file whit name of extracted module in the same directory as file contained module or directory named as extracted module name whit file mod.rs. If we extracting sub module from module we can create file module_name/sub_module_name.rs or module_name/sub_module_name/mod.rs 
+Second. Remove the module code inside the curly brackets, living only the 'mod mod_name;' declaration.
+Next, place the code that was in the curly brackets into a new file named nod_name.rs, nod_name/mod.rs, module_name/sub_module_name.rs  or module_name/sub_module_name/mod.rs
+
+was
+
+```rust
+// Filename: src/lib.rs
+mod front_of_house {
+    pub mod hosting {
+       pub fn add_to_waitlist() {}
+   }
+}
+
+pub use crate::front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+}
+
+became
+
+```rust
+// Filename: src/lib.rs
+mod front_of_house;
+
+pub use crate::front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+}
+
+// Filename: src/front_of_house.rs
+
+pub mod hosting;
+
+// Filename: src/front_of_house/hosting.rs
+
+pub fn add_to_waitlist() {}
+```
+
+##### How Rust package system allow you organize program code?
+
+Rust lets you split a package into multiple crates and a crate into modules so you can refer to items defined in one module from another module. You can do this by specifying absolute or relative paths. These paths can be brought into scope with a use statement so you can use a shorter path for multiple uses of the item in that scope. Module code is private by default, but you can make definitions public by adding the pub keyword
+
+### 8. Common Collections
+
+<https://doc.rust-lang.org/std/collections/index.html>
+
+##### How unique are collections compared to other types?
+
+Most other data types represent one specific value, but collections can contain multiple values
+
+##### What difference between collections and array and tuple?
+
+Unlike the built-in array and tuple types, the data these collections point to is stored on the heap, which means the amount of data does not need to be known at compile time and can grow or shrink as the program runs.
+
+##### What is Vector collection?
+
+Vector is collection that allow to store a variable number of values next to each other.
+
+##### What is String collection?
+
+A string is a collection of characters
+
+##### What is Hash Map collection?
+
+A hash map allows you to associate a value with a specific key. It’s a particular implementation of the more general data structure called a map
+
+#### 8.1 Storing Lists of Values with Vectors
 
