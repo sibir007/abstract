@@ -2119,3 +2119,75 @@ pub fn eat_at_restaurant() {
 ```
 
 #### 7.4 Bringing Paths into Scope with the use Keyword
+
+##### Why use `use` keyword?
+
+To call a function from other module we must every time write full path to that function that can be inconvenient and repetitive.  To simplify this process we can create a shortcut to a path with the `use` keyword once, and then use the shorter name everywhere else in the scope.
+
+```rust
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+use crate::front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+}
+```
+
+Use only creates the shortcut for the particular scope in which the use occurs
+
+```rust
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+use crate::front_of_house::hosting;
+
+mod customer {
+    use crate::hosting; // re-export, if not specify - will be an error
+    // use crate::front_of_house::hosting; // if not specify - will be an error
+    pub fn eat_at_restaurant() {
+        hosting::add_to_waitlist();
+    }
+}
+```
+
+#### How bringing two items with the same name into scope with use statements?
+
+1. we specify `use` whit path to module where name is and then required name specify with prefix module name
+
+   ```rust
+   use std::fmt;
+   use std::io;
+
+   fn function1() -> fmt::Result {
+       // --snip--
+   }
+
+   fn function2() -> io::Result<()> {
+       // --snip--
+   }
+   ```
+
+2. after specify `use path` we can specify `as` keyword and new item name that will to use in current scope
+
+   ```rust
+   use std::fmt::Result;
+   use std::io::Result as IoResult;
+
+   fn function1() -> Result {
+       // --snip--
+   }
+
+   fn function2() -> IoResult<()> {
+       // --snip--
+   }
+   ```
+
+
