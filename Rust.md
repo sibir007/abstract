@@ -2329,3 +2329,214 @@ A hash map allows you to associate a value with a specific key. It’s a particu
 
 #### 8.1 Storing Lists of Values with Vectors
 
+Note: For more on the implementation details of the `Vec<T>` type, see “[The Rustonomicon](https://doc.rust-lang.org/nomicon/vec/vec.html)”
+
+the API [documentation](https://doc.rust-lang.org/std/vec/struct.Vec.html) for all of the many useful methods defined on `Vec<T>` by the standard library
+
+
+##### How create vector instance?
+
+We can call 'Vec::new()' method and assign value to variable with annotated variable type, or call  'vec!' macro with pointing vector values and with this case we no need annotated variable type because Rust inferred it.
+
+```rust
+let v: Vec<i32> = Vec::new();
+let v = vec![1, 2, 3];
+```
+
+##### How update a Vector?
+
+Vector variable must be defined as mutable and then we can used 'push' method to insert value to vector
+
+```rust
+ let mut v = Vec::new();
+
+ v.push(5);
+ v.push(6);
+ v.push(7);
+ v.push(8);
+```
+
+The numbers we place inside are all of type i32, and Rust infers this from the data, so we don’t need the `Vec<i32>` annotation
+
+##### How we can to read Elements of Vectors?
+
+We have two ways to reference a value stored in a vector.
+
+- via indexing. In this case we indicate a vector variable with followed square brackets with value index inside. Index numbering starts from zero.
+- by means `get` method. In this case as argument we pass to `get` method vector value index also. This method return `Option<&T>` type.
+
+##### What is difference between reference vector value by index and by means `get` method?
+
+In case reference by index we get a value or value reference and if we specify not existing index this will cause the program to panic.
+In case of reference by method `get` we get `Option<&T>` type and if we pass not-existing index we get `None` variant of `Option<&T>`
+
+```rust
+    let v = vec![1, 2, 3, 4, 5];
+
+    let third: &i32 = &v[2];
+    println!("The third element is {third}");
+
+    let third: Option<&i32> = v.get(2);
+    match third {
+        Some(third) => println!("The third element is {third}"),
+        None => println!("There is no third element."),
+    }
+```
+
+##### In what cases did we used a reference to vector value by index?
+
+This method is best used when you want your program to crash if there’s an attempt to access an element past the end of the vector.
+
+```rust
+    let v = vec![1, 2, 3, 4, 5];
+
+    let does_not_exist = &v[100];
+    let does_not_exist = v.get(100);
+```
+
+##### In what cases did we used a reference to vector value by means `get` method?
+
+You would use this method if accessing an element beyond the range of the vector may happen occasionally under normal circumstances. Your code will then have logic to handle having either `Some(&element)` or `None`
+
+##### Can we have immutable and mutable reference to vector value?
+
+We can not have immutable and mutable reference to vector value in the same scope
+
+```rust
+    // not compile
+    let mut v = vec![1, 2, 3, 4, 5];
+
+    let first = &v[0]; // immutable borrow occurs here
+
+    v.push(6); // mutable borrow occurs here
+
+    println!("The first element is: {first}"); // immutable borrow later used here
+```
+
+##### How we can Iterating Over the immutable Values in a Vector?
+
+We must use `for` loop with immutable reference to vector variable
+
+```rust
+    let v = vec![100, 32, 57];
+    for i in &v {
+        println!("{i}");
+    }
+```
+
+##### How we can Iterating Over the mutable Values in a Vector?
+
+We must use `for` loop with mutable reference to vector variable and use the * dereference operator to get to the value in i before we can use the += operator
+
+```rust
+    let v = vec![100, 32, 57];
+    for i in &mut v {
+        *i += 50;
+    }
+```
+
+##### Can we modify the entire vector while iterating over the vector?
+
+Iterating over a vector, whether immutably or mutably, is safe because of the borrow checker’s rules. If we attempted to insert or remove items in the for loop bodies we would get a compiler error. The reference to the vector that the for loop holds prevents simultaneous modification of the whole vector.
+
+
+##### Can we store in vector values different types?
+
+Vectors can only store values that are of the same type
+
+##### How we can store in vector values different types?
+
+We can define an enum whose variants will hold the different value types, and all the enum variants will be considered the same type: that of the enum. Then we can create a vector to hold that enum and so, ultimately, hold different types
+
+```rust
+    enum SpreadsheetCell {
+        Int(i32),
+        Float(f64),
+        Text(String),
+    }
+
+    let row = vec![
+        SpreadsheetCell::Int(3),
+        SpreadsheetCell::Text(String::from("blue")),
+        SpreadsheetCell::Float(10.12),
+    ];
+```
+
+##### In case of using a vector with enum values holds different types, how can we handle these values?
+
+Using a `match` expression whit the exhaustive set of types.
+
+##### Where vector API?
+
+the API [documentation](https://doc.rust-lang.org/std/vec/struct.Vec.html) for all of the many useful methods defined on `Vec<T>` by the standard library
+
+#### Storing UTF-8 Encoded Text with Strings
+
+##### What Is a String?
+
+Rust has only one string type in the core language, which is the string slice str that is usually seen in its borrowed form &str. String literals, for example, are stored in the program’s binary and are therefore string slices.
+
+The String type, which is provided by Rust’s standard library rather than coded into the core language, is a growable, mutable, owned, UTF-8 encoded string type. When Rustaceans refer to “strings” in Rust, they might be referring to either the String or the string slice &str types, not just one of those types.
+
+##### How implemented String type?
+
+String is implemented as a wrapper around a vector of bytes with some extra guarantees, restrictions, and capabilities
+
+##### How create new String?
+
+- By using function `new`
+
+```rust
+let mut s = String::new();
+```
+
+- using the `to_string` method, which is available on any type that implements the Display trait
+
+```rust
+    let data = "initial contents";
+
+    let s = data.to_string();
+
+    // the method also works on a literal directly:
+    let s = "initial contents".to_string();
+```
+
+- using `String::from` function to create a String from a string literal
+
+```rust
+    let s = String::from("initial contents");
+```
+
+##### How update a String?
+
+- by using the `push_str` method to append a string slice `&str`
+
+```rust
+    let mut s1 = String::from("foo");
+    let s2 = "bar";
+    s1.push_str(s2);
+    println!("s2 is {s2}");
+```
+
+Using `push` method that takes a single character as a parameter and adds it to the String
+
+```rust
+    let mut s = String::from("lo");
+    s.push('l');
+```
+
+##### What happen when we perform String Concatenation with the + Operator?
+
+the `+` Operator uses the `add` method by accepting first operand as first parameter, taking it ownership and second operand as second parameter as string slice (&str). When we instead &str passes into `add` function String reference (&String) Rust uses a `deref coercion`, which turns &String into &String[..] (&str). Next `add` takes ownership of first parameter, appends a copy of the contents of second parameters, and then returns ownership of the result. Because add does not take ownership of the second parameter, second parameter variable will still be a valid String after this operation unlike first parameter.
+
+```rust
+    let s1 = String::from("Hello, ");
+    let s2 = String::from("world!");
+    let s3 = s1 + &s2; // note s1 has been moved here and can no longer be used
+    // fn add(self, s: &str) -> String {
+```
+
+##### What is string `deref coercion`?
+
+Many String methods accept as parameters string slice type (&str). When we pass it a &String type argument, Rust performs a type coercion - &String to &String[..] (&str), which is called `deref coercion`
+
