@@ -2774,3 +2774,23 @@ iterating over a hash map happens in an arbitrary order.
 SipHash <https://en.wikipedia.org/wiki/SipHash>
 
 ### 9. Error Handling
+
+##### What error categories exist in Rust?
+
+Rust groups errors into two major categories: recoverable and unrecoverable errors. For a recoverable error, such as a file not found error, we most likely just want to report the problem to the user and retry the operation. Unrecoverable errors are always symptoms of bugs, such as trying to access a location beyond the end of an array, and so we want to immediately stop the program.
+
+#### Unrecoverable Errors with panic!
+
+##### What are alternative actions of Rust in case of panic?
+
+- unwinding. Rust walks back up the stack and cleans up the data from each function it encounters. The default action.
+- aborting, which ends the program without cleaning up. Memory that the program was using will then need to be cleaned up by the operating system
+
+##### How and why switch from unwinding to aborting?
+
+If in your project you need to make the resultant binary as small as possible, you can switch from unwinding to aborting upon a panic by adding panic = 'abort' to the appropriate `[profile]` sections in your Cargo.toml file
+
+```toml
+[profile.release]
+panic = 'abort'
+```
