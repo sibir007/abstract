@@ -2779,12 +2779,14 @@ SipHash <https://en.wikipedia.org/wiki/SipHash>
 
 Rust groups errors into two major categories: recoverable and unrecoverable errors. For a recoverable error, such as a file not found error, we most likely just want to report the problem to the user and retry the operation. Unrecoverable errors are always symptoms of bugs, such as trying to access a location beyond the end of an array, and so we want to immediately stop the program.
 
-#### Unrecoverable Errors with panic!
+#### 9.1 Unrecoverable Errors with panic!
 
 ##### What are alternative actions of Rust in case of panic?
 
 - unwinding. Rust walks back up the stack and cleans up the data from each function it encounters. The default action.
 - aborting, which ends the program without cleaning up. Memory that the program was using will then need to be cleaned up by the operating system
+
+
 
 ##### How and why switch from unwinding to aborting?
 
@@ -2794,3 +2796,41 @@ If in your project you need to make the resultant binary as small as possible, y
 [profile.release]
 panic = 'abort'
 ```
+
+##### What ways to cause a panic in practice?
+
+- by taking an action that causes our code to panic (such as accessing an array past the end) 
+
+```rust
+fn main() {
+    let v = vec![1, 2, 3];
+
+    v[99];
+}
+```
+
+- by explicitly calling the panic! macro. In both cases, we cause a panic in our program. By default, these panics will print a failure message, unwind, clean up the stack, and quit
+
+```rust
+fn main() {
+    panic!("crash and burn");
+}
+```
+
+##### What actions does Rust take when panic occurs?
+
+panics will print a failure message, unwind, clean up the stack, and quit
+
+##### what is backtrace?
+
+A backtrace is a list of all the functions that have been called to get to this point
+
+##### How to read a backtrace?
+
+To start from the top and read until you see files you wrote. That’s the spot where the problem originated. The lines above that spot are code that your code has called; the lines below are code that called your code. These before-and-after lines might include core Rust code, standard library code, or crates that you’re using
+
+##### what settings are needed to print the backtrace?
+
+ debug symbols must be enabled. Debug symbols are enabled by default when using `cargo build` or `cargo run` without the --release flag
+
+#### 9.2 Recoverable Errors with Result
