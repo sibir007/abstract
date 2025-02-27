@@ -3026,3 +3026,81 @@ fn read_username_from_file() -> Result<String, io::Error> {
     fs::read_to_string("hello.txt")
 }
 ```
+
+##### Can `?` operator automatically convert a Result to an Option or vice versa?
+
+The ? operator won’t automatically convert a Result to an Option or vice versa; in those cases, you can use methods like the ok method on Result or the ok_or method on Option to do the conversion explicitly.
+
+##### What type can the main function return?
+
+The main function may return any types that implement the `std::process::Termination` trait, which contains a function `report` that returns an `ExitCode`.
+
+main can also return a Result<(), E>, but we’ve changed the return type of main to be `Result<(), Box<dyn Error>>` and added a return value `Ok(())` to the end. This code will now compile.
+
+```rust
+// Filename: src/main.rs
+
+use std::error::Error;
+use std::fs::File;
+
+fn main() -> Result<(), Box<dyn Error>> {
+    let greeting_file = File::open("hello.txt")?;
+
+    Ok(())
+}
+```
+
+The `Box<dyn Error>` type is a trait object, you can read `Box<dyn Error>` to mean “any kind of error.” Using ? on a Result value in a main function with the error type `Box<dyn Error>` is allowed because it allows any Err value to be returned early. Even though the body of this main function will only ever return errors of type std::io::Error, by specifying `Box<dyn Error>`, this signature will continue to be correct even if more code that returns other errors is added to the body of main.
+
+When a main function returns a Result<(), E>, the executable will exit with a value of 0 if main returns Ok(()) and will exit with a nonzero value if main returns an Err value. Executables written in C return integers when they exit: programs that exit successfully return the integer 0, and programs that error return some integer other than 0. Rust also returns integers from executables to be compatible with this convention
+
+#### 9.3 To panic! or Not to panic!
+
+##### when call panic! and when return Result?
+
+When code panics, there’s no way to recover. You could call panic! for any error situation, whether there’s a possible way to recover or not, but then you’re making the decision that a situation is unrecoverable on behalf of the calling code. When you choose to return a Result value, you give the calling code options. The calling code could choose to attempt to recover in a way that’s appropriate for its situation, or it could decide that an Err value in this case is unrecoverable, so it can call panic! and turn your recoverable error into an unrecoverable one. Therefore, returning Result is a good default choice when you’re defining a function that might fail.
+
+### 10 Generic Types, Traits, and Lifetimes
+
+##### What are generics for?
+
+For effectively handling code duplication. Functions can take parameters of some generic type, instead of a concrete type like i32 or String, in the same way they take parameters with unknown values to run the same code on multiple concrete values.
+
+##### How to extract duplicate code?
+
+1. Identify duplicate code.
+2. Extract the duplicate code into the body of the function, and specify the inputs and return values of that code in the function signature.
+3. Update the duplicate code locations to call the function instead.
+
+#### Generic Data Types
+
+##### How define function that uses generics?
+
+we place the generics in the signature of the function where we would usually specify the data types of the parameters and return value.
+
+```rust
+fn largest<TT: std::cmp::PartialOrd>(list: &[T]) -> &T {
+    let mut largest = &list[0];
+
+    for item in list {
+        if item > largest {
+            largest = item;
+        }
+    }
+
+    largest
+}
+
+fn main() {
+    let number_list = vec![34, 50, 25, 100, 65];
+
+    let result = largest(&number_list);
+    println!("The largest number is {result}");
+
+    let char_list = vec!['y', 'm', 'a', 'q'];
+
+    let result = largest(&char_list);
+    println!("The largest char is {result}");
+}
+```
+
