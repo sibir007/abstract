@@ -3029,7 +3029,7 @@ fn read_username_from_file() -> Result<String, io::Error> {
 
 ##### Can `?` operator automatically convert a Result to an Option or vice versa?
 
-The ? operator won’t automatically convert a Result to an Option or vice versa; in those cases, you can use methods like the ok method on Result or the ok_or method on Option to do the conversion explicitly.
+The ? operator won’t automatically convert a Result to an Option or vice versa; in those cases, you can use methods like the `ok` method on Result or the `ok_or` method on Option to do the conversion explicitly.
 
 ##### What type can the main function return?
 
@@ -3074,12 +3074,18 @@ For effectively handling code duplication. Functions can take parameters of some
 
 #### Generic Data Types
 
+##### How to name type parameters?
+
+To parameterize the types in a function, struct, enum we need to name the type parameters. We can use any identifier as a type parameter name following Rust’s type-naming convention that is UpperCamelCase. But, by convention, type parameter names in Rust are short, often just one letter.
+
+
 ##### How define function that uses generics?
 
-we place the generics in the signature of the function where we would usually specify the data types of the parameters and return value.
+To define a generic function, we place type name declarations inside angle brackets, <>, between the name of the function and the parameter list and declare this parameter names in the signature as parameter type annotation and return type annotation. Then we can use type names in function body.
+We read generic function definition as: the function some_function name is generic over some types T S ...
 
 ```rust
-fn largest<TT: std::cmp::PartialOrd>(list: &[T]) -> &T {
+fn largest<T: std::cmp::PartialOrd>(list: &[T]) -> &T {
     let mut largest = &list[0];
 
     for item in list {
@@ -3104,3 +3110,82 @@ fn main() {
 }
 ```
 
+##### What is parameter type Restriction?
+
+In some situations where some operations are performed on generic type parameters, we must restrict generic types to only types that support those operations. This is done by annotating the generic type name definition in angle brackets with Traits that define those operations.
+
+`fn largest<T: std::cmp::PartialOrd>(list: &[T]) -> &T `
+
+
+##### How define struct that uses generics?
+
+To define a generic struct, we place type name declarations inside angle brackets, <>, between the name of the struct and struct body. Then we can use type names in struct body as struct field type annotations.
+We read generic struct definition as: the struct some_struct name is generic over some types T S ...
+
+```rust
+struct Point<T, U> {
+    x: T,
+    y: U,
+}
+
+fn main() {
+    let both_integer = Point { x: 5, y: 10 };
+    let both_float = Point { x: 1.0, y: 4.0 };
+    let integer_and_float = Point { x: 5, y: 4.0 };
+}
+```
+
+##### How define enum that uses generics?
+
+To define a generic enum, we place type name declarations inside angle brackets, <>, between the name of the enum and enum body. Then we can use type names in enum body as enum variants bound value type annotations.
+We read generic enum definition as: the enum some_enum name is generic over some types T S ...
+
+```rust
+enum Option<T> {
+    Some(T),
+    None,
+}
+
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+```
+
+##### How define method that uses generics?
+
+To define a generic struct or enum method, we place type name declarations inside angle brackets, <>, between the `impl` keyword and name of struct or enum. Then we can use this type names in method definition.
+We read generic method definition as: the method some_method name is generic over some types T S ...
+
+```rust
+struct Point<T> {
+    x: T,
+    y: T,
+}
+
+impl<T> Point<T> {
+    fn x(&self) -> &T {
+        &self.x
+    }
+}
+
+fn main() {
+    let p = Point { x: 5, y: 10 };
+
+    println!("p.x = {}", p.x());
+}
+```
+
+##### How we can specify constraints on generic types when defining methods on the type?
+
+We can also specify constraints on generic types when defining methods on the type. We could, for example, implement methods only on `Point<f32>` instances rather than on `Point<T>` instances with any generic type. In Listing 10-10 we use the concrete type f32, meaning we don’t declare any types after impl.
+
+```rust
+// Filename: src/main.rs
+
+impl Point<f32> {
+    fn distance_from_origin(&self) -> f32 {
+        (self.x.powi(2) + self.y.powi(2)).sqrt()
+    }
+}
+```
