@@ -168,9 +168,18 @@ println!("1 new tweet: {}", tweet.summarize());
 
 it isn’t possible
 
-##### How to use traits to define functions that accept many different types?
+##### How type of argument can accept function parameter annotated by trait type? 
 
-We will be able to pass to that function any type that implement thats trait.
+This parameter can accepts any type that implements that trait.
+
+##### What syntaxes used to define functions that accept many types?
+
+- `impl Trait_name` syntax
+- Trait Bound Syntax
+
+##### How to use `impl trait_name` syntax to define functions that accept many different types?
+
+in function signature, instead of a concrete type for the parameter, we specify the `impl` keyword and the trait name.
 
 ```rust
 pub fn notify(item: &impl Summary) {
@@ -178,6 +187,138 @@ pub fn notify(item: &impl Summary) {
 }
 ```
 
+we can use multiple traits in parentheses past `impl` keyword whit `+` syntax between traits
+
+```rust
+pub fn notify(item: &(impl Summary + Display)) {
+```
 
 
+##### How to use Trait Bound Syntax to define functions that accept many different types?
 
+in definition of generic function, with the declaration of the generic type parameter inside angle brackets we place trait bounds after a parameter name followed by colon.
+
+```rust
+pub fn notify<T: Summary>(item: &T) {
+    println!("Breaking news! {}", item.summarize());
+}
+```
+
+```rust
+pub fn notify(item1: &impl Summary, item2: &impl Summary) {
+pub fn notify<T: Summary>(item1: &T, item2: &T) {
+```
+
+we can use multiple traits past colon whit `+` between traits
+
+```rust
+pub fn notify<T: Summary + Display>(item: &T) {
+```
+
+we can use Trait Bounds with where Clauses
+
+```rust
+fn some_function<T: Display + Clone, U: Clone + Debug>(t: &T, u: &U) -> i32 {
+```
+
+we can use a `where` clause - past function signature, between return type and function body we indicate `where` clause followed by list of  generic name whit colon and list of trait via `+`:
+
+```rust
+fn some_function<T, U>(t: &T, u: &U) -> i32
+where
+    T: Display + Clone,
+    U: Clone + Debug,
+{
+```
+
+##### How to use Trait in defining a function's return type?
+
+We can use `impl Trait` syntax. We specify in definition of function return type keyword `impl` followed Trait name.
+
+```rust
+fn returns_summarizable() -> impl Summary {
+    Tweet {
+        username: String::from("horse_ebooks"),
+        content: String::from(
+            "of course, as you probably already know, people",
+        ),
+        reply: false,
+        retweet: false,
+    }
+}
+```
+
+However, you can only use impl Trait if you’re returning a single type. For example, this code that returns either a NewsArticle or a Tweet with the return type specified as impl Summary wouldn’t work:
+
+This code does not compile!
+
+```rust
+fn returns_summarizable(switch: bool) -> impl Summary {
+    if switch {
+        NewsArticle {
+            headline: String::from(
+                "Penguins win the Stanley Cup Championship!",
+            ),
+            location: String::from("Pittsburgh, PA, USA"),
+            author: String::from("Iceburgh"),
+            content: String::from(
+                "The Pittsburgh Penguins once again are the best \
+                 hockey team in the NHL.",
+            ),
+        }
+    } else {
+        Tweet {
+            username: String::from("horse_ebooks"),
+            content: String::from(
+                "of course, as you probably already know, people",
+            ),
+            reply: false,
+            retweet: false,
+        }
+    }
+}
+```
+
+Returning either a NewsArticle or a Tweet isn’t allowed due to restrictions around how the impl Trait syntax is implemented in the compiler. We’ll cover how to write a function with this behavior in the “Using Trait Objects That Allow for Values of Different Types” section of Chapter 18.
+
+##### What can we Conditionally Implement Methods by Using Trait Bounds?
+
+If we have generic Struct on Enum, by defining a method we can specify in angel bracket of `impl` definition parts Trait Bounds, that is name of parameter type followed colon and list of Traits connected `+`.
+
+```rust
+Filename: src/lib.rs
+use std::fmt::Display;
+
+struct Pair<T> {
+    x: T,
+    y: T,
+}
+
+impl<T> Pair<T> {
+    fn new(x: T, y: T) -> Self {
+        Self { x, y }
+    }
+}
+
+impl<T: Display + PartialOrd> Pair<T> {
+    fn cmp_display(&self) {
+        if self.x >= self.y {
+            println!("The largest member is x = {}", self.x);
+        } else {
+            println!("The largest member is y = {}", self.y);
+        }
+    }
+}
+```
+
+##### What is blanket implementations?
+
+We can also conditionally implement a trait for any type that implements another trait. Implementations of a trait on any type that satisfies the trait bounds are called blanket implementations and are used extensively in the Rust standard library. For example, the standard library implements the ToString trait on any type that implements the Display trait. The impl block in the standard library looks similar to this code:
+
+```rust
+impl<T: Display> ToString for T {
+    // --snip--
+}
+```
+
+#### 10.3 Validating References with Lifetimes
