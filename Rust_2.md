@@ -378,4 +378,4 @@ This means that this borrowing comes from one of the function parameters.
 
 ##### When we must annotate return value of function by lifetime parameter?
 
-If we define function that accept some borrow and return borrow and we do not definitely determine from what parameter return value borrowed
+If we define function that accept some borrows and return borrow and we do not definitely determine from what parameter  borrowed return value we must specify to compiler how determine lifetime of return borrow.
