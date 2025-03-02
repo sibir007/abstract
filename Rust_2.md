@@ -322,3 +322,60 @@ impl<T: Display> ToString for T {
 ```
 
 #### 10.3 Validating References with Lifetimes
+
+##### What is lifetime?
+
+- as generic. Lifetime is kind of generic that ensure that references are valid as long as we need them to be.
+
+- as property of reference. Every reference in Rust has a lifetime. Reference lifetime is program scope for which the reference is valid.
+
+##### What is mean - reference is valid?
+
+This means that the value referenced by this reference will not be dropped from memory due to going out of scope of the owner that value.
+
+##### When we must annotate a Lifetime?
+
+Most of the time, lifetimes are implicit and inferred, just like most of the time, types are inferred. We  must annotate lifetimes when the lifetimes of references could be related in a few different ways. Rust requires us to annotate the relationships using generic lifetime parameters to ensure the actual references used at runtime will definitely be valid.
+
+##### What main aim of lifetimes?
+
+The main aim of lifetimes is to prevent dangling references, which cause a program to reference data other than the data it’s intended to reference
+
+##### What does Borrow Checker do?
+
+The Rust compiler has a borrow checker that compares scopes to determine whether all borrows are valid.
+At compile time, Rust compares the size of the two lifetimes and sees that r has a lifetime of 'a but that it refers to memory with a lifetime of 'b. The program is rejected because 'b is shorter than 'a: the subject of the reference doesn’t live as long as the reference.
+
+```rust
+fn main() {
+    let r;                // ---------+-- 'a
+                          //          |
+    {                     //          |
+        let x = 5;        // -+-- 'b  |
+        r = &x;           //  |       |
+    }                     // -+       |
+                          //          |
+    println!("r: {r}");   //          |
+}                         // ---------+
+```
+
+Here, x has the lifetime 'b, which in this case is larger than 'a. This means r can reference x because Rust knows that the reference in r will always be valid while x is valid.
+
+```rust
+fn main() {
+    let x = 5;            // ----------+-- 'b
+                          //           |
+    let r = &x;           // --+-- 'a  |
+                          //   |       |
+    println!("r: {r}");   //   |       |
+                          // --+       |
+}                         // ----------+
+```
+
+##### What is mean when function return borrowed value (reference)?
+
+This means that this borrowing comes from one of the function parameters.
+
+##### When we must annotate return value of function by lifetime parameter?
+
+If we define function that accept some borrow and return borrow and we do not definitely determine from what parameter return value borrowed
