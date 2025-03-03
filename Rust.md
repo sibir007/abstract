@@ -3072,7 +3072,7 @@ For effectively handling code duplication. Functions can take parameters of some
 2. Extract the duplicate code into the body of the function, and specify the inputs and return values of that code in the function signature.
 3. Update the duplicate code locations to call the function instead.
 
-#### Generic Data Types
+#### 10.1 Generic Data Types
 
 ##### How to name type parameters?
 
@@ -3154,8 +3154,7 @@ enum Result<T, E> {
 
 ##### How define method that uses generics?
 
-To define a generic struct or enum method, we place type name declarations inside angle brackets, <>, between the `impl` keyword and name of struct or enum. Then we can use this type names in method definition.
-We read generic method definition as: the method some_method name is generic over some types T S ...
+To define a generic method of a struct or enum, we put the type name declarations in angle brackets, <>, between the `impl` keyword and the struct or enum name, also with the type names in angle brackets. We can then define the generic method itself. When defining a particular method, we can use different type names than those used when defining the struct or enum.
 
 ```rust
 struct Point<T> {
@@ -3176,9 +3175,34 @@ fn main() {
 }
 ```
 
+```rust
+struct Point<X1, Y1> {
+    x: X1,
+    y: Y1,
+}
+
+impl<X1, Y1> Point<X1, Y1> {
+    fn mixup<X2, Y2>(self, other: Point<X2, Y2>) -> Point<X1, Y2> {
+        Point {
+            x: self.x,
+            y: other.y,
+        }
+    }
+}
+
+fn main() {
+    let p1 = Point { x: 5, y: 10.4 };
+    let p2 = Point { x: "Hello", y: 'c' };
+
+    let p3 = p1.mixup(p2);
+
+    println!("p3.x = {}, p3.y = {}", p3.x, p3.y);
+}
+```
+
 ##### How we can specify constraints on generic types when defining methods on the type?
 
-We can also specify constraints on generic types when defining methods on the type. We could, for example, implement methods only on `Point<f32>` instances rather than on `Point<T>` instances with any generic type. In Listing 10-10 we use the concrete type f32, meaning we don’t declare any types after impl.
+We can also specify constraints on generic types when defining methods on the type. We could, for example, implement methods only on `Point<f32>` instances rather than on `Point<T>` instances with any generic type.
 
 ```rust
 // Filename: src/main.rs
@@ -3189,3 +3213,50 @@ impl Point<f32> {
     }
 }
 ```
+
+This code means the type Point<f32> will have a distance_from_origin method; other instances of Point<T> where T is not of type f32 will not have this method defined. The method measures how far our point is from the point at coordinates (0.0, 0.0) and uses mathematical operations that are available only for floating-point types
+
+##### What is Monomorphization?
+
+This process that Rust compiler performs at compiler time.
+the process of turning generic code into specific code by filling in the concrete types that are used when compiled. The compiler looks at all the places where generic code is called and generates code for the concrete types that the generic code is called with.
+
+```rust
+// generic code
+let integer = Some(5);
+let float = Some(5.0);
+
+// run time code, past Monomorphization?
+
+enum Option_i32 {
+    Some(i32),
+    None,
+}
+
+enum Option_f64 {
+    Some(f64),
+    None,
+}
+
+fn main() {
+    let integer = Option_i32::Some(5);
+    let float = Option_f64::Some(5.0);
+}
+```
+
+#### 10.2 Traits: Defining Shared Behavior
+
+##### What is for Trait?
+
+A trait defines the functionality a particular type has and can share with other types. We can use traits to define shared behavior in an abstract way. We can use trait bounds to specify that a generic type can be any type that has certain behavior.
+Trait definitions are a way to group method signatures together to define a set of behaviors necessary to accomplish some purpose.
+
+##### What does a type's behavior consist of?
+
+A type’s behavior consists of the methods we can call on that type.
+
+#### When do types have the same behavior?
+
+Different types share the same behavior if we can call the same methods on all of those types
+
+
