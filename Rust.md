@@ -4176,7 +4176,7 @@ cargo test -- --ignored
 
 you can run `cargo test -- --include-ignored`
 
-#### 10.3 Test Organization
+#### 11.3 Test Organization
 
 ##### What purpose of unit tests?
 
@@ -4184,7 +4184,7 @@ The purpose of unit tests is to test each unit of code in isolation from the res
 
 ##### What convention fo organization unit tests?
 
-The convention is put unit tests in the src directory in each file with the code that they’re testing, to create a module named `tests` in each file to contain the test functions and to annotate the module with `cfg(test)`
+The convention is put unit tests in the src directory in each file with the code that they’re testing, create a module named `tests` in each file to contain the test functions and to annotate the module with `cfg(test)`
 
 ```rust
 // Filename: src/lib.rs
@@ -4210,3 +4210,183 @@ mod tests {
 
 The `#[cfg(test)]` annotation on the tests module tells Rust to compile and run the test code only when you run cargo test, not when you run cargo build.
 
+##### Should to test Private Functions?
+
+There’s debate within the testing community about whether or not private functions should be tested directly, and other languages make it difficult or impossible to test private functions.
+
+##### Does allow Rust to test of Private Function?
+
+Regardless of which testing ideology you adhere to, Rust’s privacy rules do allow you to test private functions.
+
+```rust
+Filename: src/lib.rs
+pub fn add_two(a: usize) -> usize {
+    internal_adder(a, 2)
+}
+
+fn internal_adder(left: usize, right: usize) -> usize {
+    left + right
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn internal() {
+        let result = internal_adder(2, 2);
+        assert_eq!(result, 4);
+    }
+}
+```
+
+##### What is purpose of integration tests?
+
+to test whether many parts of your library work together correctly. In Rust, integration tests are entirely external to your library. They use your library in the same way any other code would, which means they can only call functions that are part of your library’s public API. 
+
+##### Where are located integration tests?
+
+We create a tests directory at the top level of our project directory, next to src. Cargo knows to look for integration test files in this directory.
+
+```sh
+adder
+├── Cargo.lock
+├── Cargo.toml
+├── src
+│   └── lib.rs
+└── tests
+    └── integration_test.rs
+```
+
+##### How many files whit integration tests we can create?
+
+We can make as many test files as we want
+
+##### How Cargo compile files whit integration tests?
+
+Cargo will compile each of the files as an individual crate, so we need to bring our library into each test crate’s scope
+
+```rust
+// Filename: tests/integration_test.rs
+
+use adder::add_two;
+
+#[test]
+fn it_adds_two() {
+    let result = add_two(2);
+    assert_eq!(result, 4);
+}
+```
+
+##### Should we annotate any code in integration tests with `#[cfg(test)]`?
+
+We don’t need to annotate any code in tests/integration_test.rs with `#[cfg(test)]`. Cargo treats the tests directory specially and compiles files in this directory only when we run `cargo test`. Run cargo test now:
+
+```rust
+$ cargo test
+```
+
+##### How we can run a particular integration test function?
+
+We can run a particular integration test function by specifying the test function’s name as an argument to `cargo test`
+
+```sh
+cargo test it_adds_two
+```
+
+##### How we can run all function in particular integration test file?
+
+To run all the tests in a particular integration test file, use the `--test` argument of `cargo test` followed by the name of the file:
+
+```sh
+$ cargo test --test integration_test
+```
+
+##### How we can make shared code for integrated tests?
+
+Each file in the tests directory is compiled as its own separate crate. This means that files in the tests directory don’t share the same behavior as files in src do, regarding how to separate code into modules and files.
+
+In case if we wont to have shared code we must take it out to `common/mod.rs` file. This older naming convention for modules that Rust also understands.
+
+```sh
+├── Cargo.lock
+├── Cargo.toml
+├── src
+│   └── lib.rs
+└── tests
+    ├── common
+    │   └── mod.rs
+    └── integration_test.rs
+```
+
+After we move shared code to `common/mod.rs` file we can use it from any of the integration test files as a module.
+
+```rust
+// Filename: tests/common/mod.rs
+
+pub fn setup() {
+    // setup code specific to your library's tests would go here
+}
+```
+
+
+```rust
+// Filename: tests/integration_test.rs
+
+
+use adder::add_two;
+
+mod common;
+
+#[test]
+fn it_adds_two() {
+    common::setup();
+
+    let result = add_two(2);
+    assert_eq!(result, 4);
+}
+```
+
+```sh
+$ cargo test
+```
+
+##### How can we make integration testing of binary crates?
+
+If our project is a binary crate that only contains a src/main.rs file and doesn’t have a src/lib.rs file, we can’t create integration tests in the tests directory and bring functions defined in the src/main.rs file into scope with a use statement. Only library crates expose functions that other crates can use; binary crates are meant to be run on their own.
+
+This is one of the reasons Rust projects that provide a binary have a straightforward src/main.rs file that calls logic that lives in the src/lib.rs file. Using that structure, integration tests can test the library crate with use to make the important functionality available. If the important functionality works, the small amount of code in the src/main.rs file will work as well, and that small amount of code doesn’t need to be tested.
+
+### 12 An I/O Project: Building a Command Line Program
+
+#### 12.1 Accepting Command Line Arguments
+
+##### How we can pass command line arguments our program when running `cargo run`?
+
+two hyphens to indicate the following arguments are for our program rather than for `cargo`, a string to search for, and a path to a file to search in
+
+```sh
+$ cargo run -- searchstring example-filename.txt
+```
+
+##### Where we can look for existing libraries for our needs?
+
+Some existing libraries on crates.io can help with writing a programs.
+
+##### Which Rust standard library function can we use to read the values ​​of command line arguments?
+
+`std::env::args` function. This function returns an iterator of the command line arguments passed to program.
+
+```rust
+// Filename: src/main.rs
+use std::env;
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    dbg!(args);
+}
+```
+
+##### What does the `args().collect()` method do?
+
+This function returns an iterator of the command line arguments passed to program.
