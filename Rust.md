@@ -4656,3 +4656,219 @@ fn main() {
     }
 }
 ```
+
+#### 12.4 Developing the Library’s Functionality with Test-Driven Development
+
+##### What is TDD?
+
+TDD is an acronym for Test-Driven Development. This is concept of write software  of writing the test before you write the code. The test-driven development (TDD) process with the following steps:
+
+1. Write a test that fails and run it to make sure it fails for the reason you expect.
+2. Write or modify just enough code to make the new test pass.
+3. Refactor the code you just added or changed and make sure the tests continue to pass.
+4. Repeat from step 1!
+
+##### How Write a Failing Test?
+
+```rust
+// Filename: src/lib.rs
+
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    vec![]
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn one_result() {
+        let query = "duct";
+        let contents = "\
+Rust:
+safe, fast, productive.
+Pick three.";
+
+        assert_eq!(vec!["safe, fast, productive."], search(query, contents));
+    }
+}
+```
+
+##### How write code to pass the test?
+
+```rust
+// Filename: src/lib.rs
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    let mut results = Vec::new();
+
+    for line in contents.lines() {
+        if line.contains(query) {
+            results.push(line);
+        }
+    }
+
+    results
+}
+```
+
+##### Hwo Using the search Function in the run Function?
+
+```rust
+// Filename: src/lib.rs
+
+pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    let contents = fs::read_to_string(config.file_path)?;
+
+    for line in search(&config.query, &contents) {
+        println!("{line}");
+    }
+
+    Ok(())
+}
+```
+
+```sh
+$ cargo run -- body poem.txt
+```
+
+#### Working with Environment Variables
+
+Writing a Failing Test for the Case-Insensitive search Function
+
+```rust
+// Filename: src/lib.rs
+// This code does not compile!
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn case_sensitive() {
+        let query = "duct";
+        let contents = "\
+Rust:
+safe, fast, productive.
+Pick three.
+Duct tape.";
+
+        assert_eq!(vec!["safe, fast, productive."], search(query, contents));
+    }
+
+    #[test]
+    fn case_insensitive() {
+        let query = "rUsT";
+        let contents = "\
+Rust:
+safe, fast, productive.
+Pick three.
+Trust me.";
+
+        assert_eq!(
+            vec!["Rust:", "Trust me."],
+            search_case_insensitive(query, contents)
+        );
+    }
+}
+```
+
+Implementing the search_case_insensitive Function
+
+```rust
+Filename: src/lib.rs
+
+pub fn search_case_insensitive<'a>(
+    query: &str,
+    contents: &'a str,
+) -> Vec<&'a str> {
+    let query = query.to_lowercase();
+    let mut results = Vec::new();
+
+    for line in contents.lines() {
+        if line.to_lowercase().contains(&query) {
+            results.push(line);
+        }
+    }
+
+    results
+}
+```
+
+Let’s see if this implementation passes the tests:
+
+```sh
+$ cargo test
+```
+
+add a configuration option to the Config struct to switch between case-sensitive and case-insensitive search
+
+```rust
+// Filename: src/lib.rs
+
+This code does not compile!
+pub struct Config {
+    pub query: String,
+    pub file_path: String,
+    pub ignore_case: bool,
+}
+```
+
+```rust
+// Filename: src/lib.rs
+
+pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    let contents = fs::read_to_string(config.file_path)?;
+
+    let results = if config.ignore_case {
+        search_case_insensitive(&config.query, &contents)
+    } else {
+        search(&config.query, &contents)
+    };
+
+    for line in results {
+        println!("{line}");
+    }
+
+    Ok(())
+}
+```
+
+```rust
+// Filename: src/lib.rs
+use std::env;
+// --snip--
+
+impl Config {
+    pub fn build(args: &[String]) -> Result<Config, &'static str> {
+        if args.len() < 3 {
+            return Err("not enough arguments");
+        }
+
+        let query = args[1].clone();
+        let file_path = args[2].clone();
+
+        let ignore_case = env::var("IGNORE_CASE").is_ok();
+
+        Ok(Config {
+            query,
+            file_path,
+            ignore_case,
+        })
+    }
+}
+```
+
+```sh
+$ cargo run -- to poem.txt
+$ IGNORE_CASE=1 cargo run -- to poem.txt
+```
+
+
+
+##### What module contain features for dealing with environment variable?
+
+`std::env`
+
+Docs
+
+<https://doc.rust-lang.org/std/env/index.html>
+
