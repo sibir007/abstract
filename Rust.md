@@ -4909,3 +4909,163 @@ Problem parsing arguments: not enough arguments
 ##### What is Closures?
 
 Rust’s closures are anonymous functions you can save in a variable or pass as arguments to other functions. You can create the closure in one place and then call the closure elsewhere to evaluate it in a different context. Unlike functions, closures can capture values from the scope in which they’re defined.
+
+##### Should we annotate the types of the parameters or return value of Closures?
+
+Closures don’t usually require you to annotate the types of the parameters or the return value like fn functions do
+
+##### Why we do not require annotate the types of the parameters or return value of Closures?
+
+Type annotations are required on functions because the types are part of an explicit interface exposed to your users. Defining this interface rigidly is important for ensuring that everyone agrees on what types of values a function uses and returns. Closures, on the other hand, aren’t used in an exposed interface like this: they’re stored in variables and used without naming them and exposing them to users of our library.
+
+Closures are typically short and relevant only within a narrow context rather than in any arbitrary scenario. Within these limited contexts, the compiler can infer the types of the parameters and the return type, similar to how it’s able to infer the types of most variables (there are rare cases where the compiler needs closure type annotations too).
+
+##### Can we annotate the types of the parameters or return value of Closures?
+
+As with variables, we can add type annotations if we want to increase explicitness and clarity at the cost of being more verbose than is strictly necessary.
+
+```rust
+Filename: src/main.rs
+    let expensive_closure = |num: u32| -> u32 {
+        println!("calculating slowly...");
+        thread::sleep(Duration::from_secs(2));
+        num
+    };
+```
+
+##### How define Closure?
+
+```rust
+fn  add_one_v1   (x: u32) -> u32 { x + 1 } // function
+let add_one_v2 = |x: u32| -> u32 { x + 1 }; // a fully annotated closure definition.
+let add_one_v3 = |x|             { x + 1 }; // remove the type annotations from the closure definition.
+let add_one_v4 = |x|               x + 1  ; // remove the brackets, which are optional because the closure body has only one expression
+```
+
+##### What compiler determine parameters and return types of Closure?
+
+For closure definitions, the compiler will infer one concrete type for each of their parameters and for their return value at compile time the first time the closure is used. Further usage Closure whit different types will result in compile error.
+
+```rust
+// Filename: src/main.rs
+// This code does not compile!
+
+    let example_closure = |x| x;
+
+    let s = example_closure(String::from("hello"));
+    let n = example_closure(5); // error
+```
+
+##### How Closure capture environment values?
+
+Closures can capture values from their environment in three ways, which directly map to the three ways a function can take a parameter:
+
+- borrowing immutably,
+- borrowing mutably,
+- taking ownership.
+
+##### How does Closure determine what capture methods to use?
+
+The closure will decide which capture methods to use based on what the body of the closure does with the captured values.
+
+```rust
+fn main() {
+    let list = vec![1, 2, 3];
+    println!("Before defining closure: {list:?}");
+
+    let only_borrows = || println!("From closure: {list:?}"); // closure captures the immutable reference to the vector named list because it only needs an immutable reference to print the value.
+
+   // Because we can have multiple immutable references to list at the same time, list is still accessible from the code before the closure definition, after the closure definition but before the closure is called, and after the closure is called.
+
+    println!("Before calling closure: {list:?}");
+    only_borrows();
+    println!("After calling closure: {list:?}");
+}
+```
+
+```rust
+// Filename: src/main.rs
+
+fn main() {
+    let mut list = vec![1, 2, 3];
+    println!("Before defining closure: {list:?}");
+
+    let mut borrows_mutably = || list.push(7); // closure body adds an element to the list vector. The closure now captures a mutable reference
+   // Note that there’s no longer a println! between the definition and the call of the borrows_mutably closure: when borrows_mutably is defined, it captures a mutable reference to list. We don’t use the closure again after the closure is called, so the mutable borrow ends. Between the closure definition and the closure call, an immutable borrow to print isn’t allowed because no other borrows are allowed when there’s a mutable borrow.
+    borrows_mutably();
+    println!("After calling closure: {list:?}");
+}
+```
+
+##### What we should do whit ownership when passing a closure to a new thread?
+
+We must force move values passed to closure by `move` keyword before the parameter list.
+
+The new thread might finish before the rest of the main thread finishes, or the main thread might finish first. If the main thread maintained ownership of values passed to closure, but ended before the new thread did and dropped this values, the immutable references in the thread would be invalid.
+
+```rust
+// Filename: src/main.rs
+use std::thread;
+
+fn main() {
+    let list = vec![1, 2, 3];
+    println!("Before defining closure: {list:?}");
+
+    thread::spawn(move || println!("From thread: {list:?}"))
+        .join()
+        .unwrap();
+}
+```
+
+##### What closure body can do whit captured value?
+
+- move a captured value out of the closure
+- mutate the captured value,
+- neither move nor mutate the value, 
+- capture nothing from the environment to begin with.
+
+##### What does it depend the way a closure captures and handles values from the environment?
+
+How a closure captures and processes values ​​from the environment depends on what traits the closure implements. And accordingly, the trait that implement closures are what kinds of closures functions and struct can use.
+
+##### What does it depend what kinds of closures can use functions and struct?
+
+What kinds of closures can use functions and struct depends on what traits the closure implements.
+
+##### Must we declare which traits must implement the closure?
+
+Closures will automatically implement one, two, or all three of `Fn` traits, in an additive fashion, depending on how the closure’s body handles the values.
+
+##### Which traits can implement closure?
+
+Closures will automatically implement one, two, or all three of `Fn` traits:
+
+- `FnOnce` applies to closures that can be called once. All closures implement at least this trait, because all closures can be called. A closure that moves captured values out of its body will only implement FnOnce and none of the other Fn traits, because it can only be called once.
+- `FnMut` applies to closures that don’t move captured values out of their body, but that might mutate the captured values. These closures can be called more than once.
+- `Fn` applies to closures that don’t move captured values out of their body and that don’t mutate captured values, as well as closures that capture nothing from their environment. These closures can be called more than once without mutating their environment, which is important in cases such as calling a closure multiple times concurrently.
+
+```rust
+impl<T> Option<T> {
+    pub fn unwrap_or_else<F>(self, f: F) -> T
+    where
+        F: FnOnce() -> T //The trait bound specified on the generic type F is FnOnce() -> T, which means F must be able to be called once, take no arguments, and return a T. Using FnOnce in the trait bound expresses the constraint that unwrap_or_else is only going to call f at most one time.
+    {
+        match self {
+            Some(x) => x,
+            None => f(),
+        }
+    }
+}
+```
+
+##### Which trait must implement closure that moves captured values out of its body?
+
+A closure that moves captured values out of its body will only implement `FnOnce` and none of the other `Fn` traits, because it can only be called once.
+
+##### Which trait must implement closure that don’t move captured values out of their body, but that might mutate the captured values?
+
+`FnMut` applies to closures that don’t move captured values out of their body, but that might mutate the captured values. These closures can be called more than once.
+
+##### Which trait must implement closure that don’t move captured values out of their body and that don’t mutate captured values, as well as capture nothing from their environment?
+
+`Fn` applies to closures that don’t move captured values out of their body and that don’t mutate captured values, as well as closures that capture nothing from their environment. These closures can be called more than once without mutating their environment, which is important in cases such as calling a closure multiple times concurrently.
