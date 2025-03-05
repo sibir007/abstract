@@ -4731,7 +4731,7 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 $ cargo run -- body poem.txt
 ```
 
-#### Working with Environment Variables
+#### 12.5 Working with Environment Variables
 
 Writing a Failing Test for the Case-Insensitive search Function
 
@@ -4872,3 +4872,40 @@ Docs
 
 <https://doc.rust-lang.org/std/env/index.html>
 
+
+#### 12.6 Writing Error Messages to Standard Error Instead of Standard Output
+
+##### How make what our program print error massages to Standard Error Instead of Standard Output?
+
+In cases where we want our program to print messages to standard error instead of standard output, we should use the `eprintln!` macros instead of `println!`.
+
+```rust
+Filename: src/main.rs
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let config = Config::build(&args).unwrap_or_else(|err| {
+        eprintln!("Problem parsing arguments: {err}");
+        process::exit(1);
+    });
+
+    if let Err(e) = minigrep::run(config) {
+        eprintln!("Application error: {e}");
+        process::exit(1);
+    }
+}
+```
+
+```sh
+$ cargo run > output.txt
+Problem parsing arguments: not enough arguments
+```
+
+### 13 Functional Language Features: Iterators and Closures
+
+#### 13.1 Closures: Anonymous Functions that Capture Their Environment
+
+##### What is Closures?
+
+Rust’s closures are anonymous functions you can save in a variable or pass as arguments to other functions. You can create the closure in one place and then call the closure elsewhere to evaluate it in a different context. Unlike functions, closures can capture values from the scope in which they’re defined.
