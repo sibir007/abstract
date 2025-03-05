@@ -5069,3 +5069,5 @@ A closure that moves captured values out of its body will only implement `FnOnce
 ##### Which trait must implement closure that don’t move captured values out of their body and that don’t mutate captured values, as well as capture nothing from their environment?
 
 `Fn` applies to closures that don’t move captured values out of their body and that don’t mutate captured values, as well as closures that capture nothing from their environment. These closures can be called more than once without mutating their environment, which is important in cases such as calling a closure multiple times concurrently.
+
+#### 13.2 Processing a Series of Items with Iterators
