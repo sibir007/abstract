@@ -5127,7 +5127,111 @@ we must get mutable reference `mur_ref` from vector value by using `vec_var.iter
 
 we must get mutable reference `mut_ref` from vector value by using `vec_var.iter_mut()` and then using it by call method `mut_ref.next()`
 
-##### How can we get ownership of vector type and returns owned values?
+##### How can we get ownership of vector type and returns owned values using iterator syntax?
 
-We can call `into_iter`
+we can call `into_iter` instead of `iter` on the vector value
+
+##### What is 'consuming adapters' methods?
+
+The Iterator trait has a number of different methods with default implementations provided by the standard library. Some of these methods use the `next` method, these are called 'consuming adapters' because their call uses the iterator. For example `sum` method.
+
+##### How the `sum` Iterator method works
+
+the `sum` method 'consuming adapter' it takes ownership of the iterator and iterates through the items by repeatedly calling next, thus consuming the iterator. As it iterates through, it adds each item to a running total and returns the total when iteration is complete. We aren’t allowed to use v1_iter after the call to sum because sum takes ownership of the iterator we call it on.
+
+```rust
+//   Filename: src/lib.rs
+    #[test]
+    fn iterator_sum() {
+        let v1 = vec![1, 2, 3];
+
+        let v1_iter = v1.iter();
+
+        let total: i32 = v1_iter.sum();
+
+        assert_eq!(total, 6);
+    }
+```
+
+##### What is 'Iterator adapters' methods?
+
+Iterator adapters are methods defined on the Iterator trait that don’t consume the iterator. Instead, they produce different iterators by changing some aspect of the original iterator. For example `map` method
+
+##### How the `map` Iterator method works?
+
+method `map` are 'Iterator adapter' it takes a closure to call on each item as the items are iterated through. The `map` method returns a new iterator that produces the modified items. The closure here creates a new iterator in which each item from the vector will be incremented by 1
+
+```rust
+    #[test]
+    fn iter_map() {
+        let v = vec![1, 2, 3, 4, 5];
+
+        let result: Vec<i32> = v.iter().map(|x| x + 1).collect();
+
+        assert!(result == vec![2, 3, 4, 5, 6]);
+    }
+```
+
+##### How we must combine 'Iterator adapters' and 'consuming adapters' method?
+
+You can chain multiple calls to 'iterator adapters' to perform complex actions in a readable way. But because all iterators are lazy, you have to call one of the consuming adapter methods to get results from calls to iterator adapters.
+
+##### Can we Using Closures that Capture Their Environment in iterators?
+
+```rust
+// Filename: src/lib.rs
+
+#[derive(PartialEq, Debug)]
+struct Shoe {
+    size: u32,
+    style: String,
+}
+
+fn shoes_in_size(shoes: Vec<Shoe>, shoe_size: u32) -> Vec<Shoe> {
+    shoes.into_iter().filter(|s| s.size == shoe_size).collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn filters_by_size() {
+        let shoes = vec![
+            Shoe {
+                size: 10,
+                style: String::from("sneaker"),
+            },
+            Shoe {
+                size: 13,
+                style: String::from("sandal"),
+            },
+            Shoe {
+                size: 10,
+                style: String::from("boot"),
+            },
+        ];
+
+        let in_my_size = shoes_in_size(shoes, 10);
+
+        assert_eq!(
+            in_my_size,
+            vec![
+                Shoe {
+                    size: 10,
+                    style: String::from("sneaker")
+                },
+                Shoe {
+                    size: 10,
+                    style: String::from("boot")
+                },
+            ]
+        );
+    }
+}
+```
+
+##### How the `filter` Iterator method works?
+
+The `filter` method takes a closure. The closure gets an item from the iterator and returns a `bool`. If the closure returns `true`, the value will be included in the iteration produced by filter. If the closure returns `false`, the value won’t be included.
 
