@@ -5071,3 +5071,63 @@ A closure that moves captured values out of its body will only implement `FnOnce
 `Fn` applies to closures that don’t move captured values out of their body and that don’t mutate captured values, as well as closures that capture nothing from their environment. These closures can be called more than once without mutating their environment, which is important in cases such as calling a closure multiple times concurrently.
 
 #### 13.2 Processing a Series of Items with Iterators
+
+##### What is the iterator pattern used for?
+
+The iterator pattern allows you to perform some task on a sequence of items in turn. An iterator is responsible for the logic of iterating over each item and determining when the sequence has finished.
+
+##### What is means - iterators are lazy?
+
+In Rust, iterators are lazy, meaning they have no effect until you call methods that consume the iterator to use it up.
+
+##### What is Iterator in Rust?
+
+In rust Iterator is type that implement Iterator Trait.
+
+```rust
+pub trait Iterator {
+    type Item;
+
+   pub trait Iterator {
+    type Item;
+
+    fn next(&mut self) -> Option<Self::Item>;
+
+    // methods with default implementations elided
+} fn next(&mut self) -> Option<Self::Item>;
+
+    // methods with default implementations elided
+}
+```
+
+
+#### What method define Iterator Trait?
+
+`fn next(&mut self) -> Option<Self::Item>;`
+
+##### How can we get immutable references to values ​​in vector using iterator syntax?
+
+we must get mutable reference `mur_ref` from vector value by using `vec_var.iter()` and then using it by call method `mur_ref.next()`
+
+```rust
+    #[test]
+    fn iterator_demonstration() {
+        let v1 = vec![1, 2, 3];
+
+        let mut v1_iter = v1.iter();
+
+        assert_eq!(v1_iter.next(), Some(&1));
+        assert_eq!(v1_iter.next(), Some(&2));
+        assert_eq!(v1_iter.next(), Some(&3));
+        assert_eq!(v1_iter.next(), None);
+    }
+```
+
+##### How can we get mutable references to values ​​in vector using iterator syntax?
+
+we must get mutable reference `mut_ref` from vector value by using `vec_var.iter_mut()` and then using it by call method `mut_ref.next()`
+
+##### How can we get ownership of vector type and returns owned values?
+
+We can call `into_iter`
+
