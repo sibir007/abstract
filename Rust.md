@@ -5101,7 +5101,7 @@ pub trait Iterator {
 ```
 
 
-#### What method define Iterator Trait?
+##### What method define Iterator Trait?
 
 `fn next(&mut self) -> Option<Self::Item>;`
 
@@ -5235,3 +5235,332 @@ mod tests {
 
 The `filter` method takes a closure. The closure gets an item from the iterator and returns a `bool`. If the closure returns `true`, the value will be included in the iteration produced by filter. If the closure returns `false`, the value won’t be included.
 
+#### 13.3 Improving Our I/O Project
+
+Removing a clone Using an Iterator
+
+```rust
+// Filename: src/lib.rs
+
+impl Config {
+    pub fn build(args: &[String]) -> Result<Config, &'static str> {
+        if args.len() < 3 {
+            return Err("not enough arguments");
+        }
+        // We needed clone here because we have a slice with String elements in the parameter args, but the build function doesn’t own args. To return ownership of a Config instance, we had to clone the values from the query and file_path fields of Config so the Config instance can own its values.
+        let query = args[1].clone(); 
+        let file_path = args[2].clone();
+
+        let ignore_case = env::var("IGNORE_CASE").is_ok();
+
+        Ok(Config {
+            query,
+            file_path,
+            ignore_case,
+        })
+    }
+}
+```
+
+```rust
+// Filename: src/main.rs
+
+fn main() {
+
+    let config = Config::build(env::args()).unwrap_or_else(|err| { // The standard library documentation for the env::args function shows that the type of the iterator it returns is std::env::Args, and that type implements the Iterator trait and returns String values. 
+        eprintln!("Problem parsing arguments: {err}");
+        process::exit(1);
+    });
+
+    // --snip--
+}
+```
+
+```rust
+Filename: src/lib.rs
+
+impl Config {
+    pub fn build(
+        mut args: impl Iterator<Item = String>, // Because we’re taking ownership of args and we’ll be mutating args by iterating over it, we can add the mut keyword into the specification of the args parameter to make it mutable
+    ) -> Result<Config, &'static str> {
+        args.next();
+
+        let query = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn't get a query string"),
+        };
+
+        let file_path = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn't get a file path"),
+        };
+
+        let ignore_case = env::var("IGNORE_CASE").is_ok();
+
+        Ok(Config {
+            query,
+            file_path,
+            ignore_case,
+        })
+    }
+}
+```
+
+Making Code Clearer with Iterator Adapters
+
+```rust
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    contents
+        .lines()
+        .filter(|line| line.contains(query))
+        .collect()
+}
+```
+
+#### 13.4 Comparing Performance: Loops vs. Iterators
+
+##### What code implementation faster on: `for loop` or Iterators?
+
+iterators, although a high-level abstraction, get compiled down to roughly the same code as if you’d written the lower-level code yourself. Iterators are one of Rust’s zero-cost abstractions, by which we mean using the abstraction imposes no additional runtime overhead.
+The implementations of closures and iterators are such that runtime performance is not affected.
+
+##### What is 'zero-cost abstractions'?
+
+This mean using the abstraction imposes no additional runtime overhead
+
+### 14 More About Cargo and Crates.io
+
+full explanation of all Cargo features, see its [documentation](https://doc.rust-lang.org/cargo/).
+
+#### 14.1 Customizing Builds with Release Profiles
+
+For the full list of configuration options and defaults for each profile, see Cargo’s [documentation](https://doc.rust-lang.org/cargo/reference/profiles.html).
+
+##### What is 'release profiles'?
+
+In Rust, release profiles are predefined and customizable profiles with different configurations that allow a programmer to have more control over various options for compiling code.
+
+##### What release profiles exist?
+
+- the `dev` profile Cargo uses when you run `cargo build`. The `dev` profile is defined with good defaults for development
+- the `release` profile Cargo uses when you run `cargo build --release`. the release profile has good defaults for release builds.
+- `test`
+- `bench`
+
+##### What happen if we add `[profile.*]` sections for any profile?
+
+Cargo has default settings for each of the profiles that apply when you haven’t explicitly added any `[profile.*]` sections in the project’s Cargo.toml file. By adding `[profile.*]` sections for any profile you want to customize, you override any subset of the default settings.
+
+```toml
+# Filename: Cargo.toml
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 3
+```
+
+##### What controls the `opt-level` profile setting? 
+
+The `opt-level` setting controls the number of optimizations Rust will apply to your code, with a range of 0 to 3. Applying more optimizations extends compiling time, so if you’re in development and compiling your code often, you’ll want fewer optimizations to compile faster even if the resulting code runs slower. The default opt-level for dev is therefore 0. When you’re ready to release your code, it’s best to spend more time compiling. You’ll only compile in release mode once, but you’ll run the compiled program many times, so release mode trades longer compile time for code that runs faster. That is why the default opt-level for the release profile is 3.
+
+#### 14.2 Publishing a Crate to Crates.io
+
+##### what are documentation comments for?
+
+they will generate HTML documentation. HTML displays the contents of documentation comments for public API elements, intended for programmers interested in how to use your container, rather than how it is implemented.
+
+##### how are documentation comments pointed?
+
+Documentation comments use three slashes, `///`. Place documentation comments just before the item they’re documenting.
+
+```rust
+/// Adds one to the number given.
+///
+/// # Examples
+///
+/// ```
+/// let arg = 5;
+/// let answer = my_crate::add_one(arg);
+///
+/// assert_eq!(6, answer);
+/// ```
+pub fn add_one(x: i32) -> i32 {
+    x + 1
+}
+```
+
+##### what markup can be used in documentation comments?
+
+Markdown
+
+##### what sections can be used in documentation?
+
+- **Examples**
+- **Panics**: The scenarios in which the function being documented could panic. Callers of the function who don’t want their programs to panic should make sure they don’t call the function in these situations.
+- **Errors**: If the function returns a Result, describing the kinds of errors that might occur and what conditions might cause those errors to be returned can be helpful to callers so they can write code to handle the different kinds of errors in different ways.
+- **Safety**: If the function is unsafe to call (we discuss unsafety in Chapter 20), there should be a section explaining why the function is unsafe and covering the invariants that the function expects callers to uphold.
+
+##### How we can tests code in documentation comments?
+
+We must add Example section of 'documentation comments' and inside this section, using markdown syntax, write code that can be used as test.  If we run cargo test with the documentation we will see the section Doc-tests in the test results.
+Now if we change either the function or the example so the assert_eq! in the example panics and run cargo test again, we’ll see that the doc tests catch that the example and the code are out of sync with each other!
+
+##### how to create a doc comment that does not refer to a specific code?
+
+The style of doc comment `//!` adds documentation to the item that contains the comments rather than to the items following the comments. We typically use these doc comments inside the crate root file (src/lib.rs by convention) or inside a module to document the crate or the module as a whole.
+
+Filename: src/lib.rs
+
+```rust
+//! # My Crate
+//!
+//! `my_crate` is a collection of utilities to make performing certain
+//! calculations more convenient.
+
+/// Adds one to the number given.
+// --snip--
+```
+
+##### How to remove the internal organization from the public AP?
+
+We can modify the crate top level module code to add pub use statements to re-export the items placed at the below level. The API documentation that `cargo doc` generates for this crate will now list and link re-exports on the front page.
+The crate users can still see and use the internal structure or they can use the more convenient structure re-exports structure.
+
+
+```rust
+Filename: src/lib.rs
+//! # Art
+//!
+//! A library for modeling artistic concepts.
+
+pub mod kinds {
+    /// The primary colors according to the RYB color model.
+    pub enum PrimaryColor {
+        Red,
+        Yellow,
+        Blue,
+    }
+
+    /// The secondary colors according to the RYB color model.
+    pub enum SecondaryColor {
+        Orange,
+        Green,
+        Purple,
+    }
+}
+
+pub mod utils {
+    use crate::kinds::*;
+
+    /// Combines two primary colors in equal amounts to create
+    /// a secondary color.
+    pub fn mix(c1: PrimaryColor, c2: PrimaryColor) -> SecondaryColor {
+        // --snip--
+    }
+}
+
+// Filename: src/main.rs
+use art::kinds::PrimaryColor;
+use art::utils::mix;
+
+fn main() {
+    let red = PrimaryColor::Red;
+    let yellow = PrimaryColor::Yellow;
+    mix(red, yellow);
+}
+```
+
+```rust
+// Filename: src/lib.rs
+
+//! # Art
+//!
+//! A library for modeling artistic concepts.
+
+pub use self::kinds::PrimaryColor;
+pub use self::kinds::SecondaryColor;
+pub use self::utils::mix;
+
+pub mod kinds {
+    // --snip--
+}
+
+pub mod utils {
+    // --snip--
+}
+
+// Filename: src/main.rs
+
+use art::mix;
+use art::PrimaryColor;
+
+fn main() {
+    // --snip--
+}
+```
+
+##### How to Setting Up a Crates.io Account?
+
+- visit the home page at crates.io
+- log in via a GitHub account.
+- visit your account settings at https://crates.io/me/ and retrieve your API key. - run the cargo login command
+- paste your API key when prompted
+
+```sh
+$ cargo login
+abcdefghijklmnopqrstuvwxyz012345
+```
+
+This command will inform Cargo of your API token and store it locally in `~/.cargo/`credentials. Note that this token is a secret: do not share it with anyone else. If you do share it with anyone for any reason, you should revoke it and generate a new token on crates.io.
+
+##### How to Publishing a Crate to Crates.io?
+
+- create Crates.io account
+- saved your API token
+- Add Metadata to a Crate
+
+  ```toml
+  [package]
+  name = "guessing_game"
+  version = "0.1.0"
+  edition = "2021"
+  description = "A fun game where you guess what number the computer has chosen."
+  license = "MIT OR Apache-2.0"
+
+  [dependencies]
+  ```
+
+- Run the `cargo publish` command
+
+##### How Publishing a New Version of an Existing Crate?
+
+change the version value specified in your Cargo.toml file and republish
+
+##### what are the versification rules,
+
+Use the [Semantic Versioning rules](http://semver.org/)
+
+##### How to prevent any future projects from adding Deprecating Crate Versions as a new dependency?
+
+run cargo yank and specify which version you want to yank.
+
+```sh
+run `cargo yank` and specify which version you want to yank. 
+$ cargo yank --vers 1.0.1
+    Updating crates.io index
+        Yank guessing_game@1.0.1
+```
+
+By adding --undo to the command, you can also undo a yank and allow projects to start depending on a version again:
+
+```sh
+$ cargo yank --vers 1.0.1 --undo
+    Updating crates.io index
+      Unyank guessing_game@1.0.1
+```
+
+##### What is 'yanking a crate version'?
+
+Yanking a version prevents new projects from depending on that version while allowing all existing projects that depend on it to continue. Essentially, a yank means that all projects with a Cargo.lock will not break, and any future Cargo.lock files generated will not use the yanked version.
