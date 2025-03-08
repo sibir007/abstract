@@ -5563,4 +5563,182 @@ $ cargo yank --vers 1.0.1 --undo
 
 ##### What is 'yanking a crate version'?
 
+Although you can’t remove previous versions of a crate, you can prevent any future projects from adding them as a new dependency. This is useful when a crate version is broken for one reason or another. In such situations, Cargo supports yanking a crate version.
 Yanking a version prevents new projects from depending on that version while allowing all existing projects that depend on it to continue. Essentially, a yank means that all projects with a Cargo.lock will not break, and any future Cargo.lock files generated will not use the yanked version.
+
+#### 14.3 Cargo Workspaces
+
+##### What is Cargo Workspace?
+
+As your project develops, you might find that the library crate continues to get bigger and you want to split your package further into multiple library crates. Cargo offers a feature called workspaces that can help manage multiple related packages that are developed in tandem.
+A workspace is a set of packages that share the same Cargo.lock and output directory.
+
+##### How to create a Workspace?
+
+- First we must create workspace directory
+
+```sh
+$ mkdir add
+$ cd add
+```
+
+- In workspace directory we create Cargo.toml file.
+
+```sh
+$ touch Cargo.toml
+```
+  
+- In Cargo.toml file we must create `[workspace]` section. Workspace Cargo.toml file do not contain section `[package]`. In `[workspace]` section we point the latest and greatest version of Cargo’s resolver algorithm
+
+```toml
+# add/Cargo.toml file
+
+[workspace]
+resolver = "2"
+```
+
+##### How to create package in Workspace?
+
+When we have a Workspace and and we are in Workspace directory, we can create a binary or library crate by running `cargo new package_name [--lib]` within the workspace directory. This automatically adds the newly created package to the `members` key in the `[workspace]` section in the workspace Cargo.toml file
+
+```sh
+cargo new adder
+```
+
+```toml
+# add/Cargo.toml file
+
+[workspace]
+resolver = "2"
+members = ["adder"]
+```
+
+##### What we can build Workspace?
+
+We can build a workspace by running `cargo build` command in top-level Workspace dir
+
+##### Which file and directories does `cargo build` create in Workspace?
+
+`Cargo.lock` file and `target` dir
+
+```sh
+cargo build
+tree -L 3
+├── Cargo.lock
+├── Cargo.toml
+├── adder
+│   ├── Cargo.toml
+│   └── src
+│       └── main.rs
+└── target
+    ├── CACHEDIR.TAG
+    └── debug
+        ├── adder
+        ├── adder.d
+        ├── build
+        ├── deps
+        ├── examples
+        └── incremental
+```
+
+##### How many packages we can create in Workspace?
+
+We can create many packages in Workspace. All packages will be automatically added to the `members` key in the `[workspace]` section in the workspace Cargo.toml and will use the same Cargo.lock file and `target` directory.
+
+```sh
+$ cargo new adder
+$ cargo new add_one --lib
+$ tree -L 3
+.
+├── adder
+│   ├── Cargo.toml
+│   └── src
+│       └── main.rs
+├── add_one
+│   ├── Cargo.toml
+│   └── src
+│       └── lib.rs
+├── Cargo.toml
+└── target
+
+```
+
+```toml
+# Filename: Cargo.toml
+
+[workspace]
+resolver = "2"
+members = ["adder", "add_one"]
+```
+
+##### What files and directories shares all packages in Workspace?
+
+All packages in workspace shares `Cargo.lock` file and `target` directory.
+
+##### What should we do if our container code depends on code from another Workspace package?
+
+- If our crate code depends on code from another Workspace package, we should specify that package in the `[dependencies]` section of our crate package's Cargo.toml file. In this case, we specify the relative path to the package that we will reference in our code
+
+```rust
+// Filename: add_one/src/lib.rs
+pub fn add_one(x: i32) -> i32 {
+    x + 1
+}
+```
+
+```toml
+# Filename: adder/Cargo.toml
+
+[dependencies]
+add_one = { path = "../add_one" }
+```
+
+```rust
+// Filename: adder/src/main.rs
+fn main() {
+    let num = 10;
+    println!("Hello, world! {num} plus one is {}!", add_one::add_one(num));
+}
+```
+
+- Then we can build Workspace in the top-level Workspace directory
+
+```sh
+$ cargo build
+```
+
+##### How we should run binary crate in Workspace?
+
+To run a binary crate in Workspace, we should specify which package in the workspace we want to run by using the `-p` argument and the package name with `cargo run`:
+
+```sh
+$ cargo run -p adder
+```
+
+##### How we should add dependencies in Workspace packages?
+
+We should add the dependency to the Cargo.toml file of each package where this dependency is required.
+
+```toml
+# Filename: add_one/Cargo.toml
+
+[dependencies]
+rand = "0.8.5"
+```
+
+##### Where located Cargo.lock file of Workspace package?
+
+Workspace has only one Cargo.lock file at the top level, rather than having a Cargo.lock in each crate’s directory. This ensures that all crates are using the same version of all dependencies.
+
+##### What happen If crates in the workspace specify incompatible versions of the same dependency?
+
+Cargo will resolve each of them, but will still try to resolve as few versions as possible.
+
+##### How we can run tests in Workspace?
+
+If we call `cargo test` command  in top-level Workspace dir - cargo execute test in all Workspace packages. We can add `-p` flag whit name of a package - in this case cargo execute only tests specified package.
+
+##### How we should publish Workspace crate?
+
+If we wont publish Workspace crates to crates.io, we should each crate in the workspace publish separately. We can publish a particular crate in our workspace by using the `-p` flag and specifying the name of the crate we want to publish.
+
