@@ -5742,3 +5742,152 @@ If we call `cargo test` command  in top-level Workspace dir - cargo execute test
 
 If we wont publish Workspace crates to crates.io, we should each crate in the workspace publish separately. We can publish a particular crate in our workspace by using the `-p` flag and specifying the name of the crate we want to publish.
 
+#### 14.5 Installing Binaries with cargo install
+
+##### For what used `cargo install` command?
+
+The cargo install command allows you to install and use binary crates locally. This isn’t intended to replace system packages; it’s meant to be a convenient way for Rust developers to install tools that others have shared on crates.io. Note that you can only install packages that have binary targets.
+
+##### How we can install a binary cartes locally?
+
+The cargo install command allows you to install and use binary crates locally.
+
+##### What is 'binary target'?
+
+A binary target is the runnable program that is created if the crate has a src/main.rs file or another file specified as a binary, as opposed to a library target that isn’t runnable on its own but is suitable for including within other programs
+
+##### Where is information about crate target?
+
+Usually, crates have information in the README file about whether a crate is a library, has a binary target, or both.
+
+##### Where are a binaries installed with `cargo install` stored?
+
+All binaries installed with cargo install are stored in the installation root’s bin folder. If you installed Rust using `rustup.rs` and don’t have any custom configurations, this directory will be `$HOME/.cargo/bin`. Ensure that directory is in your $PATHto be able to run programs you’ve installed with `cargo install`.
+
+```sh
+$ cargo install ripgrep
+    Updating crates.io index
+  Downloaded ripgrep v13.0.0
+  Downloaded 1 crate (243.3 KB) in 0.88s
+  Installing ripgrep v13.0.0
+--snip--
+   Compiling ripgrep v13.0.0
+    Finished `release` profile [optimized + debuginfo] target(s) in 10.64s
+  Installing ~/.cargo/bin/rg
+   Installed package `ripgrep v13.0.0` (executable `rg`) # shows the location and the name of the installed binary
+
+$ rg --help
+...
+```
+
+#### 14.6 Extending Cargo with Custom Commands
+
+##### How we can extend Cargo with new subcommands without having to modify Cargo?
+
+We can use `cargo install` to install extensions and then run them just like the built-in Cargo tools. If a binary in our $PATH is named `cargo-something`, you can run it as if it was a Cargo subcommand by running `cargo something`. Custom commands like this are also listed when you run `cargo --list`.
+
+### 15 Smart Pointers.
+
+##### What is a Pointer?
+
+A pointer is a general concept for a variable that contains an address in memory. This address refers to, or “points at,” some other data.
+
+##### How Pointers implemented in Rust?
+
+The most common kind of pointer in Rust is a reference. References are indicated by the & symbol and borrow the value they point to. They don’t have any special capabilities other than referring to data, and have no overhead.
+
+##### What is 'Smart Pointers'?
+
+Smart pointers, on the other hand, are data structures that act like a pointer but also have additional metadata and capabilities. Rust, with its concept of ownership and borrowing, has an additional difference between references and smart pointers: while references only borrow data, in many cases, smart pointers own the data they point to.
+
+##### How Smart Pointers implemented in Rust?
+
+Smart pointers are usually implemented using structs. Unlike an ordinary struct, smart pointers implement the `Deref` and `Drop` traits.
+
+##### What role `Deref` trait in Smart pointers?
+
+The Deref trait allows an instance of the smart pointer struct to behave like a reference so you can write your code to work with either references or smart pointers. 
+
+##### What role `Drop` trait in Smart pointers?
+
+The Drop trait allows you to customize the code that’s run when an instance of the smart pointer goes out of scope.
+
+#### 15.1 Using `Box<T>` to Point to Data on the Heap
+
+##### What is `Box<T>` type?
+
+The `Box<T>` type is a smart pointer because it implements the Deref trait, which allows `Box<T>` values to be treated like references. When a `Box<T>` value goes out of scope, the heap data that the box is pointing to is cleaned up as well because of the Drop trait implementation. Boxes allow you to store data on the heap rather than the stack.
+
+##### Why use `Box<T>`?
+
+Boxes allow you to store data on the heap rather than the stack. What remains on the stack is the pointer to the heap data. Refer Boxes don’t have performance overhead, other than storing their data on the heap instead of on the stack. But they don’t have many extra capabilities either.
+
+- When you have a type whose size can’t be known at compile time and you want to use a value of that type in a context that requires an exact size
+- When you have a large amount of data and you want to transfer ownership but ensure the data won’t be copied when you do so
+- When you want to own a value and you care only that it’s a type that implements a particular trait rather than being of a specific type
+
+##### How define Box value?
+
+We define a variable to have the value of a Box that point to the some value, which is located on the heap.
+
+```rust
+// Filename: src/main.rs
+fn main() {
+    let b = Box::new(5);
+    println!("b = {b}");
+}
+```
+
+##### What is recursive type?
+
+A value of recursive type can have another value of the same type as part of itself.
+
+##### Why Recursive types pose an issue?
+
+At compile time Rust needs to know how much space a type takes up. However, the nesting of values of recursive types could theoretically continue infinitely, so Rust can’t know how much space the value needs.
+
+##### How does Box solve issue of Recursive types?
+
+nesting of values of recursive types could theoretically continue infinitely, so Rust can’t know how much space the value needs. Because boxes have a known size, we can enable recursive types by inserting a box in the recursive type definition.
+
+##### What is Cons List?
+
+A cons list is a data structure that comes from the Lisp programming language and is made up of nested pairs. Each item in a cons list contains two elements: the value of the current item and the next item. The last item in the list contains only a value called Nil without a next item.
+
+For example, here’s a pseudocode representation of a cons list containing the list 1, 2, 3 with each pair in parentheses:
+
+(1, (2, (3, Nil)))
+
+##### How Rust determine how much space to allocate for a Enum?
+
+Rust goes through each variant of the Enum to see which variant requires more space. Rust will use the larger size to store the Enum variants.
+
+```rust
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(i32, i32, i32),
+}
+```
+
+##### How to define Cons List by using Enum
+
+We define Enum whit two variant: First for pair whit value and nested pair that implemented as Box type whit this Enum type, Second for Nil value.
+
+```rust
+Filename: src/main.rs
+
+enum List {
+    Cons(i32, Box<List>),
+    Nil,
+}
+
+use crate::List::{Cons, Nil};
+
+fn main() {
+    let list = Cons(1, Box::new(Cons(2, Box::new(Cons(3, Box::new(Nil))))));
+}
+```
+
+#### 15.2 Treating Smart Pointers Like Regular References with the Deref Trait
