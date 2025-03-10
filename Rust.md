@@ -5891,3 +5891,106 @@ fn main() {
 ```
 
 #### 15.2 Treating Smart Pointers Like Regular References with the Deref Trait
+
+##### What is Dereference operator?
+
+Dereference operator id depicted as "*", applying it to a reference, we obtain the value contained in that reference.
+
+```rust
+Filename: src/main.rs
+fn main() {
+    let x = 5;
+    let y = &x;
+
+    assert_eq!(5, x);
+    assert_eq!(5, *y);
+}
+```
+
+##### What types can we apply the dereference operator to?
+
+We can apply the dereference operator to a regular reference and to types that implements Deref trait
+
+```rust
+// Filename: src/main.rs
+
+use std::ops::Deref;
+
+struct MyBox<T>(T);
+
+impl<T> MyBox<T> {
+    fn new(x: T) -> MyBox<T> {
+        MyBox(x)
+    }
+}
+
+impl<T> Deref for MyBox<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+fn main() {
+    let x = 5;
+    let y = MyBox::new(x);
+
+    assert_eq!(5, x);
+    assert_eq!(5, *y);
+}
+```
+
+##### How Rust dereference Deref implementing types?
+
+Rust substitutes the `*` operator with a call to the `deref` method and then a plain dereference so we don’t have to think about whether or not we need to call the deref method. This Rust feature lets us write code that functions identically whether we have a regular reference or a type that implements Deref.
+
+```rust
+fn main() {
+    let y = Box::new(5);
+    
+    assert_eq!(5, *y); // *(y.deref())
+}
+```
+
+##### Whether the '*' operator is applied recursively to values ​​returned from the `deref` method?
+
+the `*` operator is replaced with a call to the `deref` method and then a call to the `*` operator just once, each time we use a `*` in our code. Substitution of the `*` operator does not recurse infinitely.
+
+##### What is 'Deref coercion'?
+
+Deref coercion is conversion a reference to a type that implements the Deref trait into a reference to another type. For example, deref coercion can convert &String to &str because String implements the Deref trait such that it returns &str.
+
+##### Where used 'Deref coercion'?
+
+Deref coercion is a convenience Rust performs on arguments to functions and methods, and works only on types that implement the Deref trait. It happens automatically when we pass a reference to a particular type’s value as an argument to a function or method that doesn’t match the parameter type in the function or method definition. A sequence of calls to the deref method converts the type we provided into the type the parameter needs.
+
+```rust
+Filename: src/main.rs
+
+fn hello(name: &str) {
+    println!("Hello, {name}!");
+}
+
+fn main() {
+    let m = MyBox::new(String::from("Rust"));
+    hello(&m); // hello(&(*m)[..]); The (*m) dereferences the MyBox<String> into a String. Then the & and [..] take a string slice of the String that is equal to the whole string to match the signature of hello
+}
+```
+
+When the Deref trait is defined for the types involved, Rust will analyze the types and use Deref::deref as many times as necessary to get a reference to match the parameter’s type.
+
+##### How we can override `*` operator on mutable reference?
+
+We should implement DerefMut trait on type that value we are using whit the mut reference.
+
+##### What result type of Deref Coercion for &T?
+
+&U when &T: Deref<Target=U>
+
+##### What result type of Deref Coercion for mut& T?
+
+- if T: DerefMut<Target=U> then result type &mut U
+- if T: Deref<Target=U> then result type &U
+
+#### 15.3 Running Code on Cleanup with the Drop Trait
