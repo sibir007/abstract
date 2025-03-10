@@ -5871,7 +5871,7 @@ enum Message {
 }
 ```
 
-##### How to define Cons List by using Enum
+##### How to define Cons List by using Enum?
 
 We define Enum whit two variant: First for pair whit value and nested pair that implemented as Box type whit this Enum type, Second for Nil value.
 
@@ -5994,3 +5994,45 @@ We should implement DerefMut trait on type that value we are using whit the mut 
 - if T: Deref<Target=U> then result type &U
 
 #### 15.3 Running Code on Cleanup with the Drop Trait
+
+##### For what to use Drop Trait?
+
+Drop Trait lets you customize what happens when a value is about to go out of scope. You can provide an implementation for the Drop trait on any type, and that code can be used to release resources like files or network connections. You specify the code to run when a value goes out of scope by implementing the Drop trait.
+
+##### what is required to implement Drop trait?
+
+The Drop trait requires you to implement one method named `drop` that takes a mutable reference to `self`.
+
+##### How is the `drop` method of the Drop feature called?
+
+Rust automatically called `drop` for us when our instances went out of scope, calling the code we specified in.
+
+##### How can we manually drop a value?
+
+ you have to call the `std::mem::drop` function provided by the standard library if you want to force a value to be dropped before the end of its scope.
+
+```rust
+fn main() {
+    let c = CustomSmartPointer {
+        data: String::from("some data"),
+    };
+    println!("CustomSmartPointer created.");
+    // c.drop(); error
+    drop(c); // The function is in the prelude
+    println!("CustomSmartPointer dropped before the end of main.");
+}
+```
+
+#### 15.4 Rc<T>, the Reference Counted Smart Pointer
+
+##### when a single value might have multiple owners?
+
+ For example, in graph data structures, multiple edges might point to the same node, and that node is conceptually owned by all of the edges that point to it. A node shouldn’t be cleaned up unless it doesn’t have any edges pointing to it and so has no owners.
+
+##### How we can enable multiple ownership?
+
+You have to enable multiple ownership explicitly by using the Rust type Rc<T>, which is an abbreviation for reference counting.
+
+##### What does Rc<T> type?
+
+The Rc<T> type keeps track of the number of references to a value to determine whether or not the value is still in use. If there are zero references to a value, the value can be cleaned up without any references becoming invalid.
