@@ -5990,8 +5990,8 @@ We should implement DerefMut trait on type that value we are using whit the mut 
 
 ##### What result type of Deref Coercion for mut& T?
 
-- if T: DerefMut<Target=U> then result type &mut U
-- if T: Deref<Target=U> then result type &U
+- &mut U if T: DerefMut<Target=U>
+- &U if T: Deref<Target=U>
 
 #### 15.3 Running Code on Cleanup with the Drop Trait
 
@@ -6023,7 +6023,7 @@ fn main() {
 }
 ```
 
-#### 15.4 Rc<T>, the Reference Counted Smart Pointer
+#### 15.4 `Rc<T>`, the Reference Counted Smart Pointer
 
 ##### when a single value might have multiple owners?
 
@@ -6031,17 +6031,17 @@ fn main() {
 
 ##### How we can enable multiple ownership?
 
-You have to enable multiple ownership explicitly by using the Rust type Rc<T>, which is an abbreviation for reference counting.
+You have to enable multiple ownership explicitly by using the Rust type `Rc<T>`, which is an abbreviation for reference counting.
 
-##### What does Rc<T> type?
+##### What does `Rc<T>` type?
 
-The Rc<T> type keeps track of the number of references to a value to determine whether or not the value is still in use. If there are zero references to a value, the value can be cleaned up without any references becoming invalid.
+The `Rc<T>` type keeps track of the number of references to a value to determine whether or not the value is still in use. If there are zero references to a value, the value can be cleaned up without any references becoming invalid.
 
-##### Can we use Rc<T> in multi-threaded scenarios?
+##### Can we use `Rc<T>` in multi-threaded scenarios?
 
-We can use Rc<T> only in single-threaded scenarios
+We can use `Rc<T>` only in single-threaded scenarios
 
-##### How we can use Rc<T> to Share Data?
+##### How we can use `Rc<T>` to Share Data?
 
 We should use `Rc::new(Some_data)` and `Rc::clone(&ref)` methods  allowing a single value to have multiple owners, and ensures that the value remains valid as long as any of the owners still exist.
 
@@ -6086,4 +6086,177 @@ When b and then a go out of scope at the end of main, the count is then 0, and t
 
 ##### What is 'Interior mutability'?
 
-Interior mutability is a design pattern in Rust that allows you to mutate data even when there are immutable references to that data; normally, this action is disallowed by the borrowing rules. 
+Interior mutability is a design pattern in Rust that allows you to mutate data even when there are immutable references to that data; normally, this action is disallowed by the borrowing rules.
+Mutating the value inside an immutable value is the interior mutability pattern.
+
+##### How implemented the Interior mutability pattern?
+
+To mutate data, the pattern uses unsafe code inside a data structure to bend Rust’s usual rules that govern mutation and borrowing.
+
+##### What is 'unsafe code'?
+
+Unsafe code indicates to the compiler that we’re checking the rules manually instead of relying on the compiler to check them for us
+
+##### When can we use Interior mutability pattern?
+
+We can use types that use the interior mutability pattern only when we can ensure that the borrowing rules will be followed at runtime, even though the compiler can’t guarantee that. The unsafe code involved is then wrapped in a safe API, and the outer type is still immutable.
+
+##### What difference between references, `Box<T>` and `RefCell<T>`?
+
+With references and `Box<T>`, the borrowing rules’ invariants are enforced at compile time. With `RefCell<T>`, these invariants are enforced at runtime. With references, if you break these rules, you’ll get a compiler error. With `RefCell<T>`, if you break these rules, your program will panic and exit.
+
+##### What could be the advantage of checking the borrowing rules at runtime?
+
+The advantage of checking the borrowing rules at runtime is that certain memory-safe scenarios are then allowed, where they would’ve been disallowed by the compile-time checks. Static analysis, like the Rust compiler, is inherently conservative. Some properties of code are impossible to detect by analyzing the code.
+
+##### When the `RefCell<T>` type is useful?
+
+The `RefCell<T>` type is useful when you’re sure your code follows the borrowing rules but the compiler is unable to understand and guarantee that. `RefCell<T>` allows mutable borrows checked at runtime, you can mutate the value inside the `RefCell<T>` even when the `RefCell<T>` is immutable.
+
+##### Can we use `RefCell<T>` type in multi-thread scenarios?
+
+Similar to `Rc<T>`, `RefCell<T>` is only for use in single-threaded scenarios and will give you a compile-time error if you try using it in a multithreaded context.
+
+##### How we can use `RefCell<T>` type to mutate immutable value.
+
+We must create a value of type `RefCell<T>` that contains a target value of some type. We can then use that value either by itself or as part of another value used in an immutable context, i.e. passed with the `&` sign. When we call `borrow_mut()` on a value of type `RefCell<T>`, we get a mutable reference to the value inside, when we call `borrow()` on a value of type `RefCell<T>`, we get an immutable reference to the value inside. We cannot violate the borrow rules when using references obtained through `RefCell<T>` value.
+
+```rust
+pub trait Messenger {
+    fn send(&self, msg: &str) // the interface our mock object needs to implement so that the mock can be used in the same way a real object is
+}
+
+pub str LimitTracker<'a T: Messenger> {
+    messenger: &'a T,
+    value: usize,
+    max: usize,
+}
+
+impl<'a T> LimitTracker<'a T>
+where
+    T: Messenger,
+{
+    pub fn new(messenger: &'a T, max: usize) -> LimitTracker<'a T> {
+        LimitTracker {
+            messenger,
+            value: 0,
+            max,
+        }
+    }
+
+    pub fn set_value(&mut self, value: usize) {
+        self.value = value;
+
+        let percentage_of_max = self.value as f64 / self.max as f64;
+
+        if percentage_of_max >= 1.0 {
+            self.messenger.send("Error: You are over your quota!");
+        } else if percentage_of_max >= 0.9 {
+            self.messenger
+                .send("Urgent warning: You've used up over 90% of your quota!");
+        } else if percentage_of_max >= 0.75 {
+            self.messenger
+                .send("Warning: You've used up over 75% of your quota!");
+        }
+    }  
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::cell::RefCell;
+
+    struct MockMessenger { // We need a mock object that, instead of sending an email or text message when we call send, will only keep track of the messages it’s told to send. 
+        // sent_messages: Vec<String>,
+        sent_messages: RefCell<Vec<String>>, // The sent_messages field is now of type RefCell<Vec<String>> instead of Vec<String
+    }
+
+    impl MockMessenger {
+        fn new() -> MockMessenger { 
+                // sent_messages: vec![]
+                sent_messages: RefCell::new(vec![]), // we create a new RefCell<Vec<String>> instance around the empty vector.
+            }
+        }
+    }
+
+    impl Messenger for MockMessenger {
+        fn send(&self, message: &str) {
+            // self.sent_messages.push(String::from(message)); `self` is a `&` reference, so the data it refers to cannot be borrowed as mutable
+            self.sent_messages.borrow_mut().push(String::from(message)); //We call borrow_mut on the RefCell<Vec<String>> in self.sent_messages to get a mutable reference to the value inside the RefCell<Vec<String>>, which is the vector. Then we can call push on the mutable reference to the vector to keep track of the messages sent during the test.
+        }
+    }
+
+    #[test]
+    fn it_sends_an_over_75_percent_warning_message() {
+        let mock_messenger = MockMessenger::new();
+        let mut limit_tracker = LimitTracker::new(&mock_messenger, 100);
+
+        limit_tracker.set_value(80);
+        // assert_eq!(mock_messenger.sent_messages.len(), 1); 
+        assert_eq!(mock_messenger.sent_messages.borrow().len(), 1); // call borrow on the RefCell<Vec<String>> to get an immutable reference to the vector
+    }
+}
+```
+
+##### How `RefCell<T>` keeping Track of Borrows at Runtime?
+
+When creating immutable and mutable references, we use the & and &mut syntax, respectively. With `RefCell<T>`, we use the borrow and borrow_mut methods, which are part of the safe API that belongs to `RefCell<T>`. The borrow method returns the smart pointer type `Ref<T>`, and borrow_mut returns the smart pointer type `RefMut<T>`. Both types implement Deref, so we can treat them like regular references.
+
+The `RefCell<T>` keeps track of how many `Ref<T>` and `RefMut<T>` smart pointers are currently active. Every time we call borrow, the `RefCell<T>` increases its count of how many immutable borrows are active. When a `Ref<T>` value goes out of scope, the count of immutable borrows goes down by one. Just like the compile-time borrowing rules, `RefCell<T>` lets us have many immutable borrows or one mutable borrow at any point in time.
+
+If we try to violate these rules, rather than getting a compiler error as we would with references, the implementation of RefCell<T> will panic at runtime.
+
+```rust
+// Filename: src/lib.rs
+// This code panics!
+    impl Messenger for MockMessenger {
+        fn send(&self, message: &str) {
+            let mut one_borrow = self.sent_messages.borrow_mut();
+            let mut two_borrow = self.sent_messages.borrow_mut(); // we create two mutable borrow, this makes two mutable references in the same scope, which isn’t allowed.  The code will compile without any errors, but in runtime will panicked already borrowed: BorrowMutError
+
+            one_borrow.push(String::from(message));
+            two_borrow.push(String::from(message));
+        }
+    }
+```
+
+##### How get a value that can have multiple owners and that we can mutate?
+
+`Rc<T>` lets you have multiple owners of some data, but it only gives immutable access to that data. If you have an `Rc<T>` that holds a `RefCell<T>`, you can get a value that can have multiple owners and that you can mutate.
+
+```rust
+// Filename: src/main.rs
+
+#[derive(Debug)]
+enum List {
+    Cons(Rc<RefCell<i32>>, Rc<List>),
+    Nil,
+}
+
+use crate::List::{Cons, Nil};
+use std::cell::RefCell;
+use std::rc::Rc;
+
+fn main() {
+    let value = Rc::new(RefCell::new(5));
+
+    let a = Rc::new(Cons(Rc::clone(&value), Rc::new(Nil)));
+
+    let b = Cons(Rc::new(RefCell::new(3)), Rc::clone(&a));
+    let c = Cons(Rc::new(RefCell::new(4)), Rc::clone(&a));
+
+    *value.borrow_mut() += 10;
+
+    println!("a after = {a:?}");
+    println!("b after = {b:?}");
+    println!("c after = {c:?}");
+}
+```
+
+##### what is the thread-safe version of `RefCell<T>`?
+
+`RefCell<T>` does not work for multithreaded code! `Mutex<T>` is the thread-safe version of `RefCell<T>`
+
+#### 15.6 Reference Cycles Can Leak Memory
+
+
