@@ -6369,3 +6369,76 @@ Because the value that `Weak<T>` references might have been dropped, to do anyth
 ##### Where get more information about to implement your own smart pointers?
 
  check out “[The Rustonomicon](https://doc.rust-lang.org/nomicon/index.html)” for more useful information.
+
+### Fearless Concurrency
+
+##### What is parallel programming?
+
+Parallel programming is when different parts of a program are executed independently,
+
+##### What is parallel programming?
+
+Parallel programming is when different parts of a program are executed simultaneously
+
+#### Using Threads to Run Code Simultaneously
+
+##### What is threads
+
+In most current operating systems, an executed program’s code is run in a process, and the operating system will manage multiple processes at once. Within a program, you can also have independent parts that run simultaneously. The features that run these independent parts are called threads
+
+##### What are the benefits of using multiple threads?
+
+Splitting the computation in your program into multiple threads to run multiple tasks at the same time can improve performance.
+
+##### What are the problems of using multiple threads?
+
+- this adds complexity
+- because threads can run simultaneously, there’s no inherent guarantee about the order in which parts of your code on different threads will run
+- Race conditions, where threads are accessing data or resources in an inconsistent order
+- Deadlocks, where two threads are waiting for each other, preventing both threads from continuing
+- Bugs that happen only in certain situations and are hard to reproduce and fix reliably
+
+##### What is Race conditions?
+
+Situation where threads are accessing the same data or resources in an inconsistent order
+
+##### What is Deadlocks?
+
+Situation where two threads are waiting for each other, preventing both threads from continuing
+
+##### What create a new thread?
+
+To create a new thread, we call the `thread::spawn` function and pass it a closure containing the code we want to run in the new thread.
+
+```rust
+Filename: src/main.rs
+use std::thread;
+use std::time::Duration;
+
+fn main() {
+    thread::spawn(|| {
+        for i in 1..10 {
+            println!("hi number {i} from the spawned thread!");
+            thread::sleep(Duration::from_millis(1));
+        }
+    });
+
+    for i in 1..5 {
+        println!("hi number {i} from the main thread!");
+        thread::sleep(Duration::from_millis(1));
+    }
+}
+```
+
+##### What happen whit spawned threads when main thread  completes?
+
+When main thread of a Rust program completes, all spawned threads are shut down, whether or not they have finished running
+
+##### How can we guarantee that a spawned thread will completely finish its execution?
+
+
+
+##### How stop thread execution for a short duration?
+
+We need to call the `thread::sleep` function passing it the Duration
+
