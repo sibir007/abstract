@@ -6646,9 +6646,10 @@ The lock is a data structure that is part of the mutex that keeps track of who c
 
 ##### How organise multiply thread data sharing by using Mutex?
 
-- First we must create `std::sync::Mutex<T>` using the associated function `new` passing it as argument shared data.
-- Since the Mutex value will have multiple thread owners we will wrap it in `std::sync::Arc<T>`
-- Next, by using `thread::spawn` we can create several threads  in which pass cloned value of `Arc<T>` 
+- First we must create `std::sync::Mutex<T>` using the associated function `new` passing it shared data as argument .
+- Since the Mutex value will have multiple thread owners we will wrap it in `std::sync::Arc<T>`.
+- Next, by using `thread::spawn` we can create several threads  in which pass cloned value of `Arc<T>` .
+- Then we can used shared data in threds by calling `lock().unwrap()` method that return mut variand shared data.
 
 ```rust
 use std::sync::{Arc, Mutex};
