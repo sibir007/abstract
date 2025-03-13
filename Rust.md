@@ -6630,3 +6630,48 @@ Filename: src/main.rs
 ```
 
 #### 16.3 Shared-State Concurrency
+
+##### What is Mutex?
+
+Mutex is an abbreviation for mutual exclusion, as in, a mutex allows only one thread to access some data at any given time.
+Mutex is described as guarding the data it holds via the locking system.
+
+##### What should do a thread to access a date in a Mutex?
+
+To access the data in a mutex, a thread must first signal that it wants access by asking to acquire the mutex’s lock. 
+
+##### What is Mutex lock?
+
+The lock is a data structure that is part of the mutex that keeps track of who currently has exclusive access to the data
+
+##### How organise multiply thread data sharing by using Mutex?
+
+- First we must create `std::sync::Mutex<T>` using the associated function `new` passing it as argument shared data.
+- Since the Mutex value will have multiple thread owners we will wrap it in `std::sync::Arc<T>`
+- Next, by using `thread::spawn` we can create several threads  in which pass cloned value of `Arc<T>` 
+
+```rust
+use std::sync::{Arc, Mutex};
+use std::thread;
+
+fn main() {
+    let counter = Arc::new(Mutex::new(0));
+    let mut handles = vec![];
+
+    for _ in 0..10 {
+        let counter = Arc::clone(&counter);
+        let handle = thread::spawn(move || {
+            let mut num = counter.lock().unwrap();
+
+            *num += 1;
+        });
+        handles.push(handle);
+    }
+
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    println!("Result: {}", *counter.lock().unwrap());
+}
+```
