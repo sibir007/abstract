@@ -4,11 +4,11 @@
 
 ### Fearless Concurrency
 
-##### What is parallel programming?
+##### What is Concurrent programming?
 
 Parallel programming is when different parts of a program are executed independently,
 
-##### What is parallel programming?
+##### What is Parallel programming?
 
 Parallel programming is when different parts of a program are executed simultaneously
 
@@ -346,3 +346,40 @@ This is because `Mutex<T>` provides interior mutability, as the `Cell` family do
 These occur when an operation needs to lock two resources and two threads have each acquired one of the locks, causing them to wait for each other forever.
 
 #### 16.4 Extensible Concurrency with the Sync and Send Traits.
+
+##### For what used The Send marker trait?
+
+The Send marker trait indicates that ownership of values of the type implementing Send can be transferred between threads.
+
+##### Are `Rc<T>` is `Send`?
+
+`Rc<T>` cannot be Send because if you cloned an `Rc<T>` value and tried to transfer ownership of the clone to another thread, both threads might update the reference count at the same time. For this reason, `Rc<T>` is implemented for use in single-threaded situations where you don’t want to pay the thread-safe performance penalty.
+
+##### Does we marked as Send Any type composed entirely of Send types?
+
+Any type composed entirely of Send types is automatically marked as Send as well.
+
+##### What primitive types are Send?
+
+Almost all primitive types are Send, aside from raw pointers
+
+##### For what used The Sync marker trait?
+
+The Sync marker trait indicates that it is safe for the type implementing Sync to be referenced from multiple threads. In other words, any type T is Sync if &T (an immutable reference to T) is Send, meaning the reference can be sent safely to another thread.
+
+##### Does we marked as Sync Any type composed entirely of Sync types?
+
+Any type composed entirely of Sync types is automatically marked as Sync as well.
+
+##### What primitive types are Sync?
+
+All primitive types are Sync
+
+##### How we can manually implement Send and Sync type?
+
+Manually implementing these traits involves implementing unsafe Rust code and so requires careful thought to uphold the safety guarantees.
+
+### 17 Fundamentals of Asynchronous Programming: Async, Await, Futures, and Streams
+
+
+
