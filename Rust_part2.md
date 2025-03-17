@@ -885,3 +885,45 @@ fn slow(name: &str, ms: u64) {
 
 #### 17.4 Streams: Futures in Sequence
 
+##### What is Streams in async Rust?
+
+Streams is Sequence Futures. The async `recv` method of `trpl::Receiver` produces a sequence of items over time. This is an instance of a much more general pattern known as a stream. A stream is like an asynchronous form of iteration.
+
+##### How we can create Stream from Iterator?
+
+We can use `trpl::stream_from_iter` function by passing it an iterator. Then we can using stream in `while let` loop whit `next().await`. We  need the StreamExt trait in scope to be able to use the next method. When we have StreamExt in scope, we can use all of its utility methods, just as with iterators, for example `filter` method.
+
+```rust
+use trpl::StreamExt;
+
+fn main() {
+    trpl::run(async {
+        let values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        let iter = values.iter().map(|n| n * 2);
+        let mut stream = trpl::stream_from_iter(iter);
+
+        while let Some(value) = stream.next().await {
+            println!("The value was: {value}");
+        }
+    });
+}
+```
+
+```rust
+use trpl::StreamExt;
+
+fn main() {
+    trpl::run(async {
+        let values = 1..101;
+        let iter = values.map(|n| n * 2);
+        let stream = trpl::stream_from_iter(iter);
+
+        let mut filtered =
+            stream.filter(|value| value % 3 == 0 || value % 5 == 0);
+
+        while let Some(value) = filtered.next().await {
+            println!("The value was: {value}");
+        }
+    });
+}
+```
