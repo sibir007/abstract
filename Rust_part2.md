@@ -1031,3 +1031,78 @@ fn get_intervals() -> impl Stream<Item = u32> {
     ReceiverStream::new(rx)
 }
 ```
+
+#### A Closer Look at the Traits for Async
+
+##### how Rust defines Future Trait?
+
+```rust
+use std::pin::Pin;
+use std::task::{Context, Poll};
+
+pub trait Future {
+    type Output;
+
+    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output>;
+}
+```
+
+##### How named Future’s associated type?
+
+Output
+
+##### What says Future’s associated type?
+
+Future’s associated type Output says what the future resolves to.
+
+
+##### WHat method define Future Trait?
+
+Future trait define `poll` method, which takes a special `Pin` reference for its `self` parameter and a mutable reference to a `Context` type, and returns `Poll<Self::Output>` type.
+
+##### how Rust defines Poll type?
+
+Rust define the Poll type as enum whit one variant that has a value, Ready(T), and one which does not, Pending. The Pending variant indicates that the future still has work to do, so the caller will need to check again later. The Ready variant indicates that the future has finished its work and the T value is available.
+
+```rust
+enum Poll<T> {
+    Ready(T),
+    Pending,
+}
+```
+
+##### What happen if caller call `pull` again after the future has returned Ready?
+
+Many futures will panic if polled again after becoming ready.
+
+##### How Rust compile code that uses `await`?
+
+ Rust compiles it under the hood to code that calls `poll`
+
+```rust
+Filename: src/main.rs
+fn main() {
+    let args: Vec<String> = std::env::args().collect();
+
+    trpl::run(async {
+        let url = &args[1];
+        match page_title(url).await {
+            Some(title) => println!("The title for {url} was {title}"),
+            None => println!("{url} had no title"),
+        }
+    })
+}
+```
+
+
+ ```rust
+ match page_title(url).poll() {
+    Ready(page_title) => match page_title {
+        Some(title) => println!("The title for {url} was {title}"),
+        None => println!("{url} had no title"),
+    }
+    Pending => {
+        // But what goes here?
+    }
+}
+```
