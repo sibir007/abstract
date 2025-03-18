@@ -381,6 +381,8 @@ Manually implementing these traits involves implementing unsafe Rust code and so
 
 ### 17 Fundamentals of Asynchronous Programming: Async, Await, Futures, and Streams
 
+**READ THIS [Async Rust in Three Parts](https://jacko.io/async_intro.html)**
+
 ##### What techniques are for working on more than one operation at a time?
 
 Modern computers offer two techniques for working on more than one operation at a time: parallelism and concurrency.
@@ -887,7 +889,7 @@ fn slow(name: &str, ms: u64) {
 
 ##### What is Streams in async Rust?
 
-Streams is Sequence Futures. The async `recv` method of `trpl::Receiver` produces a sequence of items over time. This is an instance of a much more general pattern known as a stream. A stream is like an asynchronous form of iteration.
+A stream is like an asynchronous form of iteration.
 
 ##### How we can create Stream from Iterator?
 
@@ -925,5 +927,107 @@ fn main() {
             println!("The value was: {value}");
         }
     });
+}
+```
+
+##### How we can create stream of messages?
+
+```rust
+// Filename: src/main.rs
+use trpl::{ReceiverStream, Stream, StreamExt};
+
+fn main() {
+    trpl::run(async {
+        let mut messages =
+            pin!(get_messages().timeout(Duration::from_millis(200)));
+
+        while let Some(result) = messages.next().await {
+            match result {
+                Ok(message) => println!("{message}"),
+                Err(reason) => eprintln!("Problem: {reason:?}"),
+            }
+        }
+    })
+}
+
+fn get_messages() -> impl Stream<Item = String> {
+    let (tx, rx) = trpl::channel();
+
+    trpl::spawn_task(async move {
+        let messages = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
+        for (index, message) in messages.into_iter().enumerate() {
+            let time_to_sleep = if index % 2 == 0 { 100 } else { 300 };
+            trpl::sleep(Duration::from_millis(time_to_sleep)).await;
+
+            tx.send(format!("Message: '{message}'")).unwrap();
+        }
+    });
+
+    ReceiverStream::new(rx)
+}
+```
+
+##### How we can merge streams?
+
+
+```rust
+// Filename: src/main.rs
+use trpl::{ReceiverStream, Stream, StreamExt};
+
+fn main() {
+    trpl::run(async {
+        let messages = get_messages().timeout(Duration::from_millis(200)); 
+        let intervals = get_intervals()
+            .map(|count| format!("Interval: {count}")) // we use the map helper method to transform the intervals into a string
+            .throttle( // we use the throttle method on the intervals stream so that it doesn’t overwhelm the messages stream. Throttling is a way of limiting the rate at which a function will be called—or, in this case, how often the stream will be polled. Once every 100 milliseconds should do, because that’s roughly how often our messages arrive.
+                Duration::from_millis(100) // Because we don’t actually want a timeout for intervals, though, we can just create a timeout which is longer than the other durations we are using. Here, we create a 10-second timeout with Duration::from_secs(10)
+                )
+            .timeout(Duration::from_secs(10)); 
+
+        let merged = messages.merge(intervals)  // we merge the messages and intervals streams with the `merge` method which combines multiple streams into one stream that produces items from any of the source streams as soon as the items are available, without imposing any particular ordering
+            .take(20); // To limit the number of items we will accept from a stream, we apply the take method
+
+        let mut stream = pin!(merged); // we need to make stream mutable, so that the while let loop’s next calls can iterate through the stream, and pin it so that it’s safe to do so.
+    })
+}
+
+
+fn get_messages() -> impl Stream<Item = String> {
+    let (tx, rx) = trpl::channel();
+
+    trpl::spawn_task(async move {
+        let messages = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
+
+        for (index, message) in messages.into_iter().enumerate() {
+            let time_to_sleep = if index % 2 == 0 { 100 } else { 300 };
+            trpl::sleep(Duration::from_millis(time_to_sleep)).await;
+
+            if let Err(send_error) = tx.send(format!("Message: '{message}'")) {
+                eprintln!("Cannot send message '{message}': {send_error}");
+                break;
+            }
+        }
+    });
+
+    ReceiverStream::new(rx)
+}
+
+fn get_intervals() -> impl Stream<Item = u32> {
+    let (tx, rx) = trpl::channel();
+
+    trpl::spawn_task(async move {
+        let mut count = 0;
+        loop {
+            trpl::sleep(Duration::from_millis(1)).await;
+            count += 1;
+
+            if let Err(send_error) = tx.send(count) {
+                eprintln!("Could not send interval {count}: {send_error}");
+                break;
+            };
+        }
+    });
+
+    ReceiverStream::new(rx)
 }
 ```
