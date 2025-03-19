@@ -1032,7 +1032,7 @@ fn get_intervals() -> impl Stream<Item = u32> {
 }
 ```
 
-#### A Closer Look at the Traits for Async
+#### 17.5 A Closer Look at the Traits for Async
 
 ##### how Rust defines Future Trait?
 
@@ -1055,10 +1055,13 @@ Output
 
 Future’s associated type Output says what the future resolves to.
 
+##### What method define Future Trait?
 
-##### WHat method define Future Trait?
+Future trait define `poll` method.
 
-Future trait define `poll` method, which takes a special `Pin` reference for its `self` parameter and a mutable reference to a `Context` type, and returns `Poll<Self::Output>` type.
+##### Which takes and return the `poll` method of Future Trait?
+
+`poll` method takes a special `Pin` reference for its `self` parameter and a mutable reference to a `Context` type, and returns `Poll<Self::Output>` type.
 
 ##### how Rust defines Poll type?
 
@@ -1077,7 +1080,7 @@ Many futures will panic if polled again after becoming ready.
 
 ##### How Rust compile code that uses `await`?
 
- Rust compiles it under the hood to code that calls `poll`
+ Rust compiles it under the hood to code that calls `poll` method
 
 ```rust
 Filename: src/main.rs
@@ -1086,23 +1089,52 @@ fn main() {
 
     trpl::run(async {
         let url = &args[1];
-        match page_title(url).await {
-            Some(title) => println!("The title for {url} was {title}"),
-            None => println!("{url} had no title"),
-        }
+        // match page_title(url).await {
+        //     Some(title) => println!("The title for {url} was {title}"),
+        //     None => println!("{url} had no title"),
+        // }
+        match page_title(url).poll() {
+            Ready(page_title) => match page_title {
+                Some(title) => println!("The title for {url} was {title}"),
+                None => println!("{url} had no title"),
+            }
+            Pending => {
+                // continue
+            }
     })
 }
 ```
 
+##### What should Rust do when the future is still Pending?
 
- ```rust
- match page_title(url).poll() {
-    Ready(page_title) => match page_title {
-        Some(title) => println!("The title for {url} was {title}"),
-        None => println!("{url} had no title"),
-    }
-    Pending => {
-        // But what goes here?
-    }
-}
-```
+Rust will call `pull` in loop again, and again, and again, until the future is finally ready. Rust makes sure that the loop can hand off control to Async Runtime that can pause work on this future to work on other futures and then check this one again later.
+
+##### What is self-referential data types?
+
+self-referential data types is types which objects hold reference on himself
+
+##### Way self-referential data types is unsafe?
+
+ If we move the self-referential structure to other location in memory, those internal self-references will be left pointing to the old location, that is become invalid.
+
+#####  What is Unpin and !Unpin Traits?
+
+Unpin Trait are a marker trait which informs the compiler that a given type does not need to uphold any guarantees about whether the value in question can be safely moved in memory. Compiler implements Unpin automatically for all types where it can prove it is safe. A special case is where Unpin is not implemented for a type. The notation for this is `impl !Unpin for SomeType`, where `SomeType` is the name of a type that does need to uphold those guarantees to be safe whenever a pointer to that type is used in a Pin. 
+In other words, there are two things to keep in mind about the relationship between Pin and Unpin. First, Unpin is the “normal” case, and !Unpin is the special case. Second, whether a type implements Unpin or !Unpin only matters when you’re using a pinned pointer to that type like Pin<&mut SomeType>.
+
+##### What is Pin type?
+
+`Pin` is a wrapper for pointer-like types such as `&`, `&mut`, `Box`, and `Rc`. `Pin` is not a pointer itself and doesn’t have any behavior of its own like `R`c and `Arc` do with reference counting; it’s purely a tool the compiler use to enforce that data referenced by wrapped pointer can not be moved in memory. Type of this data must be marked by !Unpin trait. If Type of this data must be marked by !Unpin trait
+
+##### What does it affect Pin type?
+
+If Pin type wraps pointer-like type such as `&`, `&mut`, `Box`, and `Rc`, that refers to a value of type marked with `!Unpin trait` the compiler enforce that data referenced by the wrapped pointer can not be moved in memory. If data type marked by Unpin trait - Pin type not affect.
+
+##### Why we must wraps to Pin type a pointer-like types of Future for using it?
+
+Rust compiles an asynchronous function into a state machine structure that implements Future. This structure can contain a reference to itself, i.e. it is a self-referencing type. Since self-referencing types are unsafe, since when moving their objects in memory the reference will become invalid - the object must be passed for use wrapped in Box and Pin, which provides protection against moving in memory.
+
+##### Should we `pin` directly awaiting future?
+
+Directly awaiting a `future` with await pins the `future` implicitly. That’s why we don’t need to use pin! everywhere we want to await futures.
+
