@@ -1138,3 +1138,25 @@ Rust compiles an asynchronous function into a state machine structure that imple
 
 Directly awaiting a `future` with await pins the `future` implicitly. That’s why we don’t need to use pin! everywhere we want to await futures.
 
+##### What is Stream trait?
+
+ Stream trait merge together Iterator idea of a sequence: `its` next method provides an `Option<Self::Item>` and Future idea of readiness over time: its poll method provides a `Poll<Self::Output>`. To represent a sequence of items that become ready over time, we define a Stream trait that puts those features together:
+
+ ```rust
+use std::pin::Pin;
+use std::task::{Context, Poll};
+
+trait Stream {
+    type Item;
+
+    fn poll_next(
+        self: Pin<&mut Self>,
+        cx: &mut Context<'_>
+    ) -> Poll<Option<Self::Item>>;
+}
+```
+
+##### How calls Stream’s associated type?
+
+The Stream trait defines an associated type called Item for the type of the items produced by the stream.
+
