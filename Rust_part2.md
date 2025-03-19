@@ -1297,3 +1297,13 @@ Rust do not implements inheritance. There is no way to define a struct that inhe
 ##### How we can implement code reusing in Rust?
 
 You can do this in a limited way in Rust code using default trait method implementations. This is similar to a parent class having an implementation of a method and an inheriting child class also having the implementation of the method. We can also override the default implementation of default method when implement trait, which is similar to a child class overriding the implementation of a method inherited from a parent class.
+
+##### What is Polymorphism?
+
+Polymorphism is general concept that refers to code that can work with data of multiple types, which is being implemented, among other things by inheritance.
+
+##### How Rust implements Polymorphism?
+
+Rust uses generics to abstract over different possible types and trait bounds to impose constraints on what those types must provide. This is sometimes called bounded parametric polymorphism.
+
+#### 18.2 Using Trait Objects That Allow for Values of Different Types
