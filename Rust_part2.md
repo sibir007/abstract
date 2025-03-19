@@ -1156,7 +1156,144 @@ trait Stream {
 }
 ```
 
-##### How calls Stream’s associated type?
+##### How named Stream’s associated type?
 
 The Stream trait defines an associated type called Item for the type of the items produced by the stream.
 
+##### Which method define Stream?
+
+`poll_next`, name of the method it clear that it polls in the same way `Future::poll` does and produces a sequence of items in the same way `Iterator::next` does. 
+
+##### What type return `poll_next` method of Stream? 
+
+`Poll<Option<Self::Item>>`. Its return type combines `Poll` with `Option`. The outer type is `Poll`, because it has to be checked for readiness, just as a future does. The inner type is `Option`, because it needs to signal whether there are more messages, just as an iterator does.
+
+
+##### What is StreamExt trait?
+
+- StreamExt trait is wrapper for Stream which utils  `poll_next` method of Stream
+- StreamExt trait allow working whit Stream on async mode using `await`
+- StreamExt is automatically implemented for every type that implements Stream
+- The StreamExt trait is also the home of all the interesting methods available to use with streams
+
+```rust
+trait StreamExt: Stream {
+    async fn next(&mut self) -> Option<Self::Item>
+    where
+        Self: Unpin;
+
+    // other methods...
+}
+```
+
+#### 17.6  Putting It All Together: Futures, Tasks, and Threads
+
+##### what rules should be followed when choosing between Async model and Treads?
+
+- If the work is very parallelizable, such as processing a bunch of data where each part can be processed separately, threads are a better choice.
+- If the work is very concurrent, such as handling messages from a bunch of different sources that may come in at different intervals or different rates, async is a better choice.
+- if you need both parallelism and concurrency, you  can use them together freely,
+
+```rust
+use std::{thread, time::Duration};
+
+fn main() {
+    let (tx, mut rx) = trpl::channel();
+
+    thread::spawn(move || {
+        for i in 1..11 {
+            tx.send(i).unwrap();
+            thread::sleep(Duration::from_secs(1));
+        }
+    });
+
+    trpl::run(async {
+        while let Some(message) = rx.recv().await {
+            println!("{message}");
+        }
+    });
+}
+```
+
+### 18 Object-Oriented Programming Features of Rust
+
+#### 18.1 Characteristics of Object-Oriented Languages
+
+##### Which Characteristics of Object-Oriented Languages?
+
+OOP languages share certain common characteristics, namely:
+
+- objects, 
+- encapsulation, 
+- inheritance.
+- polymorphism
+
+##### What is objects in OOP?
+
+An object packages both data and the procedures that operate on that data. The procedures are typically called methods or operations.
+
+##### How Rust implement OOP objects?
+
+Rust implement objects by structs and enums that has data and impl blocks that provides methods on structs and enums.
+
+##### What is encapsulation?
+
+- encapsulation means that the implementation details of an object aren’t accessible to code using that object. Therefore, the only way to interact with an object is through its public API; 
+- code using the object shouldn’t be able to reach into the object’s internals and change data or behavior directly. This enables the programmer to change and refactor an object’s internals without needing to change the code that uses the object.
+
+##### How Rust implements encapsulation?
+
+Rust implements encapsulation by the `pub` keyword that define which modules, types, functions, and methods in our code are public, and by default everything else is private.
+
+```rust
+// Filename: src/lib.rs
+
+pub struct AveragedCollection { // struct is marked pub so that other code can use it, the list and average fields private so there is no way for external code to add or remove items to or from the list field directly
+    list: Vec<i32>,
+    average: f64,
+}
+
+```
+
+```rust
+// Filename: src/lib.rs
+
+impl AveragedCollection { // The public methods add, remove, and average are the only ways to access or modify data in an instance of AveragedCollection
+    pub fn add(&mut self, value: i32) {
+        self.list.push(value);
+        self.update_average();
+    }
+
+    pub fn remove(&mut self) -> Option<i32> {
+        let result = self.list.pop();
+        match result {
+            Some(value) => {
+                self.update_average();
+                Some(value)
+            }
+            None => None,
+        }
+    }
+
+    pub fn average(&self) -> f64 {
+        self.average
+    }
+
+    fn update_average(&mut self) { // private method not available for external code 
+        let total: i32 = self.list.iter().sum();
+        self.average = total as f64 / self.list.len() as f64;
+    }
+}
+```
+
+##### What is inheritance?
+
+Inheritance is a mechanism whereby an object can inherit elements from another object’s definition, thus gaining the parent object’s data and behavior without you having to define them again.
+
+##### How Rust implements inheritance?
+
+Rust do not implements inheritance. There is no way to define a struct that inherits the parent struct’s fields and method implementations without using a macro.
+
+##### How we can implement code reusing in Rust?
+
+You can do this in a limited way in Rust code using default trait method implementations. This is similar to a parent class having an implementation of a method and an inheriting child class also having the implementation of the method. We can also override the default implementation of default method when implement trait, which is similar to a child class overriding the implementation of a method inherited from a parent class.
