@@ -1453,7 +1453,7 @@ On the other hand, with the method using trait objects, one Screen instance can 
 
 Rust won’t compile our code
 
-#### 18.2 Implementing an Object-Oriented Design Pattern
+#### 18.3 Implementing an Object-Oriented Design Pattern
 
 ##### What is state pattern?
 
@@ -1570,3 +1570,13 @@ impl State for Published {
     }
 }
 ```
+
+### Patterns and Matching
+
+##### What is Patterns?
+
+- Patterns are a special syntax in Rust for matching against the structure of types. 
+- To use a pattern, we compare it to some value to determine whether it has the correct shape of data to continue running a particular piece of code.
+- Pattern can hav a named pieces, if compared value fits the shape of the pattern, we can use the named pieces in code associated with the pattern.
+
+#### All the Places Patterns Can Be Used
