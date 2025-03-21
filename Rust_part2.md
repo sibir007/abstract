@@ -1460,6 +1460,8 @@ Rust won’t compile our code
 The state pattern is an object-oriented design pattern. The crux of the pattern is that we define a set of states a value can have internally and the value’s behavior changes based on its state.
 The value that holds a state object knows nothing about the different behavior of the states or when to transition between states.
 
+##### What is advantage of using state pattern?
+
 The advantage of using the state pattern is that, when the business requirements of the program change, we won’t need to change the code of the value holding the state or the code that uses the value. We’ll only need to update the code inside one of the state objects to change its rules or perhaps add more state objects.
 
 ```rust
@@ -1575,8 +1577,176 @@ impl State for Published {
 
 ##### What is Patterns?
 
-- Patterns are a special syntax in Rust for matching against the structure of types. 
+- Patterns are a special syntax in Rust for matching against the structure of types.
 - To use a pattern, we compare it to some value to determine whether it has the correct shape of data to continue running a particular piece of code.
 - Pattern can hav a named pieces, if compared value fits the shape of the pattern, we can use the named pieces in code associated with the pattern.
 
 #### All the Places Patterns Can Be Used
+
+##### Where are used Patterns?
+
+- match Arms
+- Conditional if let Expressions
+- while let Conditional Loops
+- for Loops
+- let Statements
+- Function Parameters
+
+##### How using Pattern in match Arms?
+
+match expressions are defined as the keyword match, a value to match on, and one or more match arms that consist of a pattern and an expression to run if the value matches that arm’s pattern
+
+```
+match VALUE {
+    PATTERN => EXPRESSION,
+    PATTERN => EXPRESSION,
+    PATTERN => EXPRESSION,
+}
+```
+
+```rust
+match x {
+    None => None,
+    Some(i) => Some(i + 1),
+}
+```
+
+##### what is the mandatory requirement when using match Arms?
+
+One requirement for match expressions is that they need to be exhaustive in the sense that all possibilities for the value in the match expression must be accounted for.
+
+##### What method are for make exhaustive requirement for match expressions?
+
+The  pattern `_` will match anything, so it’s often used in the last match arm for make exhaustive requirement.
+
+##### Which pattern can match anything?
+
+The particular pattern `_` will match anything, but it never binds to a variable
+
+##### What pattern can be used for ignore  any value not specified?
+
+The particular pattern `_` will match anything, but it never binds to a variable, so it can be useful when you want to ignore any value not specified.
+
+##### For what used `if let` Expressions?
+
+`if let` expressions mainly as a shorter way to write the equivalent of a `match` that only matches one case. Optionally, `if let` can have a corresponding `else` containing code to run if the pattern in the `if let` doesn’t match. It’s also possible to mix and match if let, else if, and else if let expressions.
+
+```rust
+Filename: src/main.rs
+fn main() {
+    let favorite_color: Option<&str> = None;
+    let is_tuesday = false;
+    let age: Result<u8, _> = "34".parse();
+
+    if let Some(color) = favorite_color {
+        println!("Using your favorite color, {color}, as the background");
+    } else if is_tuesday {
+        println!("Tuesday is green day!");
+    } else if let Ok(age) = age { // if let can also introduce new variables which shadow existing variables. new age variable that contains the value inside the Ok variant, shadowing the existing age variable. This means we need to place the if age > 30 condition within that block: we can’t combine these two conditions into if let Ok(age) = age && age > 30. The new age we want to compare to 30 isn’t valid until the new scope starts with the curly bracket.
+        if age > 30 {
+            println!("Using purple as the background color");
+        } else {
+            println!("Using orange as the background color");
+        }
+    } else { // The downside of using if let expressions is that the compiler doesn’t check for exhaustiveness. If we omitted the last else block and therefore missed handling some cases, the compiler would not alert us to the possible logic bug.
+        println!("Using blue as the background color");
+    }
+}
+```
+
+##### What are downside of using `if let` expressions?
+
+The downside of using `if let` expressions is that the compiler doesn’t check for exhaustiveness, whereas with match expressions it does.
+
+##### How to used a pattern in `while let` Conditional Loops?
+
+`while let` conditional loop used for loop to run for as long as a pattern continues to match.
+
+```rust
+    let (tx, rx) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        for val in [1, 2, 3] {
+            tx.send(val).unwrap();
+        }
+    });
+
+    while let Ok(value) = rx.recv() {
+        println!("{value}");
+    }
+```
+
+##### How to used a pattern in `for` Loops?
+
+In a for loop, the value that directly follows the keyword for is a pattern. For example, in for x in y the x is the pattern.
+
+```rust
+    let v = vec!['a', 'b', 'c'];
+
+    for (index, value) // pattern used to destructure
+        in v.iter().enumerate() { // adapt an iterator using the enumerate method so it produces a value and the index for that value, placed into a tuple. 
+    
+        println!("{value} is at index {index}");
+    }
+```
+
+##### How used pattern whit `let` Statements whit binging value?
+
+Every time we are using a let statement we are using patterns.
+
+```
+let PATTERN = EXPRESSION;
+```
+
+Whit a variable binding statements (for example let x = 5) left side is a pattern. Right side of this statement is expression that Rust calculates and compares value against the left part pattern and binds to any names it finds in left side. So in the let x = 5; example, x is a pattern that means “bind what matches here to the variable x.” That is in `let` Statements we can used more complicated patterns. For example, we can match value of tuple of three value against pattern of three value tuple type. Rust make destruction and binding values in tuple to variable names used in pattern. If the value does not match the pattern, it will result in a compilation error. To fix the error, we could ignore one or more of the values in the tuple using `_` or `..`.
+
+```rust
+    let (x, y, z) = (1, 2, 3);
+    let (x, y) = (1, 2, 3); // error[E0308]: mismatched types
+```
+
+##### How is used patterns whit Function parameters?
+
+Part of function signature that corresponds to parameters list declaration is pattern that can be matched whit passed arguments. We can also use patterns in closure parameter lists in the same way as in function parameter lists
+
+```rust
+Filename: src/main.rs
+
+fn print_coordinates(&(x, y): &(i32, i32)) {
+    println!("Current location: ({x}, {y})");
+}
+
+fn main() {
+    let point = (3, 5);
+    print_coordinates(&point);
+}
+```
+
+#### Refutability: Whether a Pattern Might Fail to Match
+
+##### When patterns are irrefutable?
+
+Patterns that will match for any possible value passed are irrefutable. An example would be x in the statement let x = 5; because x matches anything and therefore cannot fail to match.
+
+##### When patterns are refutable?
+
+Patterns that can fail to match for some possible value are refutable.
+
+##### Which type of pattern can accept function parameters, `let` statements, and `for` loops?
+
+Function parameters, let statements, and for loops can only accept irrefutable patterns, because the program cannot do anything meaningful when values don’t match. 
+
+##### Which type of pattern can accept `if let`, `while let` expressions and the `let-else` statement?
+
+The if `let` and `while let` expressions and the `let-else` statement accept refutable and irrefutable patterns.
+
+```rust
+    let Some(x) = some_option_value; 
+    
+    //If some_option_value was a None value, it would fail to match the pattern Some(x), meaning the pattern is refutable. However, the let statement can only accept an irrefutable pattern because there is nothing valid the code can do with a None value. At compile time, Rust will complain that we’ve tried to use a refutable pattern where an irrefutable pattern is required:
+```
+
+##### Why a compiler warns against irrefutable patterns in `if let`, `while let` expressions and the `let-else` statement?
+
+compiler well warns because by definition `if let`, `while let` expressions and the `let-else` statement intended to handle possible failure: the functionality of a conditional is in its ability to perform differently depending on success or failure.
+
+##### How we can fix situation when we have a refutable pattern where an irrefutable pattern is needed?
