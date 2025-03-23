@@ -2490,3 +2490,64 @@ The compiler will not allow you to create references to a mutable static variabl
 
 ##### Implementing an Unsafe Trait
 
+###### When Trait is unsafe?
+
+A trait is unsafe when at least one of its methods has some invariant that the compiler can’t verify. We declare that a trait is unsafe by adding the `unsafe` keyword before trait and marking the implementation of the trait as `unsafe` too.
+
+###### How declare unsafe Trait?
+
+We declare that a trait is unsafe by adding the `unsafe` keyword before trait and marking the implementation of the trait as `unsafe` too.
+
+```rust
+unsafe trait Foo {
+    // methods go here
+}
+
+unsafe impl Foo for i32 {
+    // method implementations go here
+}
+
+fn main() {}
+```
+
+##### Accessing Fields of a Union
+
+###### What is Union?
+
+A union is similar to a struct, but only one declared field is used in a particular instance at one time. Unions are primarily used to interface with unions in C code. You can learn more about unions in the [Rust Reference](https://doc.rust-lang.org/reference/items/unions.html).
+
+###### How to access a Union fields?
+
+Accessing union fields is unsafe because Rust can’t guarantee the type of the data currently being stored in the union instance, so accessing fields of a union can only in `unsafe` block.
+
+##### Using Miri to check unsafe code
+
+###### What is Miri?
+
+When writing unsafe code, you might want to check that what you have written actually is safe and correct. One of the best ways to do that is to use [Miri](https://github.com/rust-lang/miri), an official Rust tool for detecting undefined behavior.
+
+###### How Miri check unsafe code?
+
+Whereas the borrow checker is a static tool which works at compile time, Miri is a dynamic tool which works at runtime. It checks your code by running your program, or its test suite, and detecting when you violate the rules it understands about how Rust should work. 
+Miri doesn’t catch everything you might get wrong when writing unsafe code. For one thing, since it is a dynamic check, it only catches problems with code that actually gets run. That means you will need to use it in conjunction with good testing techniques to increase your confidence about the unsafe code you have written. For another thing, it does not cover every possible way your code can be unsound. If Miri does catch a problem, you know there’s a bug, but just because Miri doesn’t catch a bug doesn’t mean there isn’t a problem. Miri can catch a lot, though. 
+
+###### What is required to use Miri?
+
+Using Miri requires a nightly build of Rust.
+
+###### How install Miri?
+
+You can install both a nightly version of Rust and the Miri tool by typing `rustup +nightly component add miri`
+
+###### How run Miri?
+
+You can run Miri on a project by typing cargo +nightly miri run or `cargo +nightly miri test`.
+
+###### Where deeper exploration of how to work effectively with unsafe Rust?
+
+[Rustonomicon](https://doc.rust-lang.org/nomicon/)
+
+#### 20.2 Advanced Traits
+
+##### Specifying Placeholder Types in Trait Definitions with Associated Types
+
