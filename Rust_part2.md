@@ -2200,4 +2200,293 @@ Those superpowers include the ability to:
 
 Safe API is a safe abstraction over unsafe code.
 
+##### Dereferencing a Raw Pointer
+
+###### What is Raw Pointers?
+
+Raw Pointers are Unsafe Rust types that are similar to references and allows executes unsafe operations on the values they point to.
+
+###### What are the raw pointers?
+
+raw pointers can be immutable or mutable
+
+###### How raw pointers are written?
+
+Raw pointers written as `*const T` and `*mut T`, respectively. The asterisk isn’t the dereference operator; it’s part of the type name.
+
+###### What means 'immutable' in the context of raw pointers?
+
+In the context of raw pointers, immutable means that the pointer can’t be directly assigned to after being dereferenced.
+
+###### What different raw pointers from references and smart pointers? 
+
+raw pointers:
+
+` Are allowed to ignore the borrowing rules by having both immutable and mutable pointers or multiple mutable pointers to the same location
+` Aren’t guaranteed to point to valid memory
+` Are allowed to be null
+` Don’t implement any automatic cleanup
+
+###### Can we create raw pointers outside `unsafe` block in safe code?
+
+We can create raw pointers in safe code; we just can’t dereference raw pointers outside an unsafe block.
+
+```rust
+    let mut num = 5;
+
+    let r1 = &raw const num; // immutable
+    let r2 = &raw mut num; //  mutable
+```
+
+###### What restrictions of using raw pointers in safe code?
+
+We can create raw pointers in safe code; we just can’t dereference raw pointers outside an unsafe block.
+
+###### How create raw pointer?
+
+We’ve created raw pointers by using the `raw` borrow operators: `&raw const var_name_of_type_T` creates a '*const T' immutable raw pointer, and `&raw mut var_name_of_type_T` creates a '*mut T' mutable raw pointer.
+
+```rust
+    let mut num = 5;
+
+    let r1 = &raw const num; // immutable
+    let r2 = &raw mut num; //  mutable
+```
+
+###### What is the danger of using raw pointers?
+
+With raw pointers, we can create a mutable pointer and an immutable pointer to the same location and change data through the mutable pointer, potentially creating a data race
+
+###### Why would ever use raw pointers?
+
+- One major use case is when interfacing with C code
+- Another case is when building up safe abstractions that the borrow checker doesn’t understand.
+
+###### What we can dereference raw pointers?
+
+We use the dereference operator `*` on a raw pointer that located inside unsafe block.
+
+```rust
+    let mut num = 5;
+
+    let r1 = &raw const num;
+    let r2 = &raw mut num;
+
+    unsafe {
+        println!("r1 is: {}", *r1);
+        println!("r2 is: {}", *r2);
+    }
+```
+
+##### Calling an Unsafe Function or Method
+
+###### What is Unsafe Function?
+
+Unsafe Function is function that has requirements we need to uphold when we call this function, because Rust can’t guarantee we’ve met these requirements. By calling an unsafe function within an unsafe block, we’re saying that we’ve read this function’s documentation and take responsibility for upholding the function’s contracts.
+
+###### How is an unsafe function indicated?
+
+Unsafe functions and methods look exactly like regular functions and methods, but they have an extra `unsafe` before the rest of the definition.
+
+###### How call Unsafe Function?
+
+We must call an Unsafe Function within a separate `unsafe` block. If we try to call Unsafe Functions without the unsafe block, we’ll get an error.
+
+###### How we must perform unsafe operations in the body of an unsafe function?
+
+To perform unsafe operations in the body of an unsafe function, you still need to use an `unsafe` block just as within a regular function, and the compiler will warn you if you forget. This helps to keep `unsafe` blocks as small as possible, as unsafe operations may not be needed across the whole function body.
+
+###### Is the function unsafe if it contain unsafe code?
+
+Just because a function contains unsafe code doesn’t mean we need to mark the entire function as unsafe. In fact, wrapping unsafe code in a safe function is a common abstraction
+
+```rust
+use std::slice;
+
+fn split_at_mut(values: &mut [i32], mid: usize) -> (&mut [i32], &mut [i32]) {
+    let len = values.len();
+    // return  (&mut values[..mid], &mut values[mid..]) error two mutable borrow
+    let ptr = values.as_mut_ptr();
+
+    assert!(mid <= len);
+
+
+    unsafe {
+        (
+            slice::from_raw_parts_mut(ptr, mid), // The function slice::from_raw_parts_mut is unsafe because it takes a raw pointer and must trust that this pointer is valid. 
+            slice::from_raw_parts_mut(ptr.add(mid), len - mid), // The add method on raw pointers is also unsafe, because it must trust that the offset location is also a valid pointer.
+        )
+    }
+}
+```
+
+```rust
+// Filename: src/main.rs
+fn main() {
+    let mut v = vec![1, 2, 3, 4, 5, 6];
+
+    let r = &mut v[..];
+
+    let (a, b) = r.split_at_mut(3);
+
+    assert_eq!(a, &mut [1, 2, 3]);
+    assert_eq!(b, &mut [4, 5, 6]);
+}
+```
+
+###### What is FFI?
+
+FFI is an abbreviation of Foreign Function Interface is a way for a programming language to define functions and enable a different (foreign) programming language to call those functions.
+
+###### What is the `extern` Rust keyword used for?
+
+`extern` keyword facilitates the creation and use of a Foreign Function Interface (FFI).
+
+```rust
+Filename: src/main.rs
+unsafe extern "C" {
+    fn abs(input: i32) -> i32; //  the abs function from the C standard library
+}
+
+fn main() {
+    unsafe {
+        println!("Absolute value of -3 according to C: {}", abs(-3));
+    }
+}
+```
+
+###### Way need declare `extern` block by `unsafe` keyword?
+
+Functions declared within `extern` blocks are usually unsafe to call from Rust code, so they must also be marked `unsafe`. The reason is that other languages don’t enforce Rust’s rules and guarantees, and Rust can’t check them, so responsibility falls on the programmer to ensure safety.
+
+###### How to define an extern function defined in another language?
+
+Within the `unsafe extern "C" {}` block, we list the names and signatures of external functions from another language we want to call. The "C" part defines which application binary interface (ABI) the external function uses: the ABI defines how to call the function at the assembly level. The "C" ABI is the most common and follows the C programming language’s ABI.
+If we know that particular function does not have any memory safety considerations, we can use the `safe` keyword to say that this specific function is safe to call even though it is in an unsafe extern block.
+
+```rust
+// Filename: src/main.rs
+unsafe extern "C" {
+    safe fn abs(input: i32) -> i32;
+}
+
+fn main() {
+    println!("Absolute value of -3 according to C: {}", abs(-3));
+}
+```
+
+###### How to call an extern function defined in another language?
+
+- first we must define an extern function.
+- next, if we define this function whit `safe` keyword, that is, we believe that this function does not have any memory safety considerations,  we can call this function as ordinary safe Rust function.
+- if the function is defined without `safe` keyword we must call in inside `unsafe` block.
+
+```rust
+unsafe extern "C" {
+    fn abs(input: i32) -> i32;
+}
+
+fn main() {
+    unsafe {
+        println!("Absolute value of -3 according to C: {}", abs(-3));
+    }
+}
+```
+
+###### How call Rust Functions from Other Languages?
+
+We should create an interface that allows other languages to call Rust functions. We add the extern keyword and specify the ABI to use just before the `fn` keyword for the relevant function. We also need to add a `#[unsafe(no_mangle)]` annotation to tell the Rust compiler not to mangle the name of this function.
+
+```rust
+// In the following example, we make the call_from_c function accessible from C code, after it’s compiled to a shared library and linked from C:
+
+#[unsafe(no_mangle)]
+pub extern "C" fn call_from_c() {
+    println!("Just called a Rust function from C!");
+}
+```
+
+###### What is *Mangling*?
+
+Mangling is when a compiler changes the name we’ve given a function to a different name that contains more information for other parts of the compilation process to consume but is less human readable.
+
+##### Accessing or Modifying a Mutable Static Variable.
+
+###### How create static variable?
+
+We point `static` keyword followed name in SCREAMING_SNAKE_CASE naming convention to which binding value of type: reference with the 'static lifetime.
+
+```rust
+Filename: src/main.rs
+static HELLO_WORLD: &str = "Hello, world!";
+
+fn main() {
+    println!("name is: {HELLO_WORLD}");
+}
+```
+
+###### What is Static Variables?
+
+A Static Variables is a Global variables, that is they are available from all places of program.
+
+###### Way convention of naming static variables?
+
+SCREAMING_SNAKE_CASE
+
+###### What value can store static variable?
+
+Static variables can only store references with the 'static lifetime, which means the Rust compiler can figure out the lifetime and we aren’t required to annotate it explicitly. Accessing an immutable static variable is safe.
+
+###### What is differences static variables from constants?
+
+- Values in a static variable have a fixed address in memory. Using the value will always access the same data. Constants, on the other hand, are allowed to duplicate their data whenever they’re used. 
+- Another difference is that static variables can be mutable.
+
+###### Is it safe accessing and modifying mutable static variables?
+
+Accessing and modifying mutable static variables is unsafe.
+
+###### What is unsafe using mutable static variables?
+
+If two threads are accessing the same mutable global variable, it can cause a data race.
+
+###### How we must access a mutable static variables?
+
+So accessing and modifying mutable static variables is unsafe we must access it in `unsafe` block.
+
+```rust
+Filename: src/main.rs
+static mut COUNTER: u32 = 0;
+
+/// SAFETY: Calling this from more than a single thread at a time is undefined
+/// behavior, so you *must* guarantee you only call it from a single thread at
+/// a time.
+unsafe fn add_to_count(inc: u32) {
+    unsafe {
+        COUNTER += inc;
+    }
+}
+
+fn main() {
+    unsafe {
+        // SAFETY: This is only called from a single thread in `main`.
+        add_to_count(3);
+        println!("COUNTER: {}", *(&raw const COUNTER));
+    }
+}
+```
+
+###### How we should comment unsafe function?
+
+Whenever we write an unsafe function, it is idiomatic to write a comment starting with `SAFETY` and explaining what the caller needs to do to call the function safely.
+
+###### How we should comment unsafe operation?
+
+whenever we perform an unsafe operation, it is idiomatic to write a comment starting with SAFETY to explain how the safety rules are upheld.
+
+###### How create reference to static mutable variable?
+
+The compiler will not allow you to create references to a mutable static variable. You can only access it via a raw pointer, created with one of the raw borrow operators. That includes in cases where the reference is created invisibly, as when it is used in the println!. The requirement that references to static mutable variables can only be created via raw pointers helps make the safety requirements for using them more obvious.
+
+##### Implementing an Unsafe Trait
 
