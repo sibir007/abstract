@@ -2551,3 +2551,245 @@ You can run Miri on a project by typing cargo +nightly miri run or `cargo +night
 
 ##### Specifying Placeholder Types in Trait Definitions with Associated Types
 
+###### What is Trait whit associated type?
+
+This is a trait that point type placeholder for associated types as some name that trait then is using in method definitions. Implementors of the trait must provide a type to stand in for the associated type placeholder.
+
+###### What is used Trait whit associated type for?
+
+By using definition of Trait whit associated type we can define a trait that uses some types without needing to know exactly what those types are until the trait is implemented.
+
+###### How to define Trait whit associated type?
+
+We point `type` keyword followed name of type TYPE_NAME that is associated types placeholder, then we can use type placeholder in trait method definitions as `Self::TYPE_NAME`
+
+```rust
+pub trait Iterator {
+    type Item;
+
+    fn next(&mut self) -> Option<Self::Item>;
+}
+```
+
+###### How implement Trait whit associated type?
+
+The implementor of a trait will specify the concrete type to be used instead of the placeholder type for the particular implementation.
+
+```rust
+impl Iterator for Counter {
+    type Item = u32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        // --snip--
+```
+
+##### Default Generic Type Parameters and Operator Overloading
+
+###### Why can we specify a specific default type for a generic type?
+
+This eliminates the need for implementors of the trait to specify a concrete type if the default type works.
+
+###### How specify a default type when declaring a generic type?
+
+You specify a default type when declaring a generic type with the `<PlaceholderType=ConcreteType>` syntax.
+
+```rust
+trait Add<Rhs=Self> { // Rhs=Self: this syntax is called default type parameters. 
+    type Output;
+
+    fn add(self, rhs: Rhs) -> Self::Output;
+}
+```
+
+```rust
+// Filename: src/main.rs
+
+use std::ops::Add;
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+impl Add for Point { // we don’t specify a concrete type for Rhs when we implement the Add trait, the type of Rhs will default to Self, which will be the type we’re implementing Add on
+    type Output = Point;
+
+    fn add(self, other: Point) -> Point {
+        Point {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
+    }
+}
+
+fn main() {
+    assert_eq!(
+        Point { x: 1, y: 0 } + Point { x: 2, y: 3 },
+        Point { x: 3, y: 3 }
+    );
+}
+```
+
+```rust
+// Filename: src/lib.rs
+use std::ops::Add;
+
+struct Millimeters(u32);
+struct Meters(u32);
+
+impl Add<Meters> for Millimeters { // To add Millimeters and Meters, we specify impl Add<Meters> to set the value of the Rhs type parameter instead of using the default of Self.
+    type Output = Millimeters;
+
+    fn add(self, other: Meters) -> Millimeters {
+        Millimeters(self.0 + (other.0 * 1000))
+    }
+}
+```
+
+##### Fully Qualified Syntax for Disambiguation: Calling Methods with the Same Name
+
+###### How we can call method that have the same name in different trait that is implemented by  type or in self implementation?
+
+If we will call trait method we must used Fully Qualified Syntax, that is we specify the trait name before the method name. We also can use Fully Qualified Syntax for types method, but this is not obligatory, ordinary method call will by default call type method.
+
+```rust
+Filename: src/main.rs
+trait Pilot {
+    fn fly(&self);
+}
+
+trait Wizard {
+    fn fly(&self);
+}
+
+struct Human;
+
+impl Pilot for Human {
+    fn fly(&self) {
+        println!("This is your captain speaking.");
+    }
+}
+
+impl Wizard for Human {
+    fn fly(&self) {
+        println!("Up!");
+    }
+}
+
+impl Human {
+    fn fly(&self) {
+        println!("*waving arms furiously*");
+    }
+}
+```
+
+```rust
+Filename: src/main.rs
+fn main() {
+    let person = Human;
+    Pilot::fly(&person);
+    Wizard::fly(&person);
+    person.fly();
+}
+```
+
+###### How we can call non-method function that have the same name in different implemented trait or in self implementation?
+
+When there are multiple types or traits that define non-method functions with the same function name we need to use fully qualified syntax. We must provide Rust with a type annotation within the angle brackets with following definitions: Type name, `as` keyword, name of Trait which function we will call. After this type annotation we does call to target function past two colon.
+
+```rust
+trait Animal {
+    fn baby_name() -> String;
+}
+
+struct Dog;
+
+impl Dog {
+    fn baby_name() -> String {
+        String::from("Spot")
+    }
+}
+
+impl Animal for Dog {
+    fn baby_name() -> String {
+        String::from("puppy")
+    }
+}
+
+fn main() {
+    println!("A baby dog is called a {}", <Dog as Animal>::baby_name());
+}
+```
+
+###### Which is general fully qualified syntax?
+
+`<Type as Trait>::function(receiver_if_method, next_arg, ...);`
+
+##### Using Supertraits to Require One Trait’s Functionality Within Another Trait
+
+###### What is Supertrait?
+
+Sometimes, you might write a trait definition that depends on another trait: for a type to implement the first trait, you want to require that type to also implement the second trait. You would do this so that your trait definition can make use of the associated items of the second trait. The trait your trait definition is relying on is called a supertrait of your trait.
+
+###### How to define Supertrait?
+
+We can do that in the trait definition by specifying supertrait name after defined trait name past colon `:`. When implement trait for type we must provide implementation supertrait for that type.
+
+```rust
+use std::fmt;
+
+trait OutlinePrint: fmt::Display { // define Supertrait
+    fn outline_print(&self) { // define default method
+        let output = self.to_string();
+        let len = output.len();
+        println!("{}", "*".repeat(len + 4));
+        println!("*{}*", " ".repeat(len + 2));
+        println!("* {output} *");
+        println!("*{}*", " ".repeat(len + 2));
+        println!("{}", "*".repeat(len + 4));
+    }
+}
+
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+impl OutlinePrint for Point {} // implement trait
+
+use std::fmt;
+
+impl fmt::Display for Point { // implement supertrait
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
+    }
+}
+```
+
+##### Using the Newtype Pattern to Implement External Traits on External Types
+
+###### What is Newtype pattern used for?
+
+When implementing trait on a type we must follows 'orphan rule' that states we’re only allowed to implement a trait on a type if either the trait or the type are local to our crate. To get around this restriction is used the 'newtype pattern', which involves creating a new type in a tuple struct.
+
+###### How use Newtype pattern for Implement External Traits on External Types?
+
+We must wrap External Type to tuple struct with one field, that is the wrapper type is local to our crate, and then we can implement the trait on the wrapper, implementing the required trait functionality for the wrapped type inside the wrapper.
+
+```rust
+use std::fmt;
+
+struct Wrapper(Vec<String>);
+
+impl fmt::Display for Wrapper {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[{}]", self.0.join(", "))
+    }
+}
+
+fn main() {
+    let w = Wrapper(vec![String::from("hello"), String::from("world")]);
+    println!("w = {w}");
+}
+```
