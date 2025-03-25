@@ -906,3 +906,53 @@ fn returns_initialized_closure(init: i32) -> Box<dyn Fn(i32) -> i32> {
 ```
 
 #### 20.5 Macros
+
+###### What is macros?
+
+Fundamentally, macros are a way of writing code that writes other code, which is known as metaprogramming.
+
+The term macro refers to a family of features in Rust: declarative macros with macro_rules! and three kinds of procedural macros:
+
+- Custom `#[derive]` macros that specify code added with the derive attribute used on structs and enums
+- Attribute-like macros that define custom attributes usable on any item
+- Function-like macros that look like function calls but operate on the tokens specified as their argument
+
+###### The Difference Between Macros and Functions
+
+###### What difference between Macros and Function?
+
+- Macros is called at compile time before compiler interprets the meaning of the code and is used for write code that will executed at runtime. Function is executable code and executed at runtime.
+- A function signature must declare the number and type of parameters the function has. Macros, on the other hand, can take a variable number of parameters
+- The downside to implementing a macro instead of a function is that macro definitions are more complex than function definitions because you’re writing Rust code that writes Rust code. Due to this indirection, macro definitions are generally more difficult to read, understand, and maintain than function definitions.
+- Another important difference between macros and functions is that you must define macros or bring them into scope before you call them in a file, as opposed to functions you can define anywhere and call anywhere.
+
+##### Declarative Macros with macro_rules! for General Metaprogramming
+
+###### What is Declarative Macros?
+
+Declarative Macros is most widely used form of macros in Rust. These are also sometimes referred to as “macros by example,” “macro_rules! macros,” or just plain “macros.” At their core, declarative macros allow you to write something similar to a Rust match expression. In case of macros the value is the literal Rust source code passed to the macro; the patterns are compared with the structure of that source code; and the code associated with each pattern, when matched, replaces the code passed to the macro. This all happens during compilation.
+
+###### How define a Declarative Macros?
+
+To define a macro, you use the `macro_rules!` construct.
+
+```rust
+// simplified definition of the vec! macro.
+
+// let v: Vec<u32> = vec![1, 2, 3];
+
+// Filename: src/lib.rs
+
+#[macro_export] //  annotation indicates that this macro should be made available whenever the crate in which the macro is defined is brought into scope. Without this annotation, the macro can’t be brought into scope.
+macro_rules! vec {
+    ( $( $x:expr ),* ) => { // Here we have one arm with the pattern ( $( $x:expr ),* ), followed by => and the block of code associated with this pattern
+        {
+            let mut temp_vec = Vec::new();
+            $(
+                temp_vec.push($x);
+            )*
+            temp_vec
+        }
+    };
+}
+
