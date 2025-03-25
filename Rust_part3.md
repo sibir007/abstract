@@ -745,5 +745,164 @@ impl<T> Option<T> {
     }
 ```
 
-###### Dynamically Sized Types and the Sized Trait
+##### Dynamically Sized Types and the Sized Trait
 
+###### What is DST?
+
+Rust needs to know certain details about its types, such as how much space to allocate for a value of a particular type. DST is abbreviation from "dynamically sized types", that denotes types that let us write code using values whose size we can know only at runtime.
+
+###### What is "unsized type"?
+
+"Unsized type" is synonym to "dynamically sized types".
+
+###### What DSTs are there in Rust?
+
+ Slices and trait objects (`dyn Trait`).
+
+###### How we can use DST?
+
+We can use DST only in combination with some type of Pointer: `&[T]`, `Box<[T]>`, `Rc<[T]>`, `&dyn Trait`, `Box<dyn Trait>` `Rc<dyn Trait>` etc.
+
+###### What is `Sized` trait?
+
+To work with DSTs, Rust provides the `Sized` trait to determine whether or not a type’s size is known at compile time. This trait is automatically implemented for everything whose size is known at compile time. In addition, Rust implicitly adds a bound on `Sized` to every generic function.
+
+```rust
+fn generic<T>(t: T) {
+    // --snip--
+}
+
+// is actually treated as though we had written this:
+
+fn generic<T: Sized>(t: T) {
+    // --snip--
+}
+```
+
+###### How we can provide DST as type arguments to generic type parameters?
+
+DSTs can be provided as type arguments to generic type parameters having the special `?Sized` bound. They can also be used for associated type definitions when the corresponding associated type declaration has a `?Sized` bound. By default, any type parameter or associated type has a `Sized` bound, unless it is relaxed using `?Sized`.
+
+```rust
+fn generic<T: ?Sized>(t: &T) {
+    // --snip--
+}
+```
+
+###### Can we implement Trait for DSTs?
+
+Traits may be implemented for DSTs. Unlike with generic type parameters, Self: ?Sized is the default in trait definitions.
+
+###### Can a struct contain a DST?
+
+Structs may contain a DST as the last field; this makes the struct itself a DST.
+
+#### 20.4 Advanced Functions and Closures.
+
+##### Function Pointers
+
+###### Can you pass a function to a function?
+
+We can pass regular functions to functions.
+
+###### What is Function pointer type?
+
+Function pointer is pointer that refer to a function whose identity is not necessarily known at compile-time. They can be created via a coercion to the type `fn` from both function items and non-capturing, non-async closures.
+
+```rust
+fn add(x: i32, y: i32) -> i32 {
+    x + y
+}
+
+let mut x = add(5,7);
+
+type Binop = fn(i32, i32) -> i32;
+let bo: Binop = add; // pointer
+x = bo(5,7);
+```
+
+###### How we can pass a function to a function?
+
+We can pass function by function pointer type `fn`. They can be created via a coercion to the type `fn` from a function.
+
+```rust
+fn add_one(x: i32) -> i32 {
+    x + 1
+}
+
+fn do_twice(f: fn(i32) -> i32, arg: i32) -> i32 {
+    f(arg) + f(arg)
+}
+
+fn main() {
+    let answer = do_twice(add_one, 5);
+
+    println!("The answer is: {answer}");
+}
+```
+
+###### Can we specify `fn` as the parameter type directly?
+
+Unlike closures, fn is a type rather than a trait, so we specify fn as the parameter type directly rather than declaring a generic type parameter with one of the Fn traits as a trait bound.
+
+###### Can we pass function pointer as an argument for a function that expects a closure?
+
+Function pointers implement all three of the closure traits (Fn, FnMut, and FnOnce), meaning you can always pass a function pointer as an argument for a function that expects a closure. It’s best to write functions using a generic type and one of the closure traits so your functions can accept either functions or closures. That said, one example of where you would want to only accept fn and not closures is when interfacing with external code that doesn’t have closures: C functions can accept functions as arguments, but C doesn’t have closures.
+
+```rust
+    let list_of_numbers = vec![1, 2, 3];
+    let list_of_strings: Vec<String> =
+        // list_of_numbers.iter().map(|i| i.to_string()).collect(); // passing closure
+        list_of_numbers.iter().map(ToString::to_string).collect(); // passing fn
+```
+
+###### Can we used name of enum variant as closure to pass in to function?
+
+name of each enum variant becomes an initializer function. We can use these initializer functions as function pointers that implement the closure traits, which means we can specify the initializer functions as arguments for methods that take closures.
+
+```rust
+    enum Status {
+        Value(u32),
+        Stop,
+    }
+
+    let list_of_statuses: Vec<Status> = (0u32..20).map(Status::Value).collect();
+```
+
+##### Returning Closures
+
+###### Can we return Closure directly?
+
+Closures are represented by traits, in most cases where you might want to return a trait, you can instead use the concrete type that implements the trait as the return value of the function. However, you can’t do that with closures because they don’t have a concrete type that is returnable - which means you can’t return closures directly.
+
+###### How we can return Closure from function?
+
+We can’t return closures directly. Instead, we will normally use the `impl Trait` syntax. You can return any function type, using `Fn`, `FnOnce` and `FnMut`.
+
+```rust
+fn returns_closure() -> impl Fn(i32) -> i32 {
+    |x| x + 1
+}
+```
+
+However, each closure is also its own distinct type. If you need to work with multiple functions that have the same signature but different implementations, you will need to use a trait object for them
+
+```rust
+fn main() {
+    let handlers = vec![returns_closure(), returns_initialized_closure(123)];
+    for handler in handlers {
+        let output = handler(5);
+        println!("{output}");
+    }
+}
+
+fn returns_closure() -> Box<dyn Fn(i32) -> i32> {
+    Box::new(|x| x + 1)
+}
+
+fn returns_initialized_closure(init: i32) -> Box<dyn Fn(i32) -> i32> {
+    Box::new(move |x| x + init)
+}
+```
+
+#### 20.5 Macros
