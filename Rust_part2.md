@@ -299,6 +299,35 @@ fn main() {
 - The call to `lock` returns a smart pointer called `MutexGuard`, wrapped in a `LockResult` that we can handled with the call to unwrap. We can treat the value as a mutable reference to the data inside.
 - The call to lock would fail if another thread holding the lock panicked. In that case, no one would ever be able to get the lock.
 - `Mutex<T>` is a smart pointer with a Drop implementation releases the lock automatically when a MutexGuard goes out of scope, which happens at the end of the inner scope.
+- `let`, any temporary values used in the expression on the right hand side of the equals sign are immediately dropped when the let statement ends. However, `while let` (and `if let` and `match`) does not drop temporary values until the end of the associated block.
+
+```rust
+impl Worker {
+    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
+        let thread = thread::spawn(move || {
+            while let Ok(job) = receiver.lock().unwrap().recv() { // receiver.lock() return  LockResult<MutexGuard<T>>
+                println!("Worker {id} got a job; executing.");
+
+                job();
+            } // MutexGuard<T> will be dropped here
+        });
+
+        Worker { id, thread }
+    }
+}
+impl Worker {
+    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
+        let thread = thread::spawn(move || loop {
+            let job = receiver.lock().unwrap().recv().unwrap(); // receiver.lock() return  LockResult<MutexGuard<T>>,  MutexGuard<T> will be dropped here when the let statement ends. 
+            
+            println!("Worker {} got a job; executing.", id);
+            
+            job();
+        });
+
+        Worker {id, thread}
+    }
+}
 
 
 ```rust
