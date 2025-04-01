@@ -315,6 +315,128 @@ The maximum size of a transaction is 1232 bytes.
 
 #### Transaction
 
+###### What consists Solana transaction?
+
+A Solana transaction consists of:
+
+- Signatures: An array of signatures included on the transaction.
+- Message: List of instructions to be processed atomically.
+
+```rust
+pub struct Transaction {
+    #[wasm_bindgen(skip)]
+    #[serde(with = "short_vec")]
+    pub signatures: Vec<Signature>,
+
+    #[wasm_bindgen(skip)]
+    pub message: Message,
+}
+```
+
+###### What is structure of a transaction message?
+
+The structure of a transaction message consists of:
+
+- Message Header: Specifies the number of signer and read-only account.
+- Account Addresses: An array of account addresses required by the instructions on the transaction.
+- Recent Blockhash: Acts as a timestamp for the transaction.
+- Instructions: An array of instructions to be executed.
+
+```rust
+pub struct Message {
+    /// The message header, identifying signed and read-only `account_keys`.
+    pub header: MessageHeader,
+
+    /// All the account keys used by this transaction.
+    #[serde(with = "short_vec")]
+    pub account_keys: Vec<Pubkey>,
+
+    /// The id of a recent ledger entry.
+    pub recent_blockhash: Hash,
+
+    /// Programs that will be executed in sequence and committed in
+    /// one atomic transaction if all succeed.
+    #[serde(with = "short_vec")]
+    pub instructions: Vec<CompiledInstruction>,
+}
+```
+
+###### What is structure and purpose of transaction message Header (header)?
+
+The message header uses three bytes to define account privileges:
+
+- Required signatures and message version (eg. legacy vs v0)
+- Number of read-only signed accounts
+- Number of read-only unsigned accounts
+
+```rust
+pub struct MessageHeader {
+    /// The number of signatures required for this message to be considered
+    /// valid. The signers of those signatures must match the first
+    /// `num_required_signatures` of [`Message::account_keys`].
+    pub num_required_signatures: u8,
+
+    /// The last `num_readonly_signed_accounts` of the signed keys are read-only
+    /// accounts.
+    pub num_readonly_signed_accounts: u8,
+
+    /// The last `num_readonly_unsigned_accounts` of the unsigned keys are
+    /// read-only accounts.
+    pub num_readonly_unsigned_accounts: u8,
+}
+```
+
+###### What is "Compact-Array Format"?
+
+Compact-Array Format is used to encode the lengths of the Account Addresses and Instructions arrays in transaction messages.
+
+- The array length (encoded as compact-u16)
+- The array items listed one after another
+
+###### What is structure of Transaction Message Account Addresses Array (account_keys)?
+
+Account Addresses Array contains an array of account addresses required by its instructions. The array begins with a compact-u16 number indicating how many addresses it contains. The addresses are then ordered based on their privileges, which is determined by the message header.
+
+- Accounts that are writable and signers
+- Accounts that are read-only and signers
+- Accounts that are writable and not signers
+- Accounts that are read-only and not signers
+
+###### What purpose of Transaction Message Recent Blockhash (recent_blockhash)?
+
+- Acts as a timestamp
+- Prevents duplicate transactions
+
+###### How fast expire a Recent Blockhash?
+
+A blockhash expires after 150 blocks (about 1 minute assuming 400ms block times)
+
+###### What happen whit transaction when blockhash expires?
+
+after blockhash expires the transaction cannot be processed.
 
 
+###### What RPC method to use to get the current blockhash and last block height at which the blockhash will be valid.
 
+You can use the `getLatestBlockhash` RPC method.
+
+###### What structure and purpose of Transaction Message Instructions Array (instructions)? 
+
+Instructions Array  contains transaction instructions, it starts with a compact-u16 length followed by the instruction data - instructions in the CompiledInstruction type.
+
+###### What type are the instructions in the transaction message instruction array (instructions)?
+
+A transaction message contains an array of instructions in the CompiledInstruction type. Instructions are converted to this type when added to a transaction.
+
+```rust
+pub struct CompiledInstruction {
+    /// Index into the transaction keys array indicating the program account that executes this instruction.
+    pub program_id_index: u8,
+    /// Ordered indices into the transaction keys array indicating which accounts to pass to the program.
+    #[serde(with = "short_vec")]
+    pub accounts: Vec<u8>,
+    /// The program input data.
+    #[serde(with = "short_vec")]
+    pub data: Vec<u8>,
+}
+```
