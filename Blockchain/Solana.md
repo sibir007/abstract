@@ -290,3 +290,31 @@ Only the System Program can create new accounts. Once the System Program creates
 
 ### Transactions and Instructions
 
+###### How in Solana interacting whit Network?
+
+On Solana, we send transactions to interact with the network.
+
+###### What transactions consist of?
+
+Transactions include one or more instructions that specify operations to be processed. The execution logic for instructions are stored on programs deployed to the Solana network, where each program defines its own set of instructions.
+
+###### How transaction are processed?
+
+- If a transaction includes multiple instructions, the instructions execute in the order they are added to the transaction
+- Transactions are "atomic" - either all instructions process successfully, or the entire transaction fails and no changes are made.
+
+###### What is maximum size of transaction?
+
+The maximum size of a transaction is 1232 bytes.
+
+###### What information requires a instruction?
+
+- The address of the program to invoke
+- The accounts the instruction will read from or write to
+- Any additional data required by the instruction (e.g. function arguments)
+
+#### Transaction
+
+
+
+
