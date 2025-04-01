@@ -326,7 +326,7 @@ Markdown All in One: Remove section numbers
 Markdown All in One: Toggle code span
 Markdown All in One: Toggle code block
 Markdown All in One: Print current document to HTML
-Markdown All in One: Print documents to HTML
+Markdown All in One: Print documents to HTML- [MARKDOWN](#markdown)
 Markdown All in One: Toggle math environment
 Markdown All in One: Toggle list
 It will cycle through list markers (by default -, *, +, 1. and 1), which can be changed with option list.toggle.candidate-markers).

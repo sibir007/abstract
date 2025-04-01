@@ -2,7 +2,7 @@
 
 ## THE RUST PROGRAMMING LANGUAGE 2nd Edition by Steve Klabnik and Carol Nichols
 
-### Fearless Concurrency
+### 16 Fearless Concurrency
 
 ###### What is Concurrent programming?
 

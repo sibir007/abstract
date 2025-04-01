@@ -90,7 +90,7 @@ The relationship between the account and its address can be thought of as a key-
 
 PDAs is abbreviation from "Program Derived Addresses", are special addresses that are deterministically derived from a program ID and optional inputs (seeds).
 
-#### Account Type
+##### Account Type
 
 ###### What field has every Account on Solana?
 
@@ -128,7 +128,7 @@ Only the owner program can modify the account's data or deduct its lamports bala
 
 `rent_epoch`: A legacy field from when Solana had a mechanism that periodically deducted lamports from accounts. While this field still exists in the Account type, it is no longer used since rent collection was deprecated.
 
-#### Rent
+##### Rent
 
 ###### What is Rent?
 
@@ -172,7 +172,7 @@ pub fn minimum_balance(&self, data_len: usize) -> u64 {
 }
 ```
 
-#### Program Owner
+##### Program Owner
 
 ###### What is the name of "Smart Contract" in Solana?
 
@@ -186,3 +186,107 @@ Every account has a designated program as its owner.
 
 - Modify the account's data field
 - Deduct lamports from the account's balance
+
+#### System Program
+
+###### Who is owned new created accounts?
+
+By default, all new accounts are owned by the "System Program"
+
+###### Which key tacks perform System Program?
+
+- New Account Creation: Only the System Program can create new accounts.
+- Space Allocation: Sets the byte capacity for the data field of each account.
+- Transfer / Assign Program Ownership: Once the System Program creates an account, it can reassign the designated program owner to a different program account. This is how custom programs take ownership of new accounts created by the System Program.
+
+###### Who can create new accounts?
+
+Only the System Program can create new accounts.
+
+######  How custom programs take ownership of new accounts?
+
+Once the System Program creates an account, it can reassign the designated program owner to a different program account. This is how custom programs take ownership of new accounts created by the System Program.
+
+###### What is "Wallet" account?
+
+All "wallet" accounts on Solana are simply accounts owned by the System Program.  The lamport balance stored in these accounts represents the amount of SOL owned by the wallet. Only accounts owned by the System Program can be used as transaction fee payers.
+
+###### Which account can be used as transaction fee payers?
+
+Only accounts owned by the System Program can be used as transaction fee payers, that is "Wallet" accounts.
+
+#### Sysvar Accounts
+
+###### What is Sysvar Accounts?
+
+Sysvar accounts are special accounts located at predefined addresses that provide access to cluster state data. These accounts are dynamically updated with data about the network cluster.
+
+#### Program Account
+
+###### Where loaders store the executable code?
+
+Except for loader-v3 all loaders store the executable code of the programs they manage in a so called program account
+
+###### Who owns program accounts?
+
+loaders
+
+###### What is Buffer Account?
+
+This is special account type that owned by Loader-v3 for temporarily staging the upload of a program during deployment or redeployment / upgrades
+
+###### How works Loader-v3?
+
+Loader-v3 works differently from all other loaders as it has one indirection for each program. The program account only contains the address of the programdata account which then in turn holds the actual executable code
+
+```
+Address
+Program Account: Data:            -> point to -> Address
+                 Owner: BPF Loader               Program Executable
+                                                 Data Account: Data: Program Code
+                                                               Owner: BPF Loader
+```
+
+#### Data Account
+
+###### What is Data Account?
+
+A Data Account is an account in which the program that owns it stores its state. To maintain state, programs define instructions to create separate accounts that are owned by the program. Each of these accounts has its own unique address and can store any arbitrary data defined by the program.
+
+```
+Address
+-----------
+BPF Loader 
+-----------
+     |     
+     |
+   owner
+     |
+     v
+Address
+----------- data: Program Code
+Program     executable: True
+----------- lamports: Number
+     |      owner: BPF Loader
+     |
+   owner
+     |
+     v
+Address
+-----------  data: Program state
+Data account executable: False
+-----------  lamports: Number
+             owner: Program
+```
+
+###### How Program become Account owner?
+
+Only the System Program can create new accounts. Once the System Program creates an account, it can then transfer / assign ownership of the new account to another program.
+
+###### How custom Program create Data account?
+
+1. Invoke the System Program to create an account, which then transfers ownership to the custom program
+2. Invoke the custom program, which now owns the account, to then initialize the account data as defined by the program's instruction
+
+### Transactions and Instructions
+
