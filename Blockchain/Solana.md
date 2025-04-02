@@ -440,3 +440,11 @@ pub struct CompiledInstruction {
     pub data: Vec<u8>,
 }
 ```
+
+###### What structure of CompiledInstruction type?
+
+Each CompiledInstruction contains:
+
+- `program_id_index`. Program ID Index: An u8 index that points to the program's address in the account addresses array. This specifies the program that will process the instruction.
+- `accounts`. Account Indexes: An array of u8 indexes that point to the account addresses required for this instruction.
+- `data`. Instruction Data: A byte array specifying which instruction to invoke on the program and any additional data required by the instruction (eg. function arguments).

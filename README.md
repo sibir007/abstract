@@ -6,11 +6,16 @@
       - [Variables and Mutability](#variables-and-mutability)
           - [1. When a variable is immutable?](#1-when-a-variable-is-immutable)
           - [2. What is constant?](#2-what-is-constant)
+          - [How differense between constants and variables](#how-differense-between-constants-and-variables)
+          - [What Rust’s naming convention for constants?](#what-rusts-naming-convention-for-constants)
+          - [When Constants are valid?](#when-constants-are-valid)
           - [3. What is Shadowing?](#3-what-is-shadowing)
+          - [What different Shadowing from marking mut?](#what-different-shadowing-from-marking-mut)
       - [Data Types](#data-types)
           - [4. What means data types?](#4-what-means-data-types)
           - [5. What subsets of data types are there in rust?](#5-what-subsets-of-data-types-are-there-in-rust)
           - [6. What means that rust is statically typed language?](#6-what-means-that-rust-is-statically-typed-language)
+          - [How declared types in Rust?](#how-declared-types-in-rust)
           - [7. What is scalar data types?](#7-what-is-scalar-data-types)
           - [8. What is integer data type?](#8-what-is-integer-data-type)
           - [9. What are there integers data types?](#9-what-are-there-integers-data-types)
@@ -891,22 +896,29 @@ By default in Rust variables are immutable. Once a value is bound to a name, you
 
 ###### 2. What is constant?
 
-Constants are values that are bound to a name and are not allowed to change, but there are a few differences between constants and variables:
+Constants are values that are bound to a name and are not allowed to change, but there are a few differences between constants and variables.
+
+###### How differense between constants and variables
 
 - you aren’t allowed to use `mut` with constants.
 - You declare constants using the `const` keyword instead of the `let` keyword
 - the type of the value must be annotated.
 - The last difference is that constants may be set only to a constant expression, not the result of a value that could only be computed at runtime
 
+###### What Rust’s naming convention for constants? 
+
 Rust’s naming convention for constants is to use all uppercase with underscores between words.
+
+###### When Constants are valid?
 
 Constants are valid for the entire time a program runs, within the scope in which they were declared.
 
-Naming hardcoded values used throughout your program as constants is useful in conveying the meaning of that value to future maintainers of the code. It also helps to have only one place in your code you would need to change if the hardcoded value needed to be updated in the future
 
 ###### 3. What is Shadowing?
 
 you can declare a new variable with the same name as a previous variable. We say that the first variable is shadowed by the second, which means that the second variable is what the compiler will see when you use the name of the variable. We can shadow a variable by using the same variable’s name and repeating the use of the let keyword.
+
+###### What different Shadowing from marking mut?
 
 Shadowing is different from marking a variable as mut because we’ll get a compile-time error if we accidentally try to reassign to this variable without using the let keyword
 
@@ -924,7 +936,11 @@ In rust a two data type subsets: scalar and compound
 
 ###### 6. What means that rust is statically typed language?
 
-This means that it must know the types of all variables at compile time.  The compiler can usually infer what type we want to use based on the value and how we use it. In cases when many types are possible we must add a type annotation.
+This means that it must know the types of all variables at compile time.  
+
+###### How declared types in Rust?
+
+The compiler can usually infer what type we want to use based on the value and how we use it. In cases when many types are possible we must add a type annotation.
 
 ###### 7. What is scalar data types?
 
