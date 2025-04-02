@@ -443,8 +443,245 @@ pub struct CompiledInstruction {
 
 ###### What structure of CompiledInstruction type?
 
-Each CompiledInstruction contains:
+Each CompiledInstruction type contains:
 
 - `program_id_index`. Program ID Index: An u8 index that points to the program's address in the account addresses array. This specifies the program that will process the instruction.
 - `accounts`. Account Indexes: An array of u8 indexes that point to the account addresses required for this instruction.
 - `data`. Instruction Data: A byte array specifying which instruction to invoke on the program and any additional data required by the instruction (eg. function arguments).
+
+#### Instruction
+
+###### What is Instruction?
+
+An instruction on a deployed program can be thought of as a public function that can be called by anyone using the Solana network.
+
+###### what is required to provide instructions for the call?
+
+Invoking a program's instruction requires providing three key pieces of information:
+
+- Program ID: The program being invoked to execute the instruction
+- Accounts: List of accounts the instruction requires
+- Instruction Data: Byte array specifying the instruction on the program to invoke and any function arguments required by the instruction
+  
+```rust
+pub struct Instruction {
+    /// Pubkey of the program that executes this instruction.
+    pub program_id: Pubkey,
+    /// Metadata describing accounts that should be passed to the program.
+    pub accounts: Vec<AccountMeta>,
+    /// Opaque data passed to the program for its own interpretation.
+    pub data: Vec<u8>,
+}
+```
+
+example showing the structure of a SOL transfer instruction
+
+```json
+{
+  "keys": [
+    {
+      "pubkey": "3z9vL1zjN6qyAFHhHQdWYRTFAcy69pJydkZmSFBKHg1R",
+      "isSigner": true,
+      "isWritable": true
+    },
+    {
+      "pubkey": "BpvxsLYKQZTH42jjtWHZpsVSa7s6JVwLKwBptPSHXuZc",
+      "isSigner": false,
+      "isWritable": true
+    }
+  ],
+  "programId": "11111111111111111111111111111111",
+  "data": [2, 0, 0, 0, 128, 150, 152, 0, 0, 0, 0, 0]
+}
+```
+
+
+###### In what form should accounts be submitted for instructions?
+
+Each account required by an instruction must be provided as an AccountMeta that contains:
+
+```rust
+pub struct AccountMeta {
+    /// An account's public key.
+    pub pubkey: Pubkey,
+    /// True if an `Instruction` requires a `Transaction` signature matching `pubkey`.
+    pub is_signer: bool,
+    /// True if the account data or metadata may be mutated during program execution.
+    pub is_writable: bool,
+}
+```
+
+### Transaction Fees
+
+###### For what is used base fee?
+
+Every Solana transaction requires a base fee (SOL) to compensate validators for processing the transaction.
+
+###### For what is used prioritization fee?
+
+An optional prioritization fee is available to increase the probability that the transaction is processed by the current leader (validator).
+
+###### What is the size of base fee for a transaction?
+
+The base fee for a transaction is a minimum of 5000 lamports per signature on the transaction.
+
+###### How is calculated the prioritization fee?
+
+The prioritization fee is calculated as: (compute unit limit * compute unit price).
+
+###### What is compute unit limit?
+
+The compute unit limit is the maximum number of compute units that the transaction can consume.
+
+###### What is compute unit price?
+
+The compute unit price is the price per compute unit, in micro-lamports.
+
+###### What is micro lamports equal to? 
+
+1,000,000 micro lamports = 1 lamport
+
+###### Who can to pay fee?
+
+The transaction fee payer must be an account owned by the System Program.
+
+#### Base Transaction Fee
+
+###### How base Fee is paid?
+
+The base fee is automatically paid for by the transaction fee payer, which is the first signer on the transaction. The fee payer must be an account owned by the System Program.
+
+###### How is base fee distributed?
+
+- 50% Burned: Half of the base fee is burned.
+- 50% Distribution: Half is paid to the validator that processed the transaction.
+
+#### Prioritization Fee
+
+###### How is Prioritization Fee distributed?
+
+100% of the priority fee is paid directly to the validator processing the transaction.
+
+##### Compute Units and Limits
+
+For additional details into compute unit usage:
+
+[ComputeBudget Type](https://github.com/anza-xyz/agave/blob/v2.1.13/compute-budget/src/compute_budget.rs#L22-L130)
+[Compute Unit Consumption Defaults](https://github.com/anza-xyz/agave/blob/v2.1.13/compute-budget/src/compute_budget.rs#L149-L197)
+Refer to the [How to Request Optimal Compute guide](https://solana.com/developers/guides/advanced/how-to-request-optimal-compute) for more details on compute unit usage.
+
+###### What is Compute Units?
+
+Compute Units (CU) is unit of measurement of computational resources that consumes a transaction when is executed.  Each instruction deducts from the transaction’s compute unit budget.
+
+###### What is Maximum Limit of computational resources that can use transaction?
+
+A transaction can use up to 1.4 million compute units.
+
+###### What is Default Limit of computational resources that can use transaction?
+
+By default, each instruction is limited to 200,000 compute units.
+
+###### How request a specific compute unit limit?
+
+You can request a specific compute unit limit by including a `SetComputeUnitLimit` instruction in your transaction
+
+##### Compute Unit Price
+
+Use the following resources to get real-time recommendations on the current compute unit price:
+
+[Priority Fee API](https://docs.helius.dev/solana-apis/priority-fee-api) by Helius
+[Global Priority Fee Tracker](https://triton.one/solana-prioritization-fees/) by Triton
+Refer to the [How to Use Priority Fees guide](https://solana.com/developers/guides/advanced/how-to-use-priority-fees) for more details on priority fees.
+
+##### Calculate Prioritization Fee
+
+###### How to calculate Prioritization Fee?
+
+Prioritization Fee = Compute Unit Limit × Compute Unit Price
+
+###### How to set up a specific unit limit?
+
+Use `SetComputeUnitLimit`
+
+```rust
+let limit_instruction = ComputeBudgetInstruction::set_compute_unit_limit(300_000);
+
+```
+
+###### How to define the price per compute unit?
+
+use `SetComputeUnitPrice`
+
+```rust
+let price_instruction = ComputeBudgetInstruction::set_compute_unit_price(1);
+```
+
+### Programs
+
+###### What is Programs on Solana?
+
+- On Solana, "smart contracts" are called programs. 
+- Programs are deployed on-chain to accounts that contain the program's compiled executable binary. 
+- Users interact with programs by sending transactions containing instructions that tell the program what to do.
+- Programs are accounts containing executable code, organized into functions called instructions.
+- While programs are stateless, they can include instructions that create and update other accounts to store data.
+- An upgrade authority can update programs. Once this authority is removed, the program becomes immutable.
+- Users can verify an on-chain program account's data matches its public source code through verifiable builds.
+
+#### Writing Solana Programs
+
+###### In what language predominantly is written Programs?
+
+Solana programs are predominantly written in the Rust programming language
+
+###### What approaches used for Program development?
+
+Anchor: A framework designed for Solana program development. It provides a faster and simpler way to write programs, using Rust macros to significantly reduce boilerplate code. For beginners, it is recommended to start with the Anchor framework.
+
+Native Rust: This approach involves writing Solana programs in Rust without leveraging any frameworks. It offers more flexibility but comes with increased complexity.
+
+###### What is "Anchor"?
+
+A framework designed for Solana program development. It provides a faster and simpler way to write programs, using Rust macros to significantly reduce boilerplate code. For beginners, it is recommended to start with the Anchor framework.
+
+#### Updating Solana Programs
+
+###### Can we modify on-chain programs?
+
+On-chain programs can be directly modified by an account designated as the "upgrade authority", which is typically the account that originally deployed the program. If the upgrade authority is revoked and set to None, the program becomes immutable and can no longer be updated.
+
+#### Verifiable Programs
+
+###### What are Verifiable builds used for?
+
+Verifiable builds allow anyone to check if a program's on-chain code matches its public source code, making it possible to detect discrepancies between source and deployed versions.
+
+###### How quickly check for verified programs?
+
+To quickly check for verified programs, users can search for a program address on the SolanaFM Explorer and navigate to the "Verification" tab. View an example of a verified program here.
+
+###### How there is Verification Tools?
+
+The [Solana Verifiable Build CLI](https://github.com/Ellipsis-Labs/solana-verifiable-build) by Ellipsis Labs enables users to independently verify onchain programs against published source code.
+
+###### There is support for verifiable builds in Anchor?
+
+Anchor provides built-in support for verifiable builds. Details can be found in the [Anchor documentation](https://www.anchor-lang.com/docs/verifiable-builds).
+
+#### Berkeley Packet Filter (BPF)
+
+###### What is LLVM?
+
+The LLVM Project is a collection of modular and reusable compiler and toolchain technologies. Solana uses LLVM to compile programs into ELF files.
+
+###### What is ELF file format?
+
+In computing, the Executable and Linkable Format(ELF, formerly named Extensible Linking Format) is a common standard file format for executable files, object code, shared libraries, and core dumps.
+These files contain Solana's custom version of eBPF bytecode, called "Solana Bytecode Format" (sBPF). The ELF file contains the program's binary and is stored on-chain in an executable account when the program is deployed.
+
+###### What is eBPF?
+
+eBPF is a technology that can run programs in a privileged context such as the operating system kernel.[5] It is the successor to the Berkeley Packet Filter (BPF, with the "e" originally meaning "extended") filtering mechanism in Linux and is also used in non-networking parts of the Linux kernel as well.
+
+It is used to safely and efficiently extend the capabilities of the kernel at runtime without requiring changes to kernel source code or loading kernel modules.[6] Safety is provided through an in-kernel verifier which performs static code analysis and rejects programs which crash, hang or otherwise interfere with the kernel negatively.[7][8]

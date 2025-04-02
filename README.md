@@ -970,7 +970,7 @@ Signed and unsigned refer to whether it’s possible for the number to be negati
 
 ###### 11. How many value does it contain signed integer data types?
 
-Each signed variant can store numbers from -(2^(n - 1)) to 2^(n - 1)-1 inclusive, where n is the number of bits that variant uses
+Each signed variant can store numbers from -(2^(n - 1)) to 2^(n - 1)-1 (two to the power of n minus one) inclusive, where n is the number of bits that variant uses
 
 ###### 12. How many value does it contain unsigned integer data types?
 
