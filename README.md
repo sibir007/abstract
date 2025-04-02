@@ -6,7 +6,7 @@
       - [Variables and Mutability](#variables-and-mutability)
           - [1. When a variable is immutable?](#1-when-a-variable-is-immutable)
           - [2. What is constant?](#2-what-is-constant)
-          - [How differense between constants and variables](#how-differense-between-constants-and-variables)
+          - [How differense between constants and variables?](#how-differense-between-constants-and-variables)
           - [What Rust’s naming convention for constants?](#what-rusts-naming-convention-for-constants)
           - [When Constants are valid?](#when-constants-are-valid)
           - [3. What is Shadowing?](#3-what-is-shadowing)
@@ -898,7 +898,7 @@ By default in Rust variables are immutable. Once a value is bound to a name, you
 
 Constants are values that are bound to a name and are not allowed to change, but there are a few differences between constants and variables.
 
-###### How differense between constants and variables
+###### How differense between constants and variables?
 
 - you aren’t allowed to use `mut` with constants.
 - You declare constants using the `const` keyword instead of the `let` keyword
