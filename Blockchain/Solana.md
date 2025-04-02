@@ -684,4 +684,13 @@ These files contain Solana's custom version of eBPF bytecode, called "Solana Byt
 
 eBPF is a technology that can run programs in a privileged context such as the operating system kernel.[5] It is the successor to the Berkeley Packet Filter (BPF, with the "e" originally meaning "extended") filtering mechanism in Linux and is also used in non-networking parts of the Linux kernel as well.
 
-It is used to safely and efficiently extend the capabilities of the kernel at runtime without requiring changes to kernel source code or loading kernel modules.[6] Safety is provided through an in-kernel verifier which performs static code analysis and rejects programs which crash, hang or otherwise interfere with the kernel negatively.[7][8]
+It is used to safely and efficiently extend the capabilities of the kernel at runtime without requiring changes to kernel source code or loading kernel modules. Safety is provided through an in-kernel verifier which performs static code analysis and rejects programs which crash, hang or otherwise interfere with the kernel negatively.
+
+#### Built-in Programs
+
+##### Loader Programs
+
+###### What are Loader Programs?
+
+Every program itself is owned by another program, which is its loader.
+
