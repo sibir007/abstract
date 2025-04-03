@@ -694,3 +694,275 @@ It is used to safely and efficiently extend the capabilities of the kernel at ru
 
 Every program itself is owned by another program, which is its loader.
 
+###### What goals of loaders?
+
+- Deploy a new program or buffer
+- Close a program or buffer
+- Redeploy / upgrade an existing program
+- Transfer the authority over a program
+- Finalize a program
+
+###### Which loaders support modifications to programs after their initial deployment?
+
+Loader-v3 and loader-v4 support modifications to programs after their initial deployment.
+
+###### Which loaders are there?
+
+- native loader:
+    Program id: NativeLoader1111111111111111111111111111111
+    Owns the other four loaders
+- loader-v1:
+    Program id: BPFLoader1111111111111111111111111111111111
+    Management instructions are disabled, but programs still execute
+- loader-v2:
+    Program id: BPFLoader2111111111111111111111111111111111
+    Instructions
+    Management instructions are disabled, but programs still execute
+- loader-v3:
+    Program id: BPFLoaderUpgradeab1e11111111111111111111111
+    Instructions
+    Is being phased out
+- loader-v4:
+    Program id: LoaderV411111111111111111111111111111111111
+    Instructions
+    Will become the standard loader
+
+##### Precompile Programs
+
+###### For what used Ed25519 Program?
+
+The program for verifying ed25519 signatures. It takes an ed25519 signature, a public key, and a message. Multiple signatures can be verified. If any of the signatures fail to verify, an error is returned.
+
+###### For what used Secp256k1 Program?
+
+Verify secp256k1 public key recovery operations (ecrecover).
+
+###### For what used Secp256r1 Program?
+
+The program for verifying secp256r1 signatures. It takes a secp256r1 signature, a public key, and a message. Up to 8 signatures can be verified. If any of the signatures fail to verify, an error is returned.
+
+#### Core Programs
+
+###### What are "native" programs?
+
+The Solana cluster genesis includes a list of special programs that provide various core functionalities for the network. Historically these were referred to as "native" programs and they used to be distributed together with the validator code.
+
+###### Which there are Core Programs?
+
+- System Program
+    Program id: 11111111111111111111111111111111
+    Create new accounts, allocate account data, assign accounts to owning programs, transfer lamports from System Program owned accounts and pay transaction fees.
+- Vote Program
+    Program id: Vote111111111111111111111111111111111111111
+    Create and manage accounts that track validator voting state and rewards.
+- Stake Program
+    Program id: Stake11111111111111111111111111111111111111
+    Create and manage accounts representing stake and rewards for delegations to validators.
+- Config Program
+    Program id: Config1111111111111111111111111111111111111
+    Add configuration data to the chain, followed by the list of public keys that are allowed to modify it. Unlike the other programs, the Config program does not define any individual instructions. It has just one implicit instruction: "store". Its instruction data is a set of keys that gate access to the account and the data to store inside of it.
+- Compute Budget Program
+    Program id: ComputeBudget111111111111111111111111111111
+- Address Lookup Table Program
+    Program id: AddressLookupTab1e1111111111111111111111111
+- Zk Token Proof Program
+    Program id: ZkTokenProof1111111111111111111111111111111
+- Zk Elgamal Proof Program
+    Program id: ZkE1Gama1Proof11111111111111111111111111111
+
+###### For what used System Program?
+
+Create new accounts, allocate account data, assign accounts to owning programs, transfer lamports from System Program owned accounts and pay transaction fees.
+
+###### For what used Vote Program?
+
+Create and manage accounts that track validator voting state and rewards
+
+###### For what used Stake Program?
+
+Create and manage accounts representing stake and rewards for delegations to validators.
+
+###### For what used Config Program?
+
+Add configuration data to the chain, followed by the list of public keys that are allowed to modify it. Unlike the other programs, the Config program does not define any individual instructions. It has just one implicit instruction: "store". Its instruction data is a set of keys that gate access to the account and the data to store inside of it.
+
+### Program Derived Address (PDA)
+
+###### What is Program Derived Address (PDA)?
+
+PDAs are addresses that are deterministically derived and look like standard public keys, but have no associated private keys. This means that no external user can generate a valid signature for the address. However, the Solana runtime enables programs to programmatically "sign" for PDAs without needing a private key.
+
+###### For what used Program Derived Address (PDA)?
+
+Program that derive address can create account bound to that address and subsequently find and use it based on the initial data from which the address was derived without remembering the address itself. So PDA is used as the address (unique identifier) for an on-chain account, providing a method to easily store, map, and fetch program state.
+
+###### Should we explicitly create account when derive address?
+
+It's important to understand that simply deriving a Program Derived Address (PDA) does not automatically create an on-chain account at that address. Accounts with a PDA as the on-chain address must be explicitly created through the program used to derive the address. 
+
+###### Do PDA have private key?
+
+PDAs are addresses that fall off the Ed25519 curve and have no corresponding private key.
+
+#### Who to derive a PDA
+
+###### Who to derive a PDA?
+
+The derivation of a PDA requires 3 inputs.
+
+- Optional seeds: Predefined inputs (e.g. string, number, other account addresses) used to derive a PDA. These inputs are converted to a buffer of bytes.
+- Bump seed: An additional input (with a value between 255-0) that is used to guarantee that a valid PDA (off curve) is generated. This bump seed (starting with 255) is appended to the optional seeds when generating a PDA to "bump" the point off the Ed25519 curve. The bump seed is sometimes referred to as a "nonce".
+- Program ID: The address of the program the PDA is derived from. This is also the program that can "sign" on behalf of the PDA
+
+```ts
+import { PublicKey } from "@solana/web3.js";
+
+const programId = new PublicKey("11111111111111111111111111111111");
+const string = "helloWorld";
+
+// Under the hood, findProgramAddressSync will iteratively append an additional bump seed (nonce) to the seeds buffer and call the createProgramAddressSync method. The bump seed starts with a value of 255 and is decreased by 1 until a valid PDA (off curve) is found.
+const [PDA, bump] = PublicKey.findProgramAddressSync( 
+  [Buffer.from(string)],
+  programId,
+);
+
+console.log(`PDA: ${PDA}`);
+console.log(`Bump: ${bump}`);
+```
+
+```sh
+PDA: 46GZzzetjCURsdFPb7rcnspbEMnCBXe9kpjrsZAkKb6X
+Bump: 254
+```
+
+###### What is Bump seed?
+
+An additional input (with a value between 255-0) that is used to guarantee that a valid PDA (off curve) is generated. This bump seed (starting with 255) is appended to the optional seeds when generating a PDA to "bump" the point off the Ed25519 curve. The bump seed is sometimes referred to as a "nonce".
+
+###### What is Canonical Bump seed?
+
+The "canonical bump" refers to the first bump seed (starting from 255 and decrementing by 1) that derives a valid PDA. For program security, it is recommended to only use PDAs derived from a canonical bump.
+
+```ts
+import { PublicKey } from "@solana/web3.js";
+
+const programId = new PublicKey("11111111111111111111111111111111");
+const string = "helloWorld";
+
+// Loop through all bump seeds for demonstration
+for (let bump = 255; bump >= 0; bump--) {
+  try {
+    const PDA = PublicKey.createProgramAddressSync(
+      [Buffer.from(string), Buffer.from([bump])],
+      programId,
+    );
+    console.log("bump " + bump + ": " + PDA);
+  } catch (error) {
+    console.log("bump " + bump + ": " + error);
+  }
+}
+```
+
+```sh
+bump 255: Error: Invalid seeds, address must fall off the curve
+bump 254: 46GZzzetjCURsdFPb7rcnspbEMnCBXe9kpjrsZAkKb6X
+bump 253: GBNWBGxKmdcd7JrMnBdZke9Fumj9sir4rpbruwEGmR4y
+bump 252: THfBMgduMonjaNsCisKa7Qz2cBoG1VCUYHyso7UXYHH
+bump 251: EuRrNqJAofo7y3Jy6MGvF7eZAYegqYTwH2dnLCwDDGdP
+bump 250: Error: Invalid seeds, address must fall off the curve
+...
+// remaining bump outputs
+```
+
+#### Create PDA Accounts
+
+```rust
+// lib.rs
+
+use anchor_lang::prelude::*;
+
+declare_id!("75GJVCJNhaukaa2vCCqhreY31gaphv7XTScBChmr1ueR");
+
+#[program]
+pub mod pda_account {
+    use super::*;
+
+    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
+        let account_data = &mut ctx.accounts.pda_account;
+        // store the address of the `user`
+        account_data.user = *ctx.accounts.user.key;
+        // store the canonical bump
+        account_data.bump = ctx.bumps.pda_account;
+        Ok(())
+    }
+}
+
+#[derive(Accounts)]
+pub struct Initialize<'info> {
+    #[account(mut)]
+    pub user: Signer<'info>,
+
+    #[account(
+        init,
+        // set the seeds to derive the PDA
+        seeds = [b"data", user.key().as_ref()],
+        // use the canonical bump
+        bump,
+        payer = user,
+        space = 8 + DataAccount::INIT_SPACE
+    )]
+    pub pda_account: Account<'info, DataAccount>,
+    pub system_program: Program<'info, System>,
+}
+
+#[account]
+
+#[derive(InitSpace)]
+pub struct DataAccount {
+    pub user: Pubkey,
+    pub bump: u8,
+}
+```
+
+```ts
+// pda-account.test.ts
+
+import * as anchor from "@coral-xyz/anchor";
+import { Program } from "@coral-xyz/anchor";
+import { PdaAccount } from "../target/types/pda_account";
+import { PublicKey } from "@solana/web3.js";
+
+describe("pda-account", () => {
+  const provider = anchor.AnchorProvider.env();
+  anchor.setProvider(provider);
+
+  const program = anchor.workspace.PdaAccount as Program<PdaAccount>;
+  const user = provider.wallet as anchor.Wallet;
+
+  // Derive the PDA address using the seeds specified on the program
+  const [PDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from("data"), user.publicKey.toBuffer()],
+    program.programId
+  );
+
+  it("Is initialized!", async () => {
+    const transactionSignature = await program.methods
+      .initialize()
+      .accounts({
+        user: user.publicKey,
+        pdaAccount: PDA,
+      })
+      .rpc();
+
+    console.log("Transaction Signature:", transactionSignature);
+  });
+
+  it("Fetch Account", async () => {
+    const pdaAccount = await program.account.dataAccount.fetch(PDA);
+    console.log(JSON.stringify(pdaAccount, null, 2));
+  });
+});
+```
+
+### Cross Program Invocation (CPI)
+
