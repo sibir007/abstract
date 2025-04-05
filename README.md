@@ -6,871 +6,871 @@
       - [Variables and Mutability](#variables-and-mutability)
           - [1. When a variable is immutable?](#1-when-a-variable-is-immutable)
           - [2. What is constant?](#2-what-is-constant)
-          - [How differense between constants and variables?](#how-differense-between-constants-and-variables)
-          - [What Rust’s naming convention for constants?](#what-rusts-naming-convention-for-constants)
-          - [When Constants are valid?](#when-constants-are-valid)
-          - [3. What is Shadowing?](#3-what-is-shadowing)
-          - [What different Shadowing from marking mut?](#what-different-shadowing-from-marking-mut)
+          - [3. How differense between constants and variables?](#3-how-differense-between-constants-and-variables)
+          - [4. What Rust’s naming convention for constants?](#4-what-rusts-naming-convention-for-constants)
+          - [5. When Constants are valid?](#5-when-constants-are-valid)
+          - [6. What is Shadowing?](#6-what-is-shadowing)
+          - [7. What different Shadowing from marking mut?](#7-what-different-shadowing-from-marking-mut)
       - [Data Types](#data-types)
-          - [4. What means data types?](#4-what-means-data-types)
-          - [5. What subsets of data types are there in rust?](#5-what-subsets-of-data-types-are-there-in-rust)
-          - [6. What means that rust is statically typed language?](#6-what-means-that-rust-is-statically-typed-language)
-          - [How declared types in Rust?](#how-declared-types-in-rust)
-          - [7. What is scalar data types?](#7-what-is-scalar-data-types)
-          - [8. What is integer data type?](#8-what-is-integer-data-type)
-          - [9. What are there integers data types?](#9-what-are-there-integers-data-types)
-          - [10. What means Signed and Unsigned integer data type?](#10-what-means-signed-and-unsigned-integer-data-type)
-          - [11. How many value does it contain signed integer data types?](#11-how-many-value-does-it-contain-signed-integer-data-types)
-          - [12. How many value does it contain unsigned integer data types?](#12-how-many-value-does-it-contain-unsigned-integer-data-types)
-          - [13. what length are they `isize` and `usize` types?](#13-what-length-are-they-isize-and-usize-types)
-          - [14. what is the default integer data type in Rust?](#14-what-is-the-default-integer-data-type-in-rust)
-          - [15. What is integer overflow?](#15-what-is-integer-overflow)
-          - [15. What method are used to explicitly handle the possibility of integer overflow?](#15-what-method-are-used-to-explicitly-handle-the-possibility-of-integer-overflow)
-          - [16. What is floating-point data type?](#16-what-is-floating-point-data-type)
-          - [17. what is the default floating-point data type in Rust?](#17-what-is-the-default-floating-point-data-type-in-rust)
-          - [18. Signed or unsigned floating-point types?](#18-signed-or-unsigned-floating-point-types)
-          - [19. What is boolean data type?](#19-what-is-boolean-data-type)
-          - [20. What is char data type?](#20-what-is-char-data-type)
-          - [21. What is compound data types?](#21-what-is-compound-data-types)
-          - [22. What is tuple data type?](#22-what-is-tuple-data-type)
-          - [22. What is pattern matching data type?](#22-what-is-pattern-matching-data-type)
-          - [23. How to get access to tuple value?](#23-how-to-get-access-to-tuple-value)
-          - [24. What is it called tuple  without any values?](#24-what-is-it-called-tuple--without-any-values)
-          - [25. what do expressions return f they don’t return any other value.](#25-what-do-expressions-return-f-they-dont-return-any-other-value)
-          - [26. What is Array type?](#26-what-is-array-type)
-          - [How create array?](#how-create-array)
-          - [27. How Accessing Array Elements?](#27-how-accessing-array-elements)
+          - [8. What means data types?](#8-what-means-data-types)
+          - [9. What subsets of data types are there in rust?](#9-what-subsets-of-data-types-are-there-in-rust)
+          - [10. What means that rust is statically typed language?](#10-what-means-that-rust-is-statically-typed-language)
+          - [11. How declared types in Rust?](#11-how-declared-types-in-rust)
+          - [12. What is scalar data types?](#12-what-is-scalar-data-types)
+          - [13. What is integer data type?](#13-what-is-integer-data-type)
+          - [14. What are there integers data types?](#14-what-are-there-integers-data-types)
+          - [15. What means Signed and Unsigned integer data type?](#15-what-means-signed-and-unsigned-integer-data-type)
+          - [16. How many value does it contain signed integer data types?](#16-how-many-value-does-it-contain-signed-integer-data-types)
+          - [17. How many value does it contain unsigned integer data types?](#17-how-many-value-does-it-contain-unsigned-integer-data-types)
+          - [18. what length are they `isize` and `usize` types?](#18-what-length-are-they-isize-and-usize-types)
+          - [19. what is the default integer data type in Rust?](#19-what-is-the-default-integer-data-type-in-rust)
+          - [20. What is integer overflow?](#20-what-is-integer-overflow)
+          - [21. What method are used to explicitly handle the possibility of integer overflow?](#21-what-method-are-used-to-explicitly-handle-the-possibility-of-integer-overflow)
+          - [22. What is floating-point data type?](#22-what-is-floating-point-data-type)
+          - [23. what is the default floating-point data type in Rust?](#23-what-is-the-default-floating-point-data-type-in-rust)
+          - [24. Signed or unsigned floating-point types?](#24-signed-or-unsigned-floating-point-types)
+          - [25. What is boolean data type?](#25-what-is-boolean-data-type)
+          - [26. What is char data type?](#26-what-is-char-data-type)
+          - [27. What is compound data types?](#27-what-is-compound-data-types)
+          - [28. What is tuple data type?](#28-what-is-tuple-data-type)
+          - [29. What is pattern matching data type?](#29-what-is-pattern-matching-data-type)
+          - [30. How to get access to tuple value?](#30-how-to-get-access-to-tuple-value)
+          - [31. What is it called tuple  without any values?](#31-what-is-it-called-tuple--without-any-values)
+          - [32. what do expressions return f they don’t return any other value.](#32-what-do-expressions-return-f-they-dont-return-any-other-value)
+          - [33. What is Array type?](#33-what-is-array-type)
+          - [34. How create array?](#34-how-create-array)
+          - [35. How Accessing Array Elements?](#35-how-accessing-array-elements)
       - [Functions](#functions)
-          - [28. What is the entry point in program in Rust](#28-what-is-the-entry-point-in-program-in-rust)
-          - [29. How to define function](#29-how-to-define-function)
-          - [30. How to write correctly function name?](#30-how-to-write-correctly-function-name)
-          - [31. How to call function](#31-how-to-call-function)
-          - [32. What is parameters function?](#32-what-is-parameters-function)
+          - [36. What is the entry point in program in Rust](#36-what-is-the-entry-point-in-program-in-rust)
+          - [37. How to define function](#37-how-to-define-function)
+          - [38. How to write correctly function name?](#38-how-to-write-correctly-function-name)
+          - [39. How to call function](#39-how-to-call-function)
+          - [40. What is parameters function?](#40-what-is-parameters-function)
       - [Statements and Expressions](#statements-and-expressions)
-          - [33. What is Statement and Expression](#33-what-is-statement-and-expression)
-          - [34. How function return values?](#34-how-function-return-values)
+          - [41. What is Statement and Expression](#41-what-is-statement-and-expression)
+          - [42. How function return values?](#42-how-function-return-values)
       - [Comments](#comments)
-          - [35. How in Rust write comment?](#35-how-in-rust-write-comment)
+          - [43. How in Rust write comment?](#43-how-in-rust-write-comment)
       - [Control Flow - If expression](#control-flow---if-expression)
-          - [36. what is "If" expression used for?](#36-what-is-if-expression-used-for)
-          - [37. Can use If expression in  let statement?](#37-can-use-if-expression-in--let-statement)
+          - [44. what is "If" expression used for?](#44-what-is-if-expression-used-for)
+          - [45. Can use If expression in  let statement?](#45-can-use-if-expression-in--let-statement)
       - [Control Flow - Loops](#control-flow---loops)
-          - [39. what are Loops needed for](#39-what-are-loops-needed-for)
-          - [40. what types of iterations are there in Rust](#40-what-types-of-iterations-are-there-in-rust)
-          - [41. what is "loop" keyword used for?](#41-what-is-loop-keyword-used-for)
-          - [42. how stop execution `loop`?](#42-how-stop-execution-loop)
-          - [43. how to continue a `loop` from the beginning at a certain point?](#43-how-to-continue-a-loop-from-the-beginning-at-a-certain-point)
-          - [44. How return value from `loop`](#44-how-return-value-from-loop)
-          - [45. How use Labels in Loops?](#45-how-use-labels-in-loops)
-          - [46. how can i implement conditional iteration - while](#46-how-can-i-implement-conditional-iteration---while)
-          - [47. how can i implement iteration of collection of elements - for](#47-how-can-i-implement-iteration-of-collection-of-elements---for)
-          - [48. countdown example by using `for` loop](#48-countdown-example-by-using-for-loop)
+          - [46. what are Loops needed for](#46-what-are-loops-needed-for)
+          - [47. what types of iterations are there in Rust](#47-what-types-of-iterations-are-there-in-rust)
+          - [48. what is "loop" keyword used for?](#48-what-is-loop-keyword-used-for)
+          - [49. how stop execution `loop`?](#49-how-stop-execution-loop)
+          - [50. how to continue a `loop` from the beginning at a certain point?](#50-how-to-continue-a-loop-from-the-beginning-at-a-certain-point)
+          - [51. How return value from `loop`](#51-how-return-value-from-loop)
+          - [52. How use Labels in Loops?](#52-how-use-labels-in-loops)
+          - [53. how can i implement conditional iteration - while](#53-how-can-i-implement-conditional-iteration---while)
+          - [54. how can i implement iteration of collection of elements - for](#54-how-can-i-implement-iteration-of-collection-of-elements---for)
+          - [55. countdown example by using `for` loop](#55-countdown-example-by-using-for-loop)
     - [4. Understanding Ownership](#4-understanding-ownership)
-          - [What concepts ensure memory safety in Rust programs at compile time](#what-concepts-ensure-memory-safety-in-rust-programs-at-compile-time)
+          - [56. What concepts ensure memory safety in Rust programs at compile time](#56-what-concepts-ensure-memory-safety-in-rust-programs-at-compile-time)
       - [Ownership](#ownership)
-          - [49. Why do you need to manage memory?](#49-why-do-you-need-to-manage-memory)
-          - [51. What's the difference between stack and heap](#51-whats-the-difference-between-stack-and-heap)
-          - [51.1 What is Stack?](#511-what-is-stack)
-          - [51.2 What is Heap?](#512-what-is-heap)
-          - [49. What are the methods of memory management?](#49-what-are-the-methods-of-memory-management)
-          - [50. What is the problem associated with memory management?](#50-what-is-the-problem-associated-with-memory-management)
-          - [49. What Is Ownership?](#49-what-is-ownership)
-          - [52. Ownership Rules?](#52-ownership-rules)
-          - [53. how does memory allocation happen in Rust?](#53-how-does-memory-allocation-happen-in-rust)
-          - [53. What is scope?](#53-what-is-scope)
-          - [54. how does memory free happen in Rust?](#54-how-does-memory-free-happen-in-rust)
-          - [53. What happens when we assign a variable to another variable?](#53-what-happens-when-we-assign-a-variable-to-another-variable)
-          - [54. What is Move?](#54-what-is-move)
-          - [54. where in a code a variable is valid?](#54-where-in-a-code-a-variable-is-valid)
-          - [55. What is ownership pattern?](#55-what-is-ownership-pattern)
-          - [55 What do deep copy i.e. not only copy of stack data, bat heep data](#55-what-do-deep-copy-ie-not-only-copy-of-stack-data-bat-heep-data)
-          - [56 what happens when we assign a variable whose value type implements the Copy trait, to another variable?](#56-what-happens-when-we-assign-a-variable-whose-value-type-implements-the-copy-trait-to-another-variable)
-          - [57 what happens when we annotate a type with Copy if the type, or any of its parts, has implemented the Drop trait?](#57-what-happens-when-we-annotate-a-type-with-copy-if-the-type-or-any-of-its-parts-has-implemented-the-drop-trait)
-          - [58. What types implement the Copy trait?](#58-what-types-implement-the-copy-trait)
-          - [59. What happen when we passing a value to a function?](#59-what-happen-when-we-passing-a-value-to-a-function)
+          - [57. Why do you need to manage memory?](#57-why-do-you-need-to-manage-memory)
+          - [58. What's the difference between stack and heap](#58-whats-the-difference-between-stack-and-heap)
+          - [59. What is Stack?](#59-what-is-stack)
+          - [60. What is Heap?](#60-what-is-heap)
+          - [61. What are the methods of memory management?](#61-what-are-the-methods-of-memory-management)
+          - [62. What is the problem associated with memory management?](#62-what-is-the-problem-associated-with-memory-management)
+          - [63. What Is Ownership?](#63-what-is-ownership)
+          - [64. Ownership Rules?](#64-ownership-rules)
+          - [65. how does memory allocation happen in Rust?](#65-how-does-memory-allocation-happen-in-rust)
+          - [66. What is scope?](#66-what-is-scope)
+          - [67. how does memory free happen in Rust?](#67-how-does-memory-free-happen-in-rust)
+          - [68. What happens when we assign a variable to another variable?](#68-what-happens-when-we-assign-a-variable-to-another-variable)
+          - [69. What is Move?](#69-what-is-move)
+          - [70. where in a code a variable is valid?](#70-where-in-a-code-a-variable-is-valid)
+          - [71. What is ownership pattern?](#71-what-is-ownership-pattern)
+          - [72. What do deep copy i.e. not only copy of stack data, bat heep data](#72-what-do-deep-copy-ie-not-only-copy-of-stack-data-bat-heep-data)
+          - [73. what happens when we assign a variable whose value type implements the Copy trait, to another variable?](#73-what-happens-when-we-assign-a-variable-whose-value-type-implements-the-copy-trait-to-another-variable)
+          - [74. what happens when we annotate a type with Copy if the type, or any of its parts, has implemented the Drop trait?](#74-what-happens-when-we-annotate-a-type-with-copy-if-the-type-or-any-of-its-parts-has-implemented-the-drop-trait)
+          - [75. What types implement the Copy trait?](#75-what-types-implement-the-copy-trait)
+          - [76. What happen when we passing a value to a function?](#76-what-happen-when-we-passing-a-value-to-a-function)
       - [References and Borrowing](#references-and-borrowing)
-          - [60. What is reference?](#60-what-is-reference)
-          - [61. why do we need to pass a reference and not a value?](#61-why-do-we-need-to-pass-a-reference-and-not-a-value)
-          - [What is Borrowing?](#what-is-borrowing)
-          - [what happens if we try to modify something we’re borrowing?](#what-happens-if-we-try-to-modify-something-were-borrowing)
-          - [What needs to be done to create a mutable reference?](#what-needs-to-be-done-to-create-a-mutable-reference)
-          - [What is a reference’s scope](#what-is-a-references-scope)
-          - [What restriction have a mutable references?](#what-restriction-have-a-mutable-references)
-          - [What is a dangling pointer?](#what-is-a-dangling-pointer)
-          - [How the problem of dangling pointer solved in Rust?](#how-the-problem-of-dangling-pointer-solved-in-rust)
-          - [Rules of References?](#rules-of-references)
+          - [77. What is reference?](#77-what-is-reference)
+          - [78. why do we need to pass a reference and not a value?](#78-why-do-we-need-to-pass-a-reference-and-not-a-value)
+          - [79. What is Borrowing?](#79-what-is-borrowing)
+          - [80. what happens if we try to modify something we’re borrowing?](#80-what-happens-if-we-try-to-modify-something-were-borrowing)
+          - [81. What needs to be done to create a mutable reference?](#81-what-needs-to-be-done-to-create-a-mutable-reference)
+          - [82. What is a reference’s scope](#82-what-is-a-references-scope)
+          - [83. What restriction have a mutable references?](#83-what-restriction-have-a-mutable-references)
+          - [84. What is a dangling pointer?](#84-what-is-a-dangling-pointer)
+          - [85. How the problem of dangling pointer solved in Rust?](#85-how-the-problem-of-dangling-pointer-solved-in-rust)
+          - [86. Rules of References?](#86-rules-of-references)
       - [The Slice Type](#the-slice-type)
-          - [What is Slice?](#what-is-slice)
-          - [Does Slice have Ownership?](#does-slice-have-ownership)
-          - [What is String Slices?](#what-is-string-slices)
-          - [How in Slice to start at index 0?](#how-in-slice-to-start-at-index-0)
-          - [How to go to the last index in slice?](#how-to-go-to-the-last-index-in-slice)
-          - [How to get all String in Slice?](#how-to-get-all-string-in-slice)
-          - [How  rewrite first\_word to return a slice?](#how--rewrite-first_word-to-return-a-slice)
-          - [What type string literal?](#what-type-string-literal)
-          - [How we can pass a String to string slice?](#how-we-can-pass-a-string-to-string-slice)
+          - [87. What is Slice?](#87-what-is-slice)
+          - [88. Does Slice have Ownership?](#88-does-slice-have-ownership)
+          - [89. What is String Slices?](#89-what-is-string-slices)
+          - [90. How in Slice to start at index 0?](#90-how-in-slice-to-start-at-index-0)
+          - [91. How to go to the last index in slice?](#91-how-to-go-to-the-last-index-in-slice)
+          - [92. How to get all String in Slice?](#92-how-to-get-all-string-in-slice)
+          - [93. How  rewrite first\_word to return a slice?](#93-how--rewrite-first_word-to-return-a-slice)
+          - [94. What type string literal?](#94-what-type-string-literal)
+          - [95. How we can pass a String to string slice?](#95-how-we-can-pass-a-string-to-string-slice)
     - [5. Using Structs to Structure Related Data](#5-using-structs-to-structure-related-data)
-          - [What is Struct?](#what-is-struct)
+          - [96. What is Struct?](#96-what-is-struct)
       - [5.1 Defining and Instantiating Structs](#51-defining-and-instantiating-structs)
-          - [What is the similarity structs and tuples?](#what-is-the-similarity-structs-and-tuples)
-          - [What is the difference structs and tuples?](#what-is-the-difference-structs-and-tuples)
-          - [How are structures over tuples more flexible?](#how-are-structures-over-tuples-more-flexible)
-          - [How define Struct?](#how-define-struct)
-          - [What are Struct fields?](#what-are-struct-fields)
-          - [How is defined Struct used?](#how-is-defined-struct-used)
-          - [How we create instance of the struct?](#how-we-create-instance-of-the-struct)
-          - [In what order do we specify field when creating struct?](#in-what-order-do-we-specify-field-when-creating-struct)
-          - [How to get a specific value from a struct?](#how-to-get-a-specific-value-from-a-struct)
-          - [What is needed to be able to change the value of the Struct field?](#what-is-needed-to-be-able-to-change-the-value-of-the-struct-field)
-          - [What is 'field init shorthand' syntax?](#what-is-field-init-shorthand-syntax)
-          - [What is 'struct update' syntax?](#what-is-struct-update-syntax)
-          - [What is Tuple Structs?](#what-is-tuple-structs)
-          - [How define Tuple Struct?](#how-define-tuple-struct)
-          - [What is Unit-Like Structs?](#what-is-unit-like-structs)
-          - [How define Unit-Like Struct?](#how-define-unit-like-struct)
-          - [What are Unit-Like Structs for?](#what-are-unit-like-structs-for)
-          - [Is it possible to create a structure that stores references to data that someone else owned?](#is-it-possible-to-create-a-structure-that-stores-references-to-data-that-someone-else-owned)
+          - [97. What is the similarity structs and tuples?](#97-what-is-the-similarity-structs-and-tuples)
+          - [98. What is the difference structs and tuples?](#98-what-is-the-difference-structs-and-tuples)
+          - [99. How are structures over tuples more flexible?](#99-how-are-structures-over-tuples-more-flexible)
+          - [100. How define Struct?](#100-how-define-struct)
+          - [101. What are Struct fields?](#101-what-are-struct-fields)
+          - [102. How is defined Struct used?](#102-how-is-defined-struct-used)
+          - [103. How we create instance of the struct?](#103-how-we-create-instance-of-the-struct)
+          - [104. In what order do we specify field when creating struct?](#104-in-what-order-do-we-specify-field-when-creating-struct)
+          - [105. How to get a specific value from a struct?](#105-how-to-get-a-specific-value-from-a-struct)
+          - [106. What is needed to be able to change the value of the Struct field?](#106-what-is-needed-to-be-able-to-change-the-value-of-the-struct-field)
+          - [107. What is 'field init shorthand' syntax?](#107-what-is-field-init-shorthand-syntax)
+          - [108. What is 'struct update' syntax?](#108-what-is-struct-update-syntax)
+          - [109. What is Tuple Structs?](#109-what-is-tuple-structs)
+          - [110. How define Tuple Struct?](#110-how-define-tuple-struct)
+          - [111. What is Unit-Like Structs?](#111-what-is-unit-like-structs)
+          - [112. How define Unit-Like Struct?](#112-how-define-unit-like-struct)
+          - [113. What are Unit-Like Structs for?](#113-what-are-unit-like-structs-for)
+          - [114. Is it possible to create a structure that stores references to data that someone else owned?](#114-is-it-possible-to-create-a-structure-that-stores-references-to-data-that-someone-else-owned)
       - [5.2 An Example Program Using Structs](#52-an-example-program-using-structs)
-          - [What means curly brackets in 'println!'?](#what-means-curly-brackets-in-println)
-          - [How we can add printing an instance of Struct while we’re debugging our program and see the values for all its fields?](#how-we-can-add-printing-an-instance-of-struct-while-were-debugging-our-program-and-see-the-values-for-all-its-fields)
-          - [How we can implement Display or Debug trait in Struct?](#how-we-can-implement-display-or-debug-trait-in-struct)
-          - [What is difference between `println!` and `dbg!` macro](#what-is-difference-between-println-and-dbg-macro)
-          - [What other attributes are there besides 'derive'?](#what-other-attributes-are-there-besides-derive)
+          - [115. What means curly brackets in 'println!'?](#115-what-means-curly-brackets-in-println)
+          - [116. How we can add printing an instance of Struct while we’re debugging our program and see the values for all its fields?](#116-how-we-can-add-printing-an-instance-of-struct-while-were-debugging-our-program-and-see-the-values-for-all-its-fields)
+          - [117. How we can implement Display or Debug trait in Struct?](#117-how-we-can-implement-display-or-debug-trait-in-struct)
+          - [118. What is difference between `println!` and `dbg!` macro](#118-what-is-difference-between-println-and-dbg-macro)
+          - [119. What other attributes are there besides 'derive'?](#119-what-other-attributes-are-there-besides-derive)
       - [5.3 Method Syntax](#53-method-syntax)
-          - [What is a "Method"?](#what-is-a-method)
-          - [How to define a method?](#how-to-define-a-method)
-          - [What difference using `&self` `&mut self` and `self` in method?](#what-difference-using-self-mut-self-and-self-in-method)
-          - [Do we can use equal names for fields and methods in Struct?](#do-we-can-use-equal-names-for-fields-and-methods-in-struct)
-          - [How called all functions defined in Struct impl block?](#how-called-all-functions-defined-in-struct-impl-block)
-          - [Do can we create association function without self as first argument?](#do-can-we-create-association-function-without-self-as-first-argument)
-          - [How do we call association function?](#how-do-we-call-association-function)
-          - [How many impl Blocks can do have Struct?](#how-many-impl-blocks-can-do-have-struct)
+          - [120. What is a "Method"?](#120-what-is-a-method)
+          - [121. How to define a method?](#121-how-to-define-a-method)
+          - [122. What difference using `&self` `&mut self` and `self` in method?](#122-what-difference-using-self-mut-self-and-self-in-method)
+          - [123. Do we can use equal names for fields and methods in Struct?](#123-do-we-can-use-equal-names-for-fields-and-methods-in-struct)
+          - [124. How called all functions defined in Struct impl block?](#124-how-called-all-functions-defined-in-struct-impl-block)
+          - [125. Do can we create association function without self as first argument?](#125-do-can-we-create-association-function-without-self-as-first-argument)
+          - [126. How do we call association function?](#126-how-do-we-call-association-function)
+          - [127. How many impl Blocks can do have Struct?](#127-how-many-impl-blocks-can-do-have-struct)
     - [6. Enums and Pattern Matching](#6-enums-and-pattern-matching)
-          - [What is enum used for?](#what-is-enum-used-for)
+          - [128. What is enum used for?](#128-what-is-enum-used-for)
       - [6.1 Defining an Enum](#61-defining-an-enum)
-          - [How define Enum?](#how-define-enum)
-          - [what called enum instances?](#what-called-enum-instances)
-          - [How can we get an enum variant?](#how-can-we-get-an-enum-variant)
-          - [Do can we used enum type as function parameter?](#do-can-we-used-enum-type-as-function-parameter)
-          - [How we can define method in enum?](#how-we-can-define-method-in-enum)
-          - [What is Null value?](#what-is-null-value)
-          - [How in Rust implementing Null value?](#how-in-rust-implementing-null-value)
-          - [How do we can use Options variants?](#how-do-we-can-use-options-variants)
-          - [For what using `Options<T>` type?](#for-what-using-optionst-type)
+          - [129. How define Enum?](#129-how-define-enum)
+          - [130. what called enum instances?](#130-what-called-enum-instances)
+          - [131. How can we get an enum variant?](#131-how-can-we-get-an-enum-variant)
+          - [132. Do can we used enum type as function parameter?](#132-do-can-we-used-enum-type-as-function-parameter)
+          - [133. How we can define method in enum?](#133-how-we-can-define-method-in-enum)
+          - [134. What is Null value?](#134-what-is-null-value)
+          - [135. How in Rust implementing Null value?](#135-how-in-rust-implementing-null-value)
+          - [136. How do we can use Options variants?](#136-how-do-we-can-use-options-variants)
+          - [137. For what using `Options<T>` type?](#137-for-what-using-optionst-type)
       - [6.2 The match Control Flow Construct](#62-the-match-control-flow-construct)
-          - [What is `match`?](#what-is-match)
-          - [How `match` works?](#how-match-works)
-          - [How to extract values out of enum variants?](#how-to-extract-values-out-of-enum-variants)
-          - [How to extract values out of `Option<T>` enum?](#how-to-extract-values-out-of-optiont-enum)
-          - [Do we match all possibilities in match expression?](#do-we-match-all-possibilities-in-match-expression)
-          - [What are methods for match all possibilities in match expression?](#what-are-methods-for-match-all-possibilities-in-match-expression)
-          - [What is difference between usage `other` and `_` keyword in `match`](#what-is-difference-between-usage-other-and-_-keyword-in-match)
+          - [138. What is `match`?](#138-what-is-match)
+          - [139. How `match` works?](#139-how-match-works)
+          - [140. How to extract values out of enum variants?](#140-how-to-extract-values-out-of-enum-variants)
+          - [141. How to extract values out of `Option<T>` enum?](#141-how-to-extract-values-out-of-optiont-enum)
+          - [142. Do we match all possibilities in match expression?](#142-do-we-match-all-possibilities-in-match-expression)
+          - [143. What are methods for match all possibilities in match expression?](#143-what-are-methods-for-match-all-possibilities-in-match-expression)
+          - [144. What is difference between usage `other` and `_` keyword in `match`](#144-what-is-difference-between-usage-other-and-_-keyword-in-match)
       - [6.3 Concise Control Flow with if let and let else](#63-concise-control-flow-with-if-let-and-let-else)
-          - [What is `if let` control flow syntax?](#what-is-if-let-control-flow-syntax)
+          - [145. What is `if let` control flow syntax?](#145-what-is-if-let-control-flow-syntax)
     - [7. Managing Growing Projects with Packages, Crates, and Modules](#7-managing-growing-projects-with-packages-crates-and-modules)
       - [7.1 Packages and Crates](#71-packages-and-crates)
-          - [What is Crate?](#what-is-crate)
-          - [What forms crates exists?](#what-forms-crates-exists)
-          - [What is Binary crates?](#what-is-binary-crates)
-          - [what is the distinctive feature Binary crates?](#what-is-the-distinctive-feature-binary-crates)
-          - [What is Library crates?](#what-is-library-crates)
-          - [What is crate root?](#what-is-crate-root)
-          - [What is package?](#what-is-package)
-          - [How many crates can have package?](#how-many-crates-can-have-package)
-          - [How many library crates can have package?](#how-many-library-crates-can-have-package)
-          - [How many binary crates can have package?](#how-many-binary-crates-can-have-package)
-          - [What is Cargo?](#what-is-cargo)
-          - [How create package?](#how-create-package)
-          - [what structure of package directory created 'cargo new'?](#what-structure-of-package-directory-created-cargo-new)
-          - [How cargo understands what a package contain binary crate?](#how-cargo-understands-what-a-package-contain-binary-crate)
-          - [How cargo understands what a package contain library crate?](#how-cargo-understands-what-a-package-contain-library-crate)
-          - [How a package can have multiple binary crate?](#how-a-package-can-have-multiple-binary-crate)
+          - [146. What is Crate?](#146-what-is-crate)
+          - [147. What forms crates exists?](#147-what-forms-crates-exists)
+          - [148. What is Binary crates?](#148-what-is-binary-crates)
+          - [149. what is the distinctive feature Binary crates?](#149-what-is-the-distinctive-feature-binary-crates)
+          - [150. What is Library crates?](#150-what-is-library-crates)
+          - [151. What is crate root?](#151-what-is-crate-root)
+          - [152. What is package?](#152-what-is-package)
+          - [153. How many crates can have package?](#153-how-many-crates-can-have-package)
+          - [154. How many library crates can have package?](#154-how-many-library-crates-can-have-package)
+          - [155. How many binary crates can have package?](#155-how-many-binary-crates-can-have-package)
+          - [156. What is Cargo?](#156-what-is-cargo)
+          - [157. How create package?](#157-how-create-package)
+          - [158. what structure of package directory created 'cargo new'?](#158-what-structure-of-package-directory-created-cargo-new)
+          - [159. How cargo understands what a package contain binary crate?](#159-how-cargo-understands-what-a-package-contain-binary-crate)
+          - [160. How cargo understands what a package contain library crate?](#160-how-cargo-understands-what-a-package-contain-library-crate)
+          - [161. How a package can have multiple binary crate?](#161-how-a-package-can-have-multiple-binary-crate)
       - [7.2 Defining Modules to Control Scope and Privacy](#72-defining-modules-to-control-scope-and-privacy)
-          - [What is first a compiler does when it compiles a crate?](#what-is-first-a-compiler-does-when-it-compiles-a-crate)
-          - [Where compiler look for module code for module declared in crate root, i.e. src/lib.rs or src/main.rs?](#where-compiler-look-for-module-code-for-module-declared-in-crate-root-ie-srclibrs-or-srcmainrs)
-          - [Where compiler look for module code for module declared in any file other than crate root, i.e. code for submodule?](#where-compiler-look-for-module-code-for-module-declared-in-any-file-other-than-crate-root-ie-code-for-submodule)
-          - [When and How we can refer to code in module?](#when-and-how-we-can-refer-to-code-in-module)
-          - [How to do within module public?](#how-to-do-within-module-public)
-          - [For what is used `use` keyword?](#for-what-is-used-use-keyword)
-          - [For what is used modules?](#for-what-is-used-modules)
-          - [For what is used private items?](#for-what-is-used-private-items)
-          - [For what is make modules and the items within them public.](#for-what-is-make-modules-and-the-items-within-them-public)
-          - [How we can create library crate?](#how-we-can-create-library-crate)
-          - [How we can structure crate?](#how-we-can-structure-crate)
-          - [Why `src/main.rs` and `src/lib.rs` are called crate roots?](#why-srcmainrs-and-srclibrs-are-called-crate-roots)
-          - [What is module tree?](#what-is-module-tree)
-          - [What does means that some modules a *siblings*?](#what-does-means-that-some-modules-a-siblings)
-          - [What does means that some module a child of other module?](#what-does-means-that-some-module-a-child-of-other-module)
-          - [What does means that some module a parent of other module?](#what-does-means-that-some-module-a-parent-of-other-module)
+          - [162. What is first a compiler does when it compiles a crate?](#162-what-is-first-a-compiler-does-when-it-compiles-a-crate)
+          - [163. Where compiler look for module code for module declared in crate root, i.e. src/lib.rs or src/main.rs?](#163-where-compiler-look-for-module-code-for-module-declared-in-crate-root-ie-srclibrs-or-srcmainrs)
+          - [164. Where compiler look for module code for module declared in any file other than crate root, i.e. code for submodule?](#164-where-compiler-look-for-module-code-for-module-declared-in-any-file-other-than-crate-root-ie-code-for-submodule)
+          - [165. When and How we can refer to code in module?](#165-when-and-how-we-can-refer-to-code-in-module)
+          - [166. How to do within module public?](#166-how-to-do-within-module-public)
+          - [167. For what is used `use` keyword?](#167-for-what-is-used-use-keyword)
+          - [168. For what is used modules?](#168-for-what-is-used-modules)
+          - [169. For what is used private items?](#169-for-what-is-used-private-items)
+          - [170. For what is make modules and the items within them public.](#170-for-what-is-make-modules-and-the-items-within-them-public)
+          - [171. How we can create library crate?](#171-how-we-can-create-library-crate)
+          - [172. How we can structure crate?](#172-how-we-can-structure-crate)
+          - [173. Why `src/main.rs` and `src/lib.rs` are called crate roots?](#173-why-srcmainrs-and-srclibrs-are-called-crate-roots)
+          - [174. What is module tree?](#174-what-is-module-tree)
+          - [175. What does means that some modules a *siblings*?](#175-what-does-means-that-some-modules-a-siblings)
+          - [176. What does means that some module a child of other module?](#176-what-does-means-that-some-module-a-child-of-other-module)
+          - [177. What does means that some module a parent of other module?](#177-what-does-means-that-some-module-a-parent-of-other-module)
       - [7.3 Paths for Referring to an Item in the Module Tree](#73-paths-for-referring-to-an-item-in-the-module-tree)
-          - [For what using Paths?](#for-what-using-paths)
-          - [What forms does Path have?](#what-forms-does-path-have)
-          - [What is absolute path?](#what-is-absolute-path)
-          - [What is relative path?](#what-is-relative-path)
-          - [How to choose whether to use a relative or absolute path?](#how-to-choose-whether-to-use-a-relative-or-absolute-path)
-          - [What a items in Rust?](#what-a-items-in-rust)
-          - [What is the default visibility of items in Rust](#what-is-the-default-visibility-of-items-in-rust)
-          - [Can child items use the items it their ancestor modules?](#can-child-items-use-the-items-it-their-ancestor-modules)
-          - [What make item private?](#what-make-item-private)
-          - [How  to expose inner parts of child modules’ code?](#how--to-expose-inner-parts-of-child-modules-code)
-          - [How to construct relative paths that begin in the parent module?](#how-to-construct-relative-paths-that-begin-in-the-parent-module)
-          - [what are the default fields of a structure?](#what-are-the-default-fields-of-a-structure)
-          - [How to create an struct instance from struct whit a private fields?](#how-to-create-an-struct-instance-from-struct-whit-a-private-fields)
-          - [what are the default enum variants?](#what-are-the-default-enum-variants)
-          - [How to make enum variants public?](#how-to-make-enum-variants-public)
+          - [178. For what using Paths?](#178-for-what-using-paths)
+          - [179. What forms does Path have?](#179-what-forms-does-path-have)
+          - [180. What is absolute path?](#180-what-is-absolute-path)
+          - [181. What is relative path?](#181-what-is-relative-path)
+          - [182. How to choose whether to use a relative or absolute path?](#182-how-to-choose-whether-to-use-a-relative-or-absolute-path)
+          - [183. What a items in Rust?](#183-what-a-items-in-rust)
+          - [184. What is the default visibility of items in Rust](#184-what-is-the-default-visibility-of-items-in-rust)
+          - [185. Can child items use the items it their ancestor modules?](#185-can-child-items-use-the-items-it-their-ancestor-modules)
+          - [186. What make item private?](#186-what-make-item-private)
+          - [187. How  to expose inner parts of child modules’ code?](#187-how--to-expose-inner-parts-of-child-modules-code)
+          - [188. How to construct relative paths that begin in the parent module?](#188-how-to-construct-relative-paths-that-begin-in-the-parent-module)
+          - [189. what are the default fields of a structure?](#189-what-are-the-default-fields-of-a-structure)
+          - [190. How to create an struct instance from struct whit a private fields?](#190-how-to-create-an-struct-instance-from-struct-whit-a-private-fields)
+          - [191. what are the default enum variants?](#191-what-are-the-default-enum-variants)
+          - [192. How to make enum variants public?](#192-how-to-make-enum-variants-public)
       - [7.4 Bringing Paths into Scope with the use Keyword](#74-bringing-paths-into-scope-with-the-use-keyword)
-          - [Why use `use` keyword?](#why-use-use-keyword)
-          - [How do I make a name obtained with the "use" keyword available to code in another scope?](#how-do-i-make-a-name-obtained-with-the-use-keyword-available-to-code-in-another-scope)
+          - [193. Why use `use` keyword?](#193-why-use-use-keyword)
+          - [194. How do I make a name obtained with the "use" keyword available to code in another scope?](#194-how-do-i-make-a-name-obtained-with-the-use-keyword-available-to-code-in-another-scope)
       - [How bringing two items with the same name into scope with `use` statements?](#how-bringing-two-items-with-the-same-name-into-scope-with-use-statements)
-          - [How to use External Packages?](#how-to-use-external-packages)
-          - [How we can bring multiple items defined in the same crate or same module into scope by using one line?](#how-we-can-bring-multiple-items-defined-in-the-same-crate-or-same-module-into-scope-by-using-one-line)
-          - [When we can use 'self' into 'use' statement?](#when-we-can-use-self-into-use-statement)
-          - [How we can brings all public items defined in path into scope?](#how-we-can-brings-all-public-items-defined-in-path-into-scope)
+          - [195. How to use External Packages?](#195-how-to-use-external-packages)
+          - [196. How we can bring multiple items defined in the same crate or same module into scope by using one line?](#196-how-we-can-bring-multiple-items-defined-in-the-same-crate-or-same-module-into-scope-by-using-one-line)
+          - [197. When we can use 'self' into 'use' statement?](#197-when-we-can-use-self-into-use-statement)
+          - [198. How we can brings all public items defined in path into scope?](#198-how-we-can-brings-all-public-items-defined-in-path-into-scope)
       - [Separating Modules into Different Files](#separating-modules-into-different-files)
-          - [How we can extract module defined in file to its own file?](#how-we-can-extract-module-defined-in-file-to-its-own-file)
-          - [How Rust package system allow you organize program code?](#how-rust-package-system-allow-you-organize-program-code)
+          - [199. How we can extract module defined in file to its own file?](#199-how-we-can-extract-module-defined-in-file-to-its-own-file)
+          - [200. How Rust package system allow you organize program code?](#200-how-rust-package-system-allow-you-organize-program-code)
     - [8. Common Collections](#8-common-collections)
-          - [How unique are collections compared to other types?](#how-unique-are-collections-compared-to-other-types)
-          - [What difference between collections and array and tuple?](#what-difference-between-collections-and-array-and-tuple)
-          - [What is Vector collection?](#what-is-vector-collection)
-          - [What is String collection?](#what-is-string-collection)
-          - [What is Hash Map collection?](#what-is-hash-map-collection)
+          - [201. How unique are collections compared to other types?](#201-how-unique-are-collections-compared-to-other-types)
+          - [202. What difference between collections and array and tuple?](#202-what-difference-between-collections-and-array-and-tuple)
+          - [203. What is Vector collection?](#203-what-is-vector-collection)
+          - [204. What is String collection?](#204-what-is-string-collection)
+          - [205. What is Hash Map collection?](#205-what-is-hash-map-collection)
       - [8.1 Storing Lists of Values with Vectors](#81-storing-lists-of-values-with-vectors)
-          - [How create vector instance?](#how-create-vector-instance)
-          - [How update a Vector?](#how-update-a-vector)
-          - [How we can to read Elements of Vectors?](#how-we-can-to-read-elements-of-vectors)
-          - [What is difference between reference vector value by index and by means `get` method?](#what-is-difference-between-reference-vector-value-by-index-and-by-means-get-method)
-          - [In what cases did we used a reference to vector value by index?](#in-what-cases-did-we-used-a-reference-to-vector-value-by-index)
-          - [In what cases did we used a reference to vector value by means `get` method?](#in-what-cases-did-we-used-a-reference-to-vector-value-by-means-get-method)
-          - [Can we have immutable and mutable reference to vector value?](#can-we-have-immutable-and-mutable-reference-to-vector-value)
-          - [How we can Iterating Over the immutable Values in a Vector?](#how-we-can-iterating-over-the-immutable-values-in-a-vector)
-          - [How we can Iterating Over the mutable Values in a Vector?](#how-we-can-iterating-over-the-mutable-values-in-a-vector)
-          - [Can we modify the entire vector while iterating over the vector?](#can-we-modify-the-entire-vector-while-iterating-over-the-vector)
-          - [Can we store in vector values different types?](#can-we-store-in-vector-values-different-types)
-          - [How we can store in vector values different types?](#how-we-can-store-in-vector-values-different-types)
-          - [In case of using a vector with enum values holds different types, how can we handle these values?](#in-case-of-using-a-vector-with-enum-values-holds-different-types-how-can-we-handle-these-values)
-          - [Where vector API?](#where-vector-api)
+          - [206. How create vector instance?](#206-how-create-vector-instance)
+          - [207. How update a Vector?](#207-how-update-a-vector)
+          - [208. How we can to read Elements of Vectors?](#208-how-we-can-to-read-elements-of-vectors)
+          - [209. What is difference between reference vector value by index and by means `get` method?](#209-what-is-difference-between-reference-vector-value-by-index-and-by-means-get-method)
+          - [210. In what cases did we used a reference to vector value by index?](#210-in-what-cases-did-we-used-a-reference-to-vector-value-by-index)
+          - [211. In what cases did we used a reference to vector value by means `get` method?](#211-in-what-cases-did-we-used-a-reference-to-vector-value-by-means-get-method)
+          - [212. Can we have immutable and mutable reference to vector value?](#212-can-we-have-immutable-and-mutable-reference-to-vector-value)
+          - [213. How we can Iterating Over the immutable Values in a Vector?](#213-how-we-can-iterating-over-the-immutable-values-in-a-vector)
+          - [214. How we can Iterating Over the mutable Values in a Vector?](#214-how-we-can-iterating-over-the-mutable-values-in-a-vector)
+          - [215. Can we modify the entire vector while iterating over the vector?](#215-can-we-modify-the-entire-vector-while-iterating-over-the-vector)
+          - [216. Can we store in vector values different types?](#216-can-we-store-in-vector-values-different-types)
+          - [217. How we can store in vector values different types?](#217-how-we-can-store-in-vector-values-different-types)
+          - [218. In case of using a vector with enum values holds different types, how can we handle these values?](#218-in-case-of-using-a-vector-with-enum-values-holds-different-types-how-can-we-handle-these-values)
+          - [219. Where vector API?](#219-where-vector-api)
       - [8.2 Storing UTF-8 Encoded Text with Strings](#82-storing-utf-8-encoded-text-with-strings)
-          - [What Is a String?](#what-is-a-string)
-          - [How implemented String type?](#how-implemented-string-type)
-          - [How create new String?](#how-create-new-string)
-          - [How update a String?](#how-update-a-string)
-          - [What happen when we perform String Concatenation with the + Operator?](#what-happen-when-we-perform-string-concatenation-with-the--operator)
-          - [How `format!` macro works?](#how-format-macro-works)
-          - [What is string `deref coercion`?](#what-is-string-deref-coercion)
-          - [Can we access parts of a String using indexing syntax?](#can-we-access-parts-of-a-string-using-indexing-syntax)
-          - [Why doesn't Rust allow you to index a string?](#why-doesnt-rust-allow-you-to-index-a-string)
-          - [Can we slicing a String?](#can-we-slicing-a-string)
-          - [How we can iterate over String by Char?](#how-we-can-iterate-over-string-by-char)
-          - [How we can iterate over String by Bytes?](#how-we-can-iterate-over-string-by-bytes)
+          - [220. What Is a String?](#220-what-is-a-string)
+          - [221. How implemented String type?](#221-how-implemented-string-type)
+          - [222. How create new String?](#222-how-create-new-string)
+          - [223. How update a String?](#223-how-update-a-string)
+          - [224. What happen when we perform String Concatenation with the + Operator?](#224-what-happen-when-we-perform-string-concatenation-with-the--operator)
+          - [225. How `format!` macro works?](#225-how-format-macro-works)
+          - [226. What is string `deref coercion`?](#226-what-is-string-deref-coercion)
+          - [227. Can we access parts of a String using indexing syntax?](#227-can-we-access-parts-of-a-string-using-indexing-syntax)
+          - [228. Why doesn't Rust allow you to index a string?](#228-why-doesnt-rust-allow-you-to-index-a-string)
+          - [229. Can we slicing a String?](#229-can-we-slicing-a-string)
+          - [230. How we can iterate over String by Char?](#230-how-we-can-iterate-over-string-by-char)
+          - [231. How we can iterate over String by Bytes?](#231-how-we-can-iterate-over-string-by-bytes)
       - [8.3 Storing Keys with Associated Values in Hash Maps](#83-storing-keys-with-associated-values-in-hash-maps)
-          - [What is Hash Maps?](#what-is-hash-maps)
-          - [What are Hash Maps used for?](#what-are-hash-maps-used-for)
-          - [How to create hash maps?](#how-to-create-hash-maps)
-          - [How to access a value in Hash Map?](#how-to-access-a-value-in-hash-map)
-          - [What type does the `get` method of Hash Map return?](#what-type-does-the-get-method-of-hash-map-return)
-          - [How we can iterate over each key–value pair in a hash map?](#how-we-can-iterate-over-each-keyvalue-pair-in-a-hash-map)
-          - [How Hash Map to process Ownership?](#how-hash-map-to-process-ownership)
-          - [What happens if you insert a value into a hash map for an existing key?](#what-happens-if-you-insert-a-value-into-a-hash-map-for-an-existing-key)
-          - [How insert a Key and Value Only If a Key Isn’t Present?](#how-insert-a-key-and-value-only-if-a-key-isnt-present)
-          - [How to Update a Value Based on the Old Value?](#how-to-update-a-value-based-on-the-old-value)
-          - [In what order does iteration occur in a hash map?](#in-what-order-does-iteration-occur-in-a-hash-map)
-          - [What hashing function used in Hash Map?](#what-hashing-function-used-in-hash-map)
+          - [232. What is Hash Maps?](#232-what-is-hash-maps)
+          - [233. What are Hash Maps used for?](#233-what-are-hash-maps-used-for)
+          - [234. How to create hash maps?](#234-how-to-create-hash-maps)
+          - [235. How to access a value in Hash Map?](#235-how-to-access-a-value-in-hash-map)
+          - [236. What type does the `get` method of Hash Map return?](#236-what-type-does-the-get-method-of-hash-map-return)
+          - [237. How we can iterate over each key–value pair in a hash map?](#237-how-we-can-iterate-over-each-keyvalue-pair-in-a-hash-map)
+          - [238. How Hash Map to process Ownership?](#238-how-hash-map-to-process-ownership)
+          - [239. What happens if you insert a value into a hash map for an existing key?](#239-what-happens-if-you-insert-a-value-into-a-hash-map-for-an-existing-key)
+          - [240. How insert a Key and Value Only If a Key Isn’t Present?](#240-how-insert-a-key-and-value-only-if-a-key-isnt-present)
+          - [241. How to Update a Value Based on the Old Value?](#241-how-to-update-a-value-based-on-the-old-value)
+          - [242. In what order does iteration occur in a hash map?](#242-in-what-order-does-iteration-occur-in-a-hash-map)
+          - [243. What hashing function used in Hash Map?](#243-what-hashing-function-used-in-hash-map)
     - [9. Error Handling](#9-error-handling)
-          - [What error categories exist in Rust?](#what-error-categories-exist-in-rust)
+          - [244. What error categories exist in Rust?](#244-what-error-categories-exist-in-rust)
       - [9.1 Unrecoverable Errors with panic!](#91-unrecoverable-errors-with-panic)
-          - [What is unrecoverable errors?](#what-is-unrecoverable-errors)
-          - [What are alternative actions of Rust in case of panic?](#what-are-alternative-actions-of-rust-in-case-of-panic)
-          - [How and why switch from unwinding to aborting?](#how-and-why-switch-from-unwinding-to-aborting)
-          - [What ways to cause a panic in practice?](#what-ways-to-cause-a-panic-in-practice)
-          - [What actions does Rust take when panic occurs?](#what-actions-does-rust-take-when-panic-occurs)
-          - [what is backtrace?](#what-is-backtrace)
-          - [How to read a backtrace?](#how-to-read-a-backtrace)
-          - [what settings are needed to print the backtrace?](#what-settings-are-needed-to-print-the-backtrace)
+          - [245. What is unrecoverable errors?](#245-what-is-unrecoverable-errors)
+          - [246. What are alternative actions of Rust in case of panic?](#246-what-are-alternative-actions-of-rust-in-case-of-panic)
+          - [247. How and why switch from unwinding to aborting?](#247-how-and-why-switch-from-unwinding-to-aborting)
+          - [248. What ways to cause a panic in practice?](#248-what-ways-to-cause-a-panic-in-practice)
+          - [249. What actions does Rust take when panic occurs?](#249-what-actions-does-rust-take-when-panic-occurs)
+          - [250. what is backtrace?](#250-what-is-backtrace)
+          - [251. How to read a backtrace?](#251-how-to-read-a-backtrace)
+          - [252. what settings are needed to print the backtrace?](#252-what-settings-are-needed-to-print-the-backtrace)
       - [9.2 Recoverable Errors with Result](#92-recoverable-errors-with-result)
-          - [What is recoverable error?](#what-is-recoverable-error)
-          - [How does Rust program handle recoverable error?](#how-does-rust-program-handle-recoverable-error)
-          - [What is enum Result type?](#what-is-enum-result-type)
-          - [How recoverable error handled using Result type?](#how-recoverable-error-handled-using-result-type)
-          - [What is the result of the `unwrap()` method?](#what-is-the-result-of-the-unwrap-method)
-          - [What is the result of the `expect()` method?](#what-is-the-result-of-the-expect-method)
-          - [What is Propagating Errors?](#what-is-propagating-errors)
-          - [How we can Propagate Error?](#how-we-can-propagate-error)
-          - [What does the `?` operator?](#what-does-the--operator)
-          - [What happen when `Err` Result value have called `?` operator?](#what-happen-when-err-result-value-have-called--operator)
-          - [What does the `fs::read_to_string` function?](#what-does-the-fsread_to_string-function)
-          - [Can `?` operator automatically convert a Result to an Option or vice versa?](#can--operator-automatically-convert-a-result-to-an-option-or-vice-versa)
-          - [What type can the main function return?](#what-type-can-the-main-function-return)
+          - [253. What is recoverable error?](#253-what-is-recoverable-error)
+          - [254. How does Rust program handle recoverable error?](#254-how-does-rust-program-handle-recoverable-error)
+          - [255. What is enum Result type?](#255-what-is-enum-result-type)
+          - [256. How recoverable error handled using Result type?](#256-how-recoverable-error-handled-using-result-type)
+          - [257. What is the result of the `unwrap()` method?](#257-what-is-the-result-of-the-unwrap-method)
+          - [258. What is the result of the `expect()` method?](#258-what-is-the-result-of-the-expect-method)
+          - [259. What is Propagating Errors?](#259-what-is-propagating-errors)
+          - [260. How we can Propagate Error?](#260-how-we-can-propagate-error)
+          - [261. What does the `?` operator?](#261-what-does-the--operator)
+          - [262. What happen when `Err` Result value have called `?` operator?](#262-what-happen-when-err-result-value-have-called--operator)
+          - [263. What does the `fs::read_to_string` function?](#263-what-does-the-fsread_to_string-function)
+          - [264. Can `?` operator automatically convert a Result to an Option or vice versa?](#264-can--operator-automatically-convert-a-result-to-an-option-or-vice-versa)
+          - [265. What type can the main function return?](#265-what-type-can-the-main-function-return)
       - [9.3 To panic! or Not to panic!](#93-to-panic-or-not-to-panic)
-          - [when call panic! and when return Result?](#when-call-panic-and-when-return-result)
+          - [266. when call panic! and when return Result?](#266-when-call-panic-and-when-return-result)
     - [10 Generic Types, Traits, and Lifetimes](#10-generic-types-traits-and-lifetimes)
-          - [What are generics for?](#what-are-generics-for)
-          - [How to extract duplicate code?](#how-to-extract-duplicate-code)
+          - [267. What are generics for?](#267-what-are-generics-for)
+          - [268. How to extract duplicate code?](#268-how-to-extract-duplicate-code)
       - [10.1 Generic Data Types](#101-generic-data-types)
-          - [How to name type parameters?](#how-to-name-type-parameters)
-          - [How define function that uses generics?](#how-define-function-that-uses-generics)
-          - [What is parameter type Restriction?](#what-is-parameter-type-restriction)
-          - [How define struct that uses generics?](#how-define-struct-that-uses-generics)
-          - [How define enum that uses generics?](#how-define-enum-that-uses-generics)
-          - [How define method that uses generics?](#how-define-method-that-uses-generics)
-          - [How we can specify constraints on generic types when defining methods on the type?](#how-we-can-specify-constraints-on-generic-types-when-defining-methods-on-the-type)
-          - [What is Monomorphization?](#what-is-monomorphization)
+          - [269. How to name type parameters?](#269-how-to-name-type-parameters)
+          - [270. How define function that uses generics?](#270-how-define-function-that-uses-generics)
+          - [271. What is parameter type Restriction?](#271-what-is-parameter-type-restriction)
+          - [272. How define struct that uses generics?](#272-how-define-struct-that-uses-generics)
+          - [273. How define enum that uses generics?](#273-how-define-enum-that-uses-generics)
+          - [274. How define method that uses generics?](#274-how-define-method-that-uses-generics)
+          - [275. How we can specify constraints on generic types when defining methods on the type?](#275-how-we-can-specify-constraints-on-generic-types-when-defining-methods-on-the-type)
+          - [276. What is Monomorphization?](#276-what-is-monomorphization)
       - [10.2 Traits: Defining Shared Behavior](#102-traits-defining-shared-behavior)
-          - [What is Trait for?](#what-is-trait-for)
-          - [What determines the behavior of a type?](#what-determines-the-behavior-of-a-type)
-          - [When types shares the same behavior?](#when-types-shares-the-same-behavior)
-          - [Hwo in Rust define a shared behavior?](#hwo-in-rust-define-a-shared-behavior)
-          - [How define Trait?](#how-define-trait)
-          - [How a type implements a trait?](#how-a-type-implements-a-trait)
-          - [How should we use a types that implement a trait?](#how-should-we-use-a-types-that-implement-a-trait)
-          - [Can we implement external traits on external types?](#can-we-implement-external-traits-on-external-types)
-          - [Can a trait contain an implementation of the method it defines?](#can-a-trait-contain-an-implementation-of-the-method-it-defines)
-          - [What happen if a type implement trait whit default implemented methods](#what-happen-if-a-type-implement-trait-whit-default-implemented-methods)
-          - [Can default implemented trait methods call other methods of the trait?](#can-default-implemented-trait-methods-call-other-methods-of-the-trait)
-          - [How to call the default implementation from an overriding implementation of that same method?](#how-to-call-the-default-implementation-from-an-overriding-implementation-of-that-same-method)
-          - [How type of argument can accept function parameter annotated by trait type?](#how-type-of-argument-can-accept-function-parameter-annotated-by-trait-type)
-          - [What syntaxes used to define functions that accept many types?](#what-syntaxes-used-to-define-functions-that-accept-many-types)
-          - [How to use `impl trait_name` syntax to define functions that accept many different types?](#how-to-use-impl-trait_name-syntax-to-define-functions-that-accept-many-different-types)
-          - [How to use Trait Bound Syntax to define functions that accept many different types?](#how-to-use-trait-bound-syntax-to-define-functions-that-accept-many-different-types)
-          - [How to use Trait in defining a function's return type?](#how-to-use-trait-in-defining-a-functions-return-type)
-          - [What can we Conditionally Implement Methods by Using Trait Bounds?](#what-can-we-conditionally-implement-methods-by-using-trait-bounds)
-          - [What is blanket implementations?](#what-is-blanket-implementations)
+          - [277. What is Trait for?](#277-what-is-trait-for)
+          - [278. What determines the behavior of a type?](#278-what-determines-the-behavior-of-a-type)
+          - [279. When types shares the same behavior?](#279-when-types-shares-the-same-behavior)
+          - [280. Hwo in Rust define a shared behavior?](#280-hwo-in-rust-define-a-shared-behavior)
+          - [281. How define Trait?](#281-how-define-trait)
+          - [282. How a type implements a trait?](#282-how-a-type-implements-a-trait)
+          - [283. How should we use a types that implement a trait?](#283-how-should-we-use-a-types-that-implement-a-trait)
+          - [284. Can we implement external traits on external types?](#284-can-we-implement-external-traits-on-external-types)
+          - [285. Can a trait contain an implementation of the method it defines?](#285-can-a-trait-contain-an-implementation-of-the-method-it-defines)
+          - [286. What happen if a type implement trait whit default implemented methods](#286-what-happen-if-a-type-implement-trait-whit-default-implemented-methods)
+          - [287. Can default implemented trait methods call other methods of the trait?](#287-can-default-implemented-trait-methods-call-other-methods-of-the-trait)
+          - [288. How to call the default implementation from an overriding implementation of that same method?](#288-how-to-call-the-default-implementation-from-an-overriding-implementation-of-that-same-method)
+          - [289. How type of argument can accept function parameter annotated by trait type?](#289-how-type-of-argument-can-accept-function-parameter-annotated-by-trait-type)
+          - [290. What syntaxes used to define functions that accept many types?](#290-what-syntaxes-used-to-define-functions-that-accept-many-types)
+          - [291. How to use `impl trait_name` syntax to define functions that accept many different types?](#291-how-to-use-impl-trait_name-syntax-to-define-functions-that-accept-many-different-types)
+          - [292. How to use Trait Bound Syntax to define functions that accept many different types?](#292-how-to-use-trait-bound-syntax-to-define-functions-that-accept-many-different-types)
+          - [293. How to use Trait in defining a function's return type?](#293-how-to-use-trait-in-defining-a-functions-return-type)
+          - [294. What can we Conditionally Implement Methods by Using Trait Bounds?](#294-what-can-we-conditionally-implement-methods-by-using-trait-bounds)
+          - [295. What is blanket implementations?](#295-what-is-blanket-implementations)
       - [10.3 Validating References with Lifetimes](#103-validating-references-with-lifetimes)
-          - [What is lifetime?](#what-is-lifetime)
-          - [What is mean - reference is valid?](#what-is-mean---reference-is-valid)
-          - [When we must annotate a Lifetime?](#when-we-must-annotate-a-lifetime)
-          - [What main aim of lifetimes?](#what-main-aim-of-lifetimes)
-          - [What does Borrow Checker do?](#what-does-borrow-checker-do)
-          - [What is mean when function return borrowed value (reference)?](#what-is-mean-when-function-return-borrowed-value-reference)
-          - [When we must annotate return value of function by lifetime parameter?](#when-we-must-annotate-return-value-of-function-by-lifetime-parameter)
-          - [Can have  parameters of function different reference lifetime?](#can-have--parameters-of-function-different-reference-lifetime)
-          - [What describe Lifetime annotations?](#what-describe-lifetime-annotations)
-          - [What syntax have Lifetime annotation?](#what-syntax-have-lifetime-annotation)
-          - [How to use lifetime annotations in function signatures?](#how-to-use-lifetime-annotations-in-function-signatures)
-          - [What means  If the reference returned from function does not refer to one of the parameters?](#what-means--if-the-reference-returned-from-function-does-not-refer-to-one-of-the-parameters)
-          - [How we can define struct whit field contained reference?](#how-we-can-define-struct-whit-field-contained-reference)
-          - [Can we specify lifetime parameters for every functions or structs that use references?](#can-we-specify-lifetime-parameters-for-every-functions-or-structs-that-use-references)
-          - [What is lifetime elision rules?](#what-is-lifetime-elision-rules)
-          - [What is Input lLifetimes?](#what-is-input-llifetimes)
-          - [What is Output Lifetimes?](#what-is-output-lifetimes)
-          - [How compiler analysis of references in context of recognition lifetime annotations patterns?](#how-compiler-analysis-of-references-in-context-of-recognition-lifetime-annotations-patterns)
-          - [What annotate lifetime in Method Definitions?](#what-annotate-lifetime-in-method-definitions)
-          - [What is Static Lifetime?](#what-is-static-lifetime)
-          - [What Lifetime have string literal?](#what-lifetime-have-string-literal)
-          - [How used Generic Type Parameters, Trait Bounds, and Lifetimes Together?](#how-used-generic-type-parameters-trait-bounds-and-lifetimes-together)
+          - [296. What is lifetime?](#296-what-is-lifetime)
+          - [297. What is mean - reference is valid?](#297-what-is-mean---reference-is-valid)
+          - [298. When we must annotate a Lifetime?](#298-when-we-must-annotate-a-lifetime)
+          - [299. What main aim of lifetimes?](#299-what-main-aim-of-lifetimes)
+          - [300. What does Borrow Checker do?](#300-what-does-borrow-checker-do)
+          - [301. What is mean when function return borrowed value (reference)?](#301-what-is-mean-when-function-return-borrowed-value-reference)
+          - [302. When we must annotate return value of function by lifetime parameter?](#302-when-we-must-annotate-return-value-of-function-by-lifetime-parameter)
+          - [303. Can have  parameters of function different reference lifetime?](#303-can-have--parameters-of-function-different-reference-lifetime)
+          - [304. What describe Lifetime annotations?](#304-what-describe-lifetime-annotations)
+          - [305. What syntax have Lifetime annotation?](#305-what-syntax-have-lifetime-annotation)
+          - [306. How to use lifetime annotations in function signatures?](#306-how-to-use-lifetime-annotations-in-function-signatures)
+          - [307. What means  If the reference returned from function does not refer to one of the parameters?](#307-what-means--if-the-reference-returned-from-function-does-not-refer-to-one-of-the-parameters)
+          - [308. How we can define struct whit field contained reference?](#308-how-we-can-define-struct-whit-field-contained-reference)
+          - [309. Can we specify lifetime parameters for every functions or structs that use references?](#309-can-we-specify-lifetime-parameters-for-every-functions-or-structs-that-use-references)
+          - [310. What is lifetime elision rules?](#310-what-is-lifetime-elision-rules)
+          - [311. What is Input lLifetimes?](#311-what-is-input-llifetimes)
+          - [312. What is Output Lifetimes?](#312-what-is-output-lifetimes)
+          - [313. How compiler analysis of references in context of recognition lifetime annotations patterns?](#313-how-compiler-analysis-of-references-in-context-of-recognition-lifetime-annotations-patterns)
+          - [314. What annotate lifetime in Method Definitions?](#314-what-annotate-lifetime-in-method-definitions)
+          - [315. What is Static Lifetime?](#315-what-is-static-lifetime)
+          - [316. What Lifetime have string literal?](#316-what-lifetime-have-string-literal)
+          - [317. How used Generic Type Parameters, Trait Bounds, and Lifetimes Together?](#317-how-used-generic-type-parameters-trait-bounds-and-lifetimes-together)
     - [11 Writing Automated Tests](#11-writing-automated-tests)
       - [11.1 How to Write Tests](#111-how-to-write-tests)
-          - [What is tests?](#what-is-tests)
-          - [What perform body of test function?](#what-perform-body-of-test-function)
-          - [What is Attribute](#what-is-attribute)
-          - [How from function make test function?](#how-from-function-make-test-function)
-          - [How we run tests?](#how-we-run-tests)
-          - [What happen when we run tests with the cargo test command?](#what-happen-when-we-run-tests-with-the-cargo-test-command)
-          - [What happen in testing context when we make a new library project with Cargo?](#what-happen-in-testing-context-when-we-make-a-new-library-project-with-cargo)
-          - [Can we have a non-test function in a test module?](#can-we-have-a-non-test-function-in-a-test-module)
-          - [When tests fail?](#when-tests-fail)
-          - [What is the `assert!` macro used for?](#what-is-the-assert-macro-used-for)
-          - [What is the `assert_eq!` and `assert_ne!` Macros used for?](#what-is-the-assert_eq-and-assert_ne-macros-used-for)
-          - [How to add custom  Custom Failure Messages?](#how-to-add-custom--custom-failure-messages)
-          - [How we can test that our code handles error conditions as we expect?](#how-we-can-test-that-our-code-handles-error-conditions-as-we-expect)
-          - [What needs to be done to make `should_panic` tests more precise?](#what-needs-to-be-done-to-make-should_panic-tests-more-precise)
-          - [How we can use Result type for testing our code?](#how-we-can-use-result-type-for-testing-our-code)
+          - [318. What is tests?](#318-what-is-tests)
+          - [319. What perform body of test function?](#319-what-perform-body-of-test-function)
+          - [320. What is Attribute](#320-what-is-attribute)
+          - [321. How from function make test function?](#321-how-from-function-make-test-function)
+          - [322. How we run tests?](#322-how-we-run-tests)
+          - [323. What happen when we run tests with the cargo test command?](#323-what-happen-when-we-run-tests-with-the-cargo-test-command)
+          - [324. What happen in testing context when we make a new library project with Cargo?](#324-what-happen-in-testing-context-when-we-make-a-new-library-project-with-cargo)
+          - [325. Can we have a non-test function in a test module?](#325-can-we-have-a-non-test-function-in-a-test-module)
+          - [326. When tests fail?](#326-when-tests-fail)
+          - [327. What is the `assert!` macro used for?](#327-what-is-the-assert-macro-used-for)
+          - [328. What is the `assert_eq!` and `assert_ne!` Macros used for?](#328-what-is-the-assert_eq-and-assert_ne-macros-used-for)
+          - [329. How to add custom  Custom Failure Messages?](#329-how-to-add-custom--custom-failure-messages)
+          - [330. How we can test that our code handles error conditions as we expect?](#330-how-we-can-test-that-our-code-handles-error-conditions-as-we-expect)
+          - [331. What needs to be done to make `should_panic` tests more precise?](#331-what-needs-to-be-done-to-make-should_panic-tests-more-precise)
+          - [332. How we can use Result type for testing our code?](#332-how-we-can-use-result-type-for-testing-our-code)
       - [11.2 Controlling How Tests Are Run](#112-controlling-how-tests-are-run)
-          - [How default behavior of the binary produced by `cargo test`?](#how-default-behavior-of-the-binary-produced-by-cargo-test)
-          - [How to change default `cargo test` behavior?](#how-to-change-default-cargo-test-behavior)
-          - [How to separate command line options go to cargo test, and those that go to the resultant test binary](#how-to-separate-command-line-options-go-to-cargo-test-and-those-that-go-to-the-resultant-test-binary)
-          - [How by default Cargo run test?](#how-by-default-cargo-run-test)
-          - [How to run tests consistently?](#how-to-run-tests-consistently)
-          - [What we should do if wont to see printed values for passing tests?](#what-we-should-do-if-wont-to-see-printed-values-for-passing-tests)
-          - [How we can Running Single Tests?](#how-we-can-running-single-tests)
-          - [How to Filtering to Run Multiple Tests?](#how-to-filtering-to-run-multiple-tests)
-          - [How to Ignoring Some Tests?](#how-to-ignoring-some-tests)
-          - [How we can run only tests marked as `ignored`?](#how-we-can-run-only-tests-marked-as-ignored)
-          - [How we can run all tests include marked as `ignored`?](#how-we-can-run-all-tests-include-marked-as-ignored)
+          - [333. How default behavior of the binary produced by `cargo test`?](#333-how-default-behavior-of-the-binary-produced-by-cargo-test)
+          - [334. How to change default `cargo test` behavior?](#334-how-to-change-default-cargo-test-behavior)
+          - [335. How to separate command line options go to cargo test, and those that go to the resultant test binary](#335-how-to-separate-command-line-options-go-to-cargo-test-and-those-that-go-to-the-resultant-test-binary)
+          - [336. How by default Cargo run test?](#336-how-by-default-cargo-run-test)
+          - [337. How to run tests consistently?](#337-how-to-run-tests-consistently)
+          - [338. What we should do if wont to see printed values for passing tests?](#338-what-we-should-do-if-wont-to-see-printed-values-for-passing-tests)
+          - [339. How we can Running Single Tests?](#339-how-we-can-running-single-tests)
+          - [340. How to Filtering to Run Multiple Tests?](#340-how-to-filtering-to-run-multiple-tests)
+          - [341. How to Ignoring Some Tests?](#341-how-to-ignoring-some-tests)
+          - [342. How we can run only tests marked as `ignored`?](#342-how-we-can-run-only-tests-marked-as-ignored)
+          - [343. How we can run all tests include marked as `ignored`?](#343-how-we-can-run-all-tests-include-marked-as-ignored)
       - [11.3 Test Organization](#113-test-organization)
-          - [What purpose of unit tests?](#what-purpose-of-unit-tests)
-          - [What convention fo organization unit tests?](#what-convention-fo-organization-unit-tests)
-          - [How role of `#[cfg(test)]` annotation?](#how-role-of-cfgtest-annotation)
-          - [Should to test Private Functions?](#should-to-test-private-functions)
-          - [Does allow Rust to test of Private Function?](#does-allow-rust-to-test-of-private-function)
-          - [What is purpose of integration tests?](#what-is-purpose-of-integration-tests)
-          - [Where are located integration tests?](#where-are-located-integration-tests)
-          - [How many files whit integration tests we can create?](#how-many-files-whit-integration-tests-we-can-create)
-          - [How Cargo compile files whit integration tests?](#how-cargo-compile-files-whit-integration-tests)
-          - [Should we annotate any code in integration tests with `#[cfg(test)]`?](#should-we-annotate-any-code-in-integration-tests-with-cfgtest)
-          - [How we can run a particular integration test function?](#how-we-can-run-a-particular-integration-test-function)
-          - [How we can run all function in particular integration test file?](#how-we-can-run-all-function-in-particular-integration-test-file)
-          - [How we can make shared code for integrated tests?](#how-we-can-make-shared-code-for-integrated-tests)
-          - [How can we make integration testing of binary crates?](#how-can-we-make-integration-testing-of-binary-crates)
+          - [344. What purpose of unit tests?](#344-what-purpose-of-unit-tests)
+          - [345. What convention fo organization unit tests?](#345-what-convention-fo-organization-unit-tests)
+          - [346. How role of `#[cfg(test)]` annotation?](#346-how-role-of-cfgtest-annotation)
+          - [347. Should to test Private Functions?](#347-should-to-test-private-functions)
+          - [348. Does allow Rust to test of Private Function?](#348-does-allow-rust-to-test-of-private-function)
+          - [349. What is purpose of integration tests?](#349-what-is-purpose-of-integration-tests)
+          - [350. Where are located integration tests?](#350-where-are-located-integration-tests)
+          - [351. How many files whit integration tests we can create?](#351-how-many-files-whit-integration-tests-we-can-create)
+          - [352. How Cargo compile files whit integration tests?](#352-how-cargo-compile-files-whit-integration-tests)
+          - [353. Should we annotate any code in integration tests with `#[cfg(test)]`?](#353-should-we-annotate-any-code-in-integration-tests-with-cfgtest)
+          - [354. How we can run a particular integration test function?](#354-how-we-can-run-a-particular-integration-test-function)
+          - [355. How we can run all function in particular integration test file?](#355-how-we-can-run-all-function-in-particular-integration-test-file)
+          - [356. How we can make shared code for integrated tests?](#356-how-we-can-make-shared-code-for-integrated-tests)
+          - [357. How can we make integration testing of binary crates?](#357-how-can-we-make-integration-testing-of-binary-crates)
     - [12 An I/O Project: Building a Command Line Program](#12-an-io-project-building-a-command-line-program)
       - [12.1 Accepting Command Line Arguments](#121-accepting-command-line-arguments)
-          - [How we can pass command line arguments our program when running `cargo run`?](#how-we-can-pass-command-line-arguments-our-program-when-running-cargo-run)
-          - [Where we can look for existing libraries for our needs?](#where-we-can-look-for-existing-libraries-for-our-needs)
-          - [Which Rust standard library function can we use to read the values ​​of command line arguments?](#which-rust-standard-library-function-can-we-use-to-read-the-values-of-command-line-arguments)
-          - [What does the `args().collect()` method do?](#what-does-the-argscollect-method-do)
+          - [358. How we can pass command line arguments our program when running `cargo run`?](#358-how-we-can-pass-command-line-arguments-our-program-when-running-cargo-run)
+          - [359. Where we can look for existing libraries for our needs?](#359-where-we-can-look-for-existing-libraries-for-our-needs)
+          - [360. Which Rust standard library function can we use to read the values ​​of command line arguments?](#360-which-rust-standard-library-function-can-we-use-to-read-the-values-of-command-line-arguments)
+          - [361. What does the `args().collect()` method do?](#361-what-does-the-argscollect-method-do)
       - [12.2 Reading a File](#122-reading-a-file)
-          - [How we can read file to string?](#how-we-can-read-file-to-string)
+          - [362. How we can read file to string?](#362-how-we-can-read-file-to-string)
       - [12.3 Refactoring to Improve Modularity and Error Handling](#123-refactoring-to-improve-modularity-and-error-handling)
-          - [Why refactor?](#why-refactor)
-          - [What is main Rust pattern about separating concerns?](#what-is-main-rust-pattern-about-separating-concerns)
-          - [How we can do refactoring?](#how-we-can-do-refactoring)
+          - [363. Why refactor?](#363-why-refactor)
+          - [364. What is main Rust pattern about separating concerns?](#364-what-is-main-rust-pattern-about-separating-concerns)
+          - [365. How we can do refactoring?](#365-how-we-can-do-refactoring)
       - [12.4 Developing the Library’s Functionality with Test-Driven Development](#124-developing-the-librarys-functionality-with-test-driven-development)
-          - [What is TDD?](#what-is-tdd)
-          - [How Write a Failing Test?](#how-write-a-failing-test)
-          - [How write code to pass the test?](#how-write-code-to-pass-the-test)
-          - [Hwo Using the search Function in the run Function?](#hwo-using-the-search-function-in-the-run-function)
+          - [366. What is TDD?](#366-what-is-tdd)
+          - [367. How Write a Failing Test?](#367-how-write-a-failing-test)
+          - [368. How write code to pass the test?](#368-how-write-code-to-pass-the-test)
+          - [369. Hwo Using the search Function in the run Function?](#369-hwo-using-the-search-function-in-the-run-function)
       - [12.5 Working with Environment Variables](#125-working-with-environment-variables)
-          - [What module contain features for dealing with environment variable?](#what-module-contain-features-for-dealing-with-environment-variable)
+          - [370. What module contain features for dealing with environment variable?](#370-what-module-contain-features-for-dealing-with-environment-variable)
       - [12.6 Writing Error Messages to Standard Error Instead of Standard Output](#126-writing-error-messages-to-standard-error-instead-of-standard-output)
-          - [How make what our program print error massages to Standard Error Instead of Standard Output?](#how-make-what-our-program-print-error-massages-to-standard-error-instead-of-standard-output)
+          - [371. How make what our program print error massages to Standard Error Instead of Standard Output?](#371-how-make-what-our-program-print-error-massages-to-standard-error-instead-of-standard-output)
     - [13 Functional Language Features: Iterators and Closures](#13-functional-language-features-iterators-and-closures)
       - [13.1 Closures: Anonymous Functions that Capture Their Environment](#131-closures-anonymous-functions-that-capture-their-environment)
-          - [What is Closures?](#what-is-closures)
-          - [Should we annotate the types of the parameters or return value of Closures?](#should-we-annotate-the-types-of-the-parameters-or-return-value-of-closures)
-          - [Why we do not require annotate the types of the parameters or return value of Closures?](#why-we-do-not-require-annotate-the-types-of-the-parameters-or-return-value-of-closures)
-          - [Can we annotate the types of the parameters or return value of Closures?](#can-we-annotate-the-types-of-the-parameters-or-return-value-of-closures)
-          - [How define Closure?](#how-define-closure)
-          - [What compiler determine parameters and return types of Closure?](#what-compiler-determine-parameters-and-return-types-of-closure)
-          - [How Closure capture environment values?](#how-closure-capture-environment-values)
-          - [How does Closure determine what capture methods to use?](#how-does-closure-determine-what-capture-methods-to-use)
-          - [What we should do whit ownership when passing a closure to a new thread?](#what-we-should-do-whit-ownership-when-passing-a-closure-to-a-new-thread)
-          - [What closure body can do whit captured value?](#what-closure-body-can-do-whit-captured-value)
-          - [What does it depend the way a closure captures and handles values from the environment?](#what-does-it-depend-the-way-a-closure-captures-and-handles-values-from-the-environment)
-          - [What does it depend what kinds of closures can use functions and struct?](#what-does-it-depend-what-kinds-of-closures-can-use-functions-and-struct)
-          - [Must we declare which traits must implement the closure?](#must-we-declare-which-traits-must-implement-the-closure)
-          - [Which traits can implement closure?](#which-traits-can-implement-closure)
-          - [Which trait must implement closure that moves captured values out of its body?](#which-trait-must-implement-closure-that-moves-captured-values-out-of-its-body)
-          - [Which trait must implement closure that don’t move captured values out of their body, but that might mutate the captured values?](#which-trait-must-implement-closure-that-dont-move-captured-values-out-of-their-body-but-that-might-mutate-the-captured-values)
-          - [Which trait must implement closure that don’t move captured values out of their body and that don’t mutate captured values, as well as capture nothing from their environment?](#which-trait-must-implement-closure-that-dont-move-captured-values-out-of-their-body-and-that-dont-mutate-captured-values-as-well-as-capture-nothing-from-their-environment)
+          - [372. What is Closures?](#372-what-is-closures)
+          - [373. Should we annotate the types of the parameters or return value of Closures?](#373-should-we-annotate-the-types-of-the-parameters-or-return-value-of-closures)
+          - [374. Why we do not require annotate the types of the parameters or return value of Closures?](#374-why-we-do-not-require-annotate-the-types-of-the-parameters-or-return-value-of-closures)
+          - [375. Can we annotate the types of the parameters or return value of Closures?](#375-can-we-annotate-the-types-of-the-parameters-or-return-value-of-closures)
+          - [376. How define Closure?](#376-how-define-closure)
+          - [377. What compiler determine parameters and return types of Closure?](#377-what-compiler-determine-parameters-and-return-types-of-closure)
+          - [378. How Closure capture environment values?](#378-how-closure-capture-environment-values)
+          - [379. How does Closure determine what capture methods to use?](#379-how-does-closure-determine-what-capture-methods-to-use)
+          - [380. What we should do whit ownership when passing a closure to a new thread?](#380-what-we-should-do-whit-ownership-when-passing-a-closure-to-a-new-thread)
+          - [381. What closure body can do whit captured value?](#381-what-closure-body-can-do-whit-captured-value)
+          - [382. What does it depend the way a closure captures and handles values from the environment?](#382-what-does-it-depend-the-way-a-closure-captures-and-handles-values-from-the-environment)
+          - [383. What does it depend what kinds of closures can use functions and struct?](#383-what-does-it-depend-what-kinds-of-closures-can-use-functions-and-struct)
+          - [384. Must we declare which traits must implement the closure?](#384-must-we-declare-which-traits-must-implement-the-closure)
+          - [385. Which traits can implement closure?](#385-which-traits-can-implement-closure)
+          - [386. Which trait must implement closure that moves captured values out of its body?](#386-which-trait-must-implement-closure-that-moves-captured-values-out-of-its-body)
+          - [387. Which trait must implement closure that don’t move captured values out of their body, but that might mutate the captured values?](#387-which-trait-must-implement-closure-that-dont-move-captured-values-out-of-their-body-but-that-might-mutate-the-captured-values)
+          - [388. Which trait must implement closure that don’t move captured values out of their body and that don’t mutate captured values, as well as capture nothing from their environment?](#388-which-trait-must-implement-closure-that-dont-move-captured-values-out-of-their-body-and-that-dont-mutate-captured-values-as-well-as-capture-nothing-from-their-environment)
       - [13.2 Processing a Series of Items with Iterators](#132-processing-a-series-of-items-with-iterators)
-          - [What is the iterator pattern used for?](#what-is-the-iterator-pattern-used-for)
-          - [What is means - iterators are lazy?](#what-is-means---iterators-are-lazy)
-          - [What is Iterator in Rust?](#what-is-iterator-in-rust)
-          - [What method define Iterator Trait?](#what-method-define-iterator-trait)
-          - [How can we get immutable references to values ​​in vector using iterator syntax?](#how-can-we-get-immutable-references-to-values-in-vector-using-iterator-syntax)
-          - [How can we get mutable references to values ​​in vector using iterator syntax?](#how-can-we-get-mutable-references-to-values-in-vector-using-iterator-syntax)
-          - [How can we get ownership of vector type and returns owned values using iterator syntax?](#how-can-we-get-ownership-of-vector-type-and-returns-owned-values-using-iterator-syntax)
-          - [What is 'consuming adapters' methods?](#what-is-consuming-adapters-methods)
-          - [How the `sum` Iterator method works](#how-the-sum-iterator-method-works)
-          - [What is 'Iterator adapters' methods?](#what-is-iterator-adapters-methods)
-          - [How the `map` Iterator method works?](#how-the-map-iterator-method-works)
-          - [How we must combine 'Iterator adapters' and 'consuming adapters' method?](#how-we-must-combine-iterator-adapters-and-consuming-adapters-method)
-          - [Can we Using Closures that Capture Their Environment in iterators?](#can-we-using-closures-that-capture-their-environment-in-iterators)
-          - [How the `filter` Iterator method works?](#how-the-filter-iterator-method-works)
+          - [389. What is the iterator pattern used for?](#389-what-is-the-iterator-pattern-used-for)
+          - [390. What is means - iterators are lazy?](#390-what-is-means---iterators-are-lazy)
+          - [391. What is Iterator in Rust?](#391-what-is-iterator-in-rust)
+          - [392. What method define Iterator Trait?](#392-what-method-define-iterator-trait)
+          - [393. How can we get immutable references to values ​​in vector using iterator syntax?](#393-how-can-we-get-immutable-references-to-values-in-vector-using-iterator-syntax)
+          - [394. How can we get mutable references to values ​​in vector using iterator syntax?](#394-how-can-we-get-mutable-references-to-values-in-vector-using-iterator-syntax)
+          - [395. How can we get ownership of vector type and returns owned values using iterator syntax?](#395-how-can-we-get-ownership-of-vector-type-and-returns-owned-values-using-iterator-syntax)
+          - [396. What is 'consuming adapters' methods?](#396-what-is-consuming-adapters-methods)
+          - [397. How the `sum` Iterator method works](#397-how-the-sum-iterator-method-works)
+          - [398. What is 'Iterator adapters' methods?](#398-what-is-iterator-adapters-methods)
+          - [399. How the `map` Iterator method works?](#399-how-the-map-iterator-method-works)
+          - [400. How we must combine 'Iterator adapters' and 'consuming adapters' method?](#400-how-we-must-combine-iterator-adapters-and-consuming-adapters-method)
+          - [401. Can we Using Closures that Capture Their Environment in iterators?](#401-can-we-using-closures-that-capture-their-environment-in-iterators)
+          - [402. How the `filter` Iterator method works?](#402-how-the-filter-iterator-method-works)
       - [13.3 Improving Our I/O Project](#133-improving-our-io-project)
       - [13.4 Comparing Performance: Loops vs. Iterators](#134-comparing-performance-loops-vs-iterators)
-          - [What code implementation faster on: `for loop` or Iterators?](#what-code-implementation-faster-on-for-loop-or-iterators)
-          - [What is 'zero-cost abstractions'?](#what-is-zero-cost-abstractions)
+          - [403. What code implementation faster on: `for loop` or Iterators?](#403-what-code-implementation-faster-on-for-loop-or-iterators)
+          - [404. What is 'zero-cost abstractions'?](#404-what-is-zero-cost-abstractions)
     - [14 More About Cargo and Crates.io](#14-more-about-cargo-and-cratesio)
       - [14.1 Customizing Builds with Release Profiles](#141-customizing-builds-with-release-profiles)
-          - [What is 'release profiles'?](#what-is-release-profiles)
-          - [What release profiles exist?](#what-release-profiles-exist)
-          - [What happen if we add `[profile.*]` sections for any profile?](#what-happen-if-we-add-profile-sections-for-any-profile)
-          - [What controls the `opt-level` profile setting?](#what-controls-the-opt-level-profile-setting)
+          - [405. What is 'release profiles'?](#405-what-is-release-profiles)
+          - [406. What release profiles exist?](#406-what-release-profiles-exist)
+          - [407. What happen if we add `[profile.*]` sections for any profile?](#407-what-happen-if-we-add-profile-sections-for-any-profile)
+          - [408. What controls the `opt-level` profile setting?](#408-what-controls-the-opt-level-profile-setting)
       - [14.2 Publishing a Crate to Crates.io](#142-publishing-a-crate-to-cratesio)
-          - [what are documentation comments for?](#what-are-documentation-comments-for)
-          - [how are documentation comments pointed?](#how-are-documentation-comments-pointed)
-          - [what markup can be used in documentation comments?](#what-markup-can-be-used-in-documentation-comments)
-          - [what sections can be used in documentation?](#what-sections-can-be-used-in-documentation)
-          - [How we can tests code in documentation comments?](#how-we-can-tests-code-in-documentation-comments)
-          - [how to create a doc comment that does not refer to a specific code?](#how-to-create-a-doc-comment-that-does-not-refer-to-a-specific-code)
-          - [How to remove the internal organization from the public AP?](#how-to-remove-the-internal-organization-from-the-public-ap)
-          - [How to Setting Up a Crates.io Account?](#how-to-setting-up-a-cratesio-account)
-          - [How to Publishing a Crate to Crates.io?](#how-to-publishing-a-crate-to-cratesio)
-          - [How Publishing a New Version of an Existing Crate?](#how-publishing-a-new-version-of-an-existing-crate)
-          - [what are the versification rules,](#what-are-the-versification-rules)
-          - [How to prevent any future projects from adding Deprecating Crate Versions as a new dependency?](#how-to-prevent-any-future-projects-from-adding-deprecating-crate-versions-as-a-new-dependency)
-          - [What is 'yanking a crate version'?](#what-is-yanking-a-crate-version)
+          - [409. what are documentation comments for?](#409-what-are-documentation-comments-for)
+          - [410. how are documentation comments pointed?](#410-how-are-documentation-comments-pointed)
+          - [411. what markup can be used in documentation comments?](#411-what-markup-can-be-used-in-documentation-comments)
+          - [412. what sections can be used in documentation?](#412-what-sections-can-be-used-in-documentation)
+          - [413. How we can tests code in documentation comments?](#413-how-we-can-tests-code-in-documentation-comments)
+          - [414. how to create a doc comment that does not refer to a specific code?](#414-how-to-create-a-doc-comment-that-does-not-refer-to-a-specific-code)
+          - [415. How to remove the internal organization from the public AP?](#415-how-to-remove-the-internal-organization-from-the-public-ap)
+          - [416. How to Setting Up a Crates.io Account?](#416-how-to-setting-up-a-cratesio-account)
+          - [417. How to Publishing a Crate to Crates.io?](#417-how-to-publishing-a-crate-to-cratesio)
+          - [418. How Publishing a New Version of an Existing Crate?](#418-how-publishing-a-new-version-of-an-existing-crate)
+          - [419. what are the versification rules,](#419-what-are-the-versification-rules)
+          - [420. How to prevent any future projects from adding Deprecating Crate Versions as a new dependency?](#420-how-to-prevent-any-future-projects-from-adding-deprecating-crate-versions-as-a-new-dependency)
+          - [421. What is 'yanking a crate version'?](#421-what-is-yanking-a-crate-version)
       - [14.3 Cargo Workspaces](#143-cargo-workspaces)
-          - [What is Cargo Workspace?](#what-is-cargo-workspace)
-          - [How to create a Workspace?](#how-to-create-a-workspace)
-          - [How to create package in Workspace?](#how-to-create-package-in-workspace)
-          - [What we can build Workspace?](#what-we-can-build-workspace)
-          - [Which file and directories does `cargo build` create in Workspace?](#which-file-and-directories-does-cargo-build-create-in-workspace)
-          - [How many packages we can create in Workspace?](#how-many-packages-we-can-create-in-workspace)
-          - [What files and directories shares all packages in Workspace?](#what-files-and-directories-shares-all-packages-in-workspace)
-          - [What should we do if our container code depends on code from another Workspace package?](#what-should-we-do-if-our-container-code-depends-on-code-from-another-workspace-package)
-          - [How we should run binary crate in Workspace?](#how-we-should-run-binary-crate-in-workspace)
-          - [How we should add dependencies in Workspace packages?](#how-we-should-add-dependencies-in-workspace-packages)
-          - [Where located Cargo.lock file of Workspace package?](#where-located-cargolock-file-of-workspace-package)
-          - [What happen If crates in the workspace specify incompatible versions of the same dependency?](#what-happen-if-crates-in-the-workspace-specify-incompatible-versions-of-the-same-dependency)
-          - [How we can run tests in Workspace?](#how-we-can-run-tests-in-workspace)
-          - [How we should publish Workspace crate?](#how-we-should-publish-workspace-crate)
+          - [422. What is Cargo Workspace?](#422-what-is-cargo-workspace)
+          - [423. How to create a Workspace?](#423-how-to-create-a-workspace)
+          - [424. How to create package in Workspace?](#424-how-to-create-package-in-workspace)
+          - [425. What we can build Workspace?](#425-what-we-can-build-workspace)
+          - [426. Which file and directories does `cargo build` create in Workspace?](#426-which-file-and-directories-does-cargo-build-create-in-workspace)
+          - [427. How many packages we can create in Workspace?](#427-how-many-packages-we-can-create-in-workspace)
+          - [428. What files and directories shares all packages in Workspace?](#428-what-files-and-directories-shares-all-packages-in-workspace)
+          - [429. What should we do if our container code depends on code from another Workspace package?](#429-what-should-we-do-if-our-container-code-depends-on-code-from-another-workspace-package)
+          - [430. How we should run binary crate in Workspace?](#430-how-we-should-run-binary-crate-in-workspace)
+          - [431. How we should add dependencies in Workspace packages?](#431-how-we-should-add-dependencies-in-workspace-packages)
+          - [432. Where located Cargo.lock file of Workspace package?](#432-where-located-cargolock-file-of-workspace-package)
+          - [433. What happen If crates in the workspace specify incompatible versions of the same dependency?](#433-what-happen-if-crates-in-the-workspace-specify-incompatible-versions-of-the-same-dependency)
+          - [434. How we can run tests in Workspace?](#434-how-we-can-run-tests-in-workspace)
+          - [435. How we should publish Workspace crate?](#435-how-we-should-publish-workspace-crate)
       - [14.5 Installing Binaries with cargo install](#145-installing-binaries-with-cargo-install)
-          - [For what used `cargo install` command?](#for-what-used-cargo-install-command)
-          - [How we can install a binary cartes locally?](#how-we-can-install-a-binary-cartes-locally)
-          - [What is 'binary target'?](#what-is-binary-target)
-          - [Where is information about crate target?](#where-is-information-about-crate-target)
-          - [Where are a binaries installed with `cargo install` stored?](#where-are-a-binaries-installed-with-cargo-install-stored)
+          - [436. For what used `cargo install` command?](#436-for-what-used-cargo-install-command)
+          - [437. How we can install a binary cartes locally?](#437-how-we-can-install-a-binary-cartes-locally)
+          - [438. What is 'binary target'?](#438-what-is-binary-target)
+          - [439. Where is information about crate target?](#439-where-is-information-about-crate-target)
+          - [440. Where are a binaries installed with `cargo install` stored?](#440-where-are-a-binaries-installed-with-cargo-install-stored)
       - [14.6 Extending Cargo with Custom Commands](#146-extending-cargo-with-custom-commands)
-          - [How we can extend Cargo with new subcommands without having to modify Cargo?](#how-we-can-extend-cargo-with-new-subcommands-without-having-to-modify-cargo)
+          - [441. How we can extend Cargo with new subcommands without having to modify Cargo?](#441-how-we-can-extend-cargo-with-new-subcommands-without-having-to-modify-cargo)
     - [15 Smart Pointers.](#15-smart-pointers)
-          - [What is a Pointer?](#what-is-a-pointer)
-          - [How Pointers implemented in Rust?](#how-pointers-implemented-in-rust)
-          - [What is 'Smart Pointers'?](#what-is-smart-pointers)
-          - [How Smart Pointers implemented in Rust?](#how-smart-pointers-implemented-in-rust)
-          - [What role `Deref` trait in Smart pointers?](#what-role-deref-trait-in-smart-pointers)
-          - [What role `Drop` trait in Smart pointers?](#what-role-drop-trait-in-smart-pointers)
+          - [442. What is a Pointer?](#442-what-is-a-pointer)
+          - [443. How Pointers implemented in Rust?](#443-how-pointers-implemented-in-rust)
+          - [444. What is 'Smart Pointers'?](#444-what-is-smart-pointers)
+          - [445. How Smart Pointers implemented in Rust?](#445-how-smart-pointers-implemented-in-rust)
+          - [446. What role `Deref` trait in Smart pointers?](#446-what-role-deref-trait-in-smart-pointers)
+          - [447. What role `Drop` trait in Smart pointers?](#447-what-role-drop-trait-in-smart-pointers)
       - [15.1 Using `Box<T>` to Point to Data on the Heap](#151-using-boxt-to-point-to-data-on-the-heap)
-          - [What is `Box<T>` type?](#what-is-boxt-type)
-          - [Why use `Box<T>`?](#why-use-boxt)
-          - [How define Box value?](#how-define-box-value)
-          - [What is recursive type?](#what-is-recursive-type)
-          - [Why Recursive types pose an issue?](#why-recursive-types-pose-an-issue)
-          - [How does Box solve issue of Recursive types?](#how-does-box-solve-issue-of-recursive-types)
-          - [What is Cons List?](#what-is-cons-list)
-          - [How Rust determine how much space to allocate for a Enum?](#how-rust-determine-how-much-space-to-allocate-for-a-enum)
-          - [How to define Cons List by using Enum?](#how-to-define-cons-list-by-using-enum)
+          - [448. What is `Box<T>` type?](#448-what-is-boxt-type)
+          - [449. Why use `Box<T>`?](#449-why-use-boxt)
+          - [450. How define Box value?](#450-how-define-box-value)
+          - [451. What is recursive type?](#451-what-is-recursive-type)
+          - [452. Why Recursive types pose an issue?](#452-why-recursive-types-pose-an-issue)
+          - [453. How does Box solve issue of Recursive types?](#453-how-does-box-solve-issue-of-recursive-types)
+          - [454. What is Cons List?](#454-what-is-cons-list)
+          - [455. How Rust determine how much space to allocate for a Enum?](#455-how-rust-determine-how-much-space-to-allocate-for-a-enum)
+          - [456. How to define Cons List by using Enum?](#456-how-to-define-cons-list-by-using-enum)
       - [15.2 Treating Smart Pointers Like Regular References with the Deref Trait](#152-treating-smart-pointers-like-regular-references-with-the-deref-trait)
-          - [What is Dereference operator?](#what-is-dereference-operator)
-          - [What types can we apply the dereference operator to?](#what-types-can-we-apply-the-dereference-operator-to)
-          - [How Rust dereference Deref implementing types?](#how-rust-dereference-deref-implementing-types)
-          - [Whether the '\*' operator is applied recursively to values ​​returned from the `deref` method?](#whether-the--operator-is-applied-recursively-to-values-returned-from-the-deref-method)
-          - [What is 'Deref coercion'?](#what-is-deref-coercion)
-          - [Where used 'Deref coercion'?](#where-used-deref-coercion)
-          - [How we can override `*` operator on mutable reference?](#how-we-can-override--operator-on-mutable-reference)
-          - [What result type of Deref Coercion for \&T?](#what-result-type-of-deref-coercion-for-t)
-          - [What result type of Deref Coercion for mut\& T?](#what-result-type-of-deref-coercion-for-mut-t)
+          - [457. What is Dereference operator?](#457-what-is-dereference-operator)
+          - [458. What types can we apply the dereference operator to?](#458-what-types-can-we-apply-the-dereference-operator-to)
+          - [459. How Rust dereference Deref implementing types?](#459-how-rust-dereference-deref-implementing-types)
+          - [460. Whether the '\*' operator is applied recursively to values ​​returned from the `deref` method?](#460-whether-the--operator-is-applied-recursively-to-values-returned-from-the-deref-method)
+          - [461. What is 'Deref coercion'?](#461-what-is-deref-coercion)
+          - [462. Where used 'Deref coercion'?](#462-where-used-deref-coercion)
+          - [463. How we can override `*` operator on mutable reference?](#463-how-we-can-override--operator-on-mutable-reference)
+          - [464. What result type of Deref Coercion for \&T?](#464-what-result-type-of-deref-coercion-for-t)
+          - [465. What result type of Deref Coercion for mut\& T?](#465-what-result-type-of-deref-coercion-for-mut-t)
       - [15.3 Running Code on Cleanup with the Drop Trait](#153-running-code-on-cleanup-with-the-drop-trait)
-          - [For what to use Drop Trait?](#for-what-to-use-drop-trait)
-          - [what is required to implement Drop trait?](#what-is-required-to-implement-drop-trait)
-          - [How is the `drop` method of the Drop feature called?](#how-is-the-drop-method-of-the-drop-feature-called)
-          - [How can we manually drop a value?](#how-can-we-manually-drop-a-value)
+          - [466. For what to use Drop Trait?](#466-for-what-to-use-drop-trait)
+          - [467. what is required to implement Drop trait?](#467-what-is-required-to-implement-drop-trait)
+          - [468. How is the `drop` method of the Drop feature called?](#468-how-is-the-drop-method-of-the-drop-feature-called)
+          - [469. How can we manually drop a value?](#469-how-can-we-manually-drop-a-value)
       - [15.4 `Rc<T>`, the Reference Counted Smart Pointer](#154-rct-the-reference-counted-smart-pointer)
-          - [when a single value might have multiple owners?](#when-a-single-value-might-have-multiple-owners)
-          - [How we can enable multiple ownership?](#how-we-can-enable-multiple-ownership)
-          - [What does `Rc<T>` type?](#what-does-rct-type)
-          - [Can we use `Rc<T>` in multi-threaded scenarios?](#can-we-use-rct-in-multi-threaded-scenarios)
-          - [How we can use `Rc<T>` to Share Data?](#how-we-can-use-rct-to-share-data)
+          - [470. when a single value might have multiple owners?](#470-when-a-single-value-might-have-multiple-owners)
+          - [471. How we can enable multiple ownership?](#471-how-we-can-enable-multiple-ownership)
+          - [472. What does `Rc<T>` type?](#472-what-does-rct-type)
+          - [473. Can we use `Rc<T>` in multi-threaded scenarios?](#473-can-we-use-rct-in-multi-threaded-scenarios)
+          - [474. How we can use `Rc<T>` to Share Data?](#474-how-we-can-use-rct-to-share-data)
       - [RefCell and the Interior Mutability Pattern](#refcell-and-the-interior-mutability-pattern)
-          - [What is 'Interior mutability'?](#what-is-interior-mutability)
-          - [How implemented the Interior mutability pattern?](#how-implemented-the-interior-mutability-pattern)
-          - [What is 'unsafe code'?](#what-is-unsafe-code)
-          - [When can we use Interior mutability pattern?](#when-can-we-use-interior-mutability-pattern)
-          - [What difference between references, `Box<T>` and `RefCell<T>`?](#what-difference-between-references-boxt-and-refcellt)
-          - [What could be the advantage of checking the borrowing rules at runtime?](#what-could-be-the-advantage-of-checking-the-borrowing-rules-at-runtime)
-          - [When the `RefCell<T>` type is useful?](#when-the-refcellt-type-is-useful)
-          - [Can we use `RefCell<T>` type in multi-thread scenarios?](#can-we-use-refcellt-type-in-multi-thread-scenarios)
-          - [How we can use `RefCell<T>` type to mutate immutable value.](#how-we-can-use-refcellt-type-to-mutate-immutable-value)
-          - [How `RefCell<T>` keeping Track of Borrows at Runtime?](#how-refcellt-keeping-track-of-borrows-at-runtime)
-          - [How get a value that can have multiple owners and that we can mutate?](#how-get-a-value-that-can-have-multiple-owners-and-that-we-can-mutate)
-          - [what is the thread-safe version of `RefCell<T>`?](#what-is-the-thread-safe-version-of-refcellt)
+          - [475. What is 'Interior mutability'?](#475-what-is-interior-mutability)
+          - [476. How implemented the Interior mutability pattern?](#476-how-implemented-the-interior-mutability-pattern)
+          - [477. What is 'unsafe code'?](#477-what-is-unsafe-code)
+          - [478. When can we use Interior mutability pattern?](#478-when-can-we-use-interior-mutability-pattern)
+          - [479. What difference between references, `Box<T>` and `RefCell<T>`?](#479-what-difference-between-references-boxt-and-refcellt)
+          - [480. What could be the advantage of checking the borrowing rules at runtime?](#480-what-could-be-the-advantage-of-checking-the-borrowing-rules-at-runtime)
+          - [481. When the `RefCell<T>` type is useful?](#481-when-the-refcellt-type-is-useful)
+          - [482. Can we use `RefCell<T>` type in multi-thread scenarios?](#482-can-we-use-refcellt-type-in-multi-thread-scenarios)
+          - [483. How we can use `RefCell<T>` type to mutate immutable value.](#483-how-we-can-use-refcellt-type-to-mutate-immutable-value)
+          - [484. How `RefCell<T>` keeping Track of Borrows at Runtime?](#484-how-refcellt-keeping-track-of-borrows-at-runtime)
+          - [485. How get a value that can have multiple owners and that we can mutate?](#485-how-get-a-value-that-can-have-multiple-owners-and-that-we-can-mutate)
+          - [486. what is the thread-safe version of `RefCell<T>`?](#486-what-is-the-thread-safe-version-of-refcellt)
       - [15.6 Reference Cycles Can Leak Memory](#156-reference-cycles-can-leak-memory)
-          - [What is `memory leak`?](#what-is-memory-leak)
-          - [What situation in Rust does create 'memory leak'?](#what-situation-in-rust-does-create-memory-leak)
-          - [How can we avoid memory leaks by using `Rc<T>` and `RefCell<T>`?](#how-can-we-avoid-memory-leaks-by-using-rct-and-refcellt)
-          - [How we can organize our data structures that have reference cycles so avoid memory leaks?](#how-we-can-organize-our-data-structures-that-have-reference-cycles-so-avoid-memory-leaks)
-          - [How we can access a value that a `Weak<T>` is pointing to?](#how-we-can-access-a-value-that-a-weakt-is-pointing-to)
-          - [Where get more information about to implement your own smart pointers?](#where-get-more-information-about-to-implement-your-own-smart-pointers)
+          - [487. What is `memory leak`?](#487-what-is-memory-leak)
+          - [488. What situation in Rust does create 'memory leak'?](#488-what-situation-in-rust-does-create-memory-leak)
+          - [489. How can we avoid memory leaks by using `Rc<T>` and `RefCell<T>`?](#489-how-can-we-avoid-memory-leaks-by-using-rct-and-refcellt)
+          - [490. How we can organize our data structures that have reference cycles so avoid memory leaks?](#490-how-we-can-organize-our-data-structures-that-have-reference-cycles-so-avoid-memory-leaks)
+          - [491. How we can access a value that a `Weak<T>` is pointing to?](#491-how-we-can-access-a-value-that-a-weakt-is-pointing-to)
+          - [492. Where get more information about to implement your own smart pointers?](#492-where-get-more-information-about-to-implement-your-own-smart-pointers)
     - [16 Fearless Concurrency](#16-fearless-concurrency)
-          - [What is Concurrent programming?](#what-is-concurrent-programming)
-          - [What is Parallel programming?](#what-is-parallel-programming)
+          - [493. What is Concurrent programming?](#493-what-is-concurrent-programming)
+          - [494. What is Parallel programming?](#494-what-is-parallel-programming)
       - [16.1 Using Threads to Run Code Simultaneously](#161-using-threads-to-run-code-simultaneously)
-          - [What is threads?](#what-is-threads)
-          - [What are the benefits of using multiple threads?](#what-are-the-benefits-of-using-multiple-threads)
-          - [What are the problems of using multiple threads?](#what-are-the-problems-of-using-multiple-threads)
-          - [What is Race conditions?](#what-is-race-conditions)
-          - [What is Deadlocks?](#what-is-deadlocks)
-          - [What create a new thread?](#what-create-a-new-thread)
-          - [What happen whit spawned threads when main thread  completes?](#what-happen-whit-spawned-threads-when-main-thread--completes)
-          - [How can we guarantee that a spawned thread will completely finish its execution?](#how-can-we-guarantee-that-a-spawned-thread-will-completely-finish-its-execution)
-          - [What mean Blocking a thread?](#what-mean-blocking-a-thread)
-          - [How stop current thread execution for a short duration?](#how-stop-current-thread-execution-for-a-short-duration)
-          - [How we should use any data from the main thread in the spawned thread’s code?](#how-we-should-use-any-data-from-the-main-thread-in-the-spawned-threads-code)
+          - [495. What is threads?](#495-what-is-threads)
+          - [496. What are the benefits of using multiple threads?](#496-what-are-the-benefits-of-using-multiple-threads)
+          - [497. What are the problems of using multiple threads?](#497-what-are-the-problems-of-using-multiple-threads)
+          - [498. What is Race conditions?](#498-what-is-race-conditions)
+          - [499. What is Deadlocks?](#499-what-is-deadlocks)
+          - [500. What create a new thread?](#500-what-create-a-new-thread)
+          - [501. What happen whit spawned threads when main thread  completes?](#501-what-happen-whit-spawned-threads-when-main-thread--completes)
+          - [502. How can we guarantee that a spawned thread will completely finish its execution?](#502-how-can-we-guarantee-that-a-spawned-thread-will-completely-finish-its-execution)
+          - [503. What mean Blocking a thread?](#503-what-mean-blocking-a-thread)
+          - [504. How stop current thread execution for a short duration?](#504-how-stop-current-thread-execution-for-a-short-duration)
+          - [505. How we should use any data from the main thread in the spawned thread’s code?](#505-how-we-should-use-any-data-from-the-main-thread-in-the-spawned-threads-code)
       - [16.2 Using Message Passing to Transfer Data Between Threads](#162-using-message-passing-to-transfer-data-between-threads)
-          - [What is `Message Passing` concurrency?](#what-is-message-passing-concurrency)
-          - [How `Message Passing` implemented in Rust?](#how-message-passing-implemented-in-rust)
-          - [What is 'Channels'?](#what-is-channels)
-          - [How create Chanel for multiple producer and single consumer (mpsc)?](#how-create-chanel-for-multiple-producer-and-single-consumer-mpsc)
-          - [How can we organize thread communication using mpsc Channel?](#how-can-we-organize-thread-communication-using-mpsc-channel)
-          - [In Channel, is it possible to reuse a value in the sender code after it has been sent?](#in-channel-is-it-possible-to-reuse-a-value-in-the-sender-code-after-it-has-been-sent)
-          - [How we can send multiple values in mpsc Channel?](#how-we-can-send-multiple-values-in-mpsc-channel)
-          - [How we can use multiply produsers whit mpsc Cannel?](#how-we-can-use-multiply-produsers-whit-mpsc-cannel)
+          - [506. What is `Message Passing` concurrency?](#506-what-is-message-passing-concurrency)
+          - [507. How `Message Passing` implemented in Rust?](#507-how-message-passing-implemented-in-rust)
+          - [508. What is 'Channels'?](#508-what-is-channels)
+          - [509. How create Chanel for multiple producer and single consumer (mpsc)?](#509-how-create-chanel-for-multiple-producer-and-single-consumer-mpsc)
+          - [510. How can we organize thread communication using mpsc Channel?](#510-how-can-we-organize-thread-communication-using-mpsc-channel)
+          - [511. In Channel, is it possible to reuse a value in the sender code after it has been sent?](#511-in-channel-is-it-possible-to-reuse-a-value-in-the-sender-code-after-it-has-been-sent)
+          - [512. How we can send multiple values in mpsc Channel?](#512-how-we-can-send-multiple-values-in-mpsc-channel)
+          - [513. How we can use multiply produsers whit mpsc Cannel?](#513-how-we-can-use-multiply-produsers-whit-mpsc-cannel)
       - [16.3 Shared-State Concurrency](#163-shared-state-concurrency)
-          - [What is Mutex?](#what-is-mutex)
-          - [How create Mutex?](#how-create-mutex)
-          - [How Sharing a `Mutex<T>` Between Multiple Threads?](#how-sharing-a-mutext-between-multiple-threads)
-          - [How does a thread access data inside a Mutex?](#how-does-a-thread-access-data-inside-a-mutex)
-          - [What is `Arc<T>`?](#what-is-arct)
-          - [What is Atomics?](#what-is-atomics)
-          - [Way having immutable `Mutex<T>`  value we could get a mutable reference to the value inside it?](#way-having-immutable-mutext--value-we-could-get-a-mutable-reference-to-the-value-inside-it)
-          - [What is deadlock?](#what-is-deadlock)
+          - [514. What is Mutex?](#514-what-is-mutex)
+          - [515. How create Mutex?](#515-how-create-mutex)
+          - [516. How Sharing a `Mutex<T>` Between Multiple Threads?](#516-how-sharing-a-mutext-between-multiple-threads)
+          - [517. How does a thread access data inside a Mutex?](#517-how-does-a-thread-access-data-inside-a-mutex)
+          - [518. What is `Arc<T>`?](#518-what-is-arct)
+          - [519. What is Atomics?](#519-what-is-atomics)
+          - [520. Way having immutable `Mutex<T>`  value we could get a mutable reference to the value inside it?](#520-way-having-immutable-mutext--value-we-could-get-a-mutable-reference-to-the-value-inside-it)
+          - [521. What is deadlock?](#521-what-is-deadlock)
       - [16.4 Extensible Concurrency with the Sync and Send Traits.](#164-extensible-concurrency-with-the-sync-and-send-traits)
-          - [For what used The Send marker trait?](#for-what-used-the-send-marker-trait)
-          - [Are `Rc<T>` is `Send`?](#are-rct-is-send)
-          - [Does we marked as Send Any type composed entirely of Send types?](#does-we-marked-as-send-any-type-composed-entirely-of-send-types)
-          - [What primitive types are Send?](#what-primitive-types-are-send)
-          - [For what used The Sync marker trait?](#for-what-used-the-sync-marker-trait)
-          - [Does we marked as Sync Any type composed entirely of Sync types?](#does-we-marked-as-sync-any-type-composed-entirely-of-sync-types)
-          - [What primitive types are Sync?](#what-primitive-types-are-sync)
-          - [How we can manually implement Send and Sync type?](#how-we-can-manually-implement-send-and-sync-type)
+          - [522. For what used The Send marker trait?](#522-for-what-used-the-send-marker-trait)
+          - [523. Are `Rc<T>` is `Send`?](#523-are-rct-is-send)
+          - [524. Does we marked as Send Any type composed entirely of Send types?](#524-does-we-marked-as-send-any-type-composed-entirely-of-send-types)
+          - [525. What primitive types are Send?](#525-what-primitive-types-are-send)
+          - [526. For what used The Sync marker trait?](#526-for-what-used-the-sync-marker-trait)
+          - [527. Does we marked as Sync Any type composed entirely of Sync types?](#527-does-we-marked-as-sync-any-type-composed-entirely-of-sync-types)
+          - [528. What primitive types are Sync?](#528-what-primitive-types-are-sync)
+          - [529. How we can manually implement Send and Sync type?](#529-how-we-can-manually-implement-send-and-sync-type)
     - [17 Fundamentals of Asynchronous Programming: Async, Await, Futures, and Streams](#17-fundamentals-of-asynchronous-programming-async-await-futures-and-streams)
-          - [What techniques are for working on more than one operation at a time?](#what-techniques-are-for-working-on-more-than-one-operation-at-a-time)
-          - [What is CPU-bound or compute-bound operation?](#what-is-cpu-bound-or-compute-bound-operation)
-          - [What is IO-bound operation?](#what-is-io-bound-operation)
-          - [What is concurrency?](#what-is-concurrency)
-          - [What is parallelism?](#what-is-parallelism)
-          - [What is serial?](#what-is-serial)
+          - [530. What techniques are for working on more than one operation at a time?](#530-what-techniques-are-for-working-on-more-than-one-operation-at-a-time)
+          - [531. What is CPU-bound or compute-bound operation?](#531-what-is-cpu-bound-or-compute-bound-operation)
+          - [532. What is IO-bound operation?](#532-what-is-io-bound-operation)
+          - [533. What is concurrency?](#533-what-is-concurrency)
+          - [534. What is parallelism?](#534-what-is-parallelism)
+          - [535. What is serial?](#535-what-is-serial)
       - [17.1 Futures and the Async Syntax](#171-futures-and-the-async-syntax)
-          - [What is key elements of asynchronous programming in Rust?](#what-is-key-elements-of-asynchronous-programming-in-rust)
-          - [What is Future in Rust asynchronous programming?](#what-is-future-in-rust-asynchronous-programming)
-          - [How to use `async` keyword?](#how-to-use-async-keyword)
-          - [In what places of code async function or block can be paused and resumed.](#in-what-places-of-code-async-function-or-block-can-be-paused-and-resumed)
-          - [What called process of checking with a Future to see if its value is available yet?](#what-called-process-of-checking-with-a-future-to-see-if-its-value-is-available-yet)
-          - [How to use `await` keyword?](#how-to-use-await-keyword)
-          - [What is `trpl` crate?](#what-is-trpl-crate)
-          - [What is `futures` crate?](#what-is-futures-crate)
-          - [What is Tokio in Rust ?](#what-is-tokio-in-rust-)
-          - [How to define `async` function?](#how-to-define-async-function)
-          - [How Rust compile async function?](#how-rust-compile-async-function)
-          - [What is required for run async code?](#what-is-required-for-run-async-code)
-          - [What is Async Runtime?](#what-is-async-runtime)
+          - [536. What is key elements of asynchronous programming in Rust?](#536-what-is-key-elements-of-asynchronous-programming-in-rust)
+          - [537. What is Future in Rust asynchronous programming?](#537-what-is-future-in-rust-asynchronous-programming)
+          - [538. How to use `async` keyword?](#538-how-to-use-async-keyword)
+          - [539. In what places of code async function or block can be paused and resumed.](#539-in-what-places-of-code-async-function-or-block-can-be-paused-and-resumed)
+          - [540. What called process of checking with a Future to see if its value is available yet?](#540-what-called-process-of-checking-with-a-future-to-see-if-its-value-is-available-yet)
+          - [541. How to use `await` keyword?](#541-how-to-use-await-keyword)
+          - [542. What is `trpl` crate?](#542-what-is-trpl-crate)
+          - [543. What is `futures` crate?](#543-what-is-futures-crate)
+          - [544. What is Tokio in Rust ?](#544-what-is-tokio-in-rust-)
+          - [545. How to define `async` function?](#545-how-to-define-async-function)
+          - [546. How Rust compile async function?](#546-how-rust-compile-async-function)
+          - [547. What is required for run async code?](#547-what-is-required-for-run-async-code)
+          - [548. What is Async Runtime?](#548-what-is-async-runtime)
       - [17.2 Applying Concurrency with Async](#172-applying-concurrency-with-async)
-          - [How create a New async Task with `trpl::spawn_task`?](#how-create-a-new-async-task-with-trplspawn_task)
-          - [How create and run multiple async task?](#how-create-and-run-multiple-async-task)
-          - [How Passing Messages between Futures (async tasks)?](#how-passing-messages-between-futures-async-tasks)
-          - [Can we use `for` loop over an asynchronous series of items?](#can-we-use-for-loop-over-an-asynchronous-series-of-items)
-          - [How we can iterate over asynchronous series of items?](#how-we-can-iterate-over-asynchronous-series-of-items)
-          - [What is `while let` conditional loop?](#what-is-while-let-conditional-loop)
+          - [549. How create a New async Task with `trpl::spawn_task`?](#549-how-create-a-new-async-task-with-trplspawn_task)
+          - [550. How create and run multiple async task?](#550-how-create-and-run-multiple-async-task)
+          - [551. How Passing Messages between Futures (async tasks)?](#551-how-passing-messages-between-futures-async-tasks)
+          - [552. Can we use `for` loop over an asynchronous series of items?](#552-can-we-use-for-loop-over-an-asynchronous-series-of-items)
+          - [553. How we can iterate over asynchronous series of items?](#553-how-we-can-iterate-over-asynchronous-series-of-items)
+          - [554. What is `while let` conditional loop?](#554-what-is-while-let-conditional-loop)
       - [17.3 Working with Any Number of Futures](#173-working-with-any-number-of-futures)
-          - [How we can run any number of async Task (Futures) the same type?](#how-we-can-run-any-number-of-async-task-futures-the-same-type)
-          - [Can we run any number of async Task (Futures) different types?](#can-we-run-any-number-of-async-task-futures-different-types)
-          - [How we can get only one future result from many futures?](#how-we-can-get-only-one-future-result-from-many-futures)
-          - [In what order async runtime `race` run futures passed in as arguments?](#in-what-order-async-runtime-race-run-futures-passed-in-as-arguments)
-          - [How we can yield control from a long-running task to the Runtime?](#how-we-can-yield-control-from-a-long-running-task-to-the-runtime)
+          - [555. How we can run any number of async Task (Futures) the same type?](#555-how-we-can-run-any-number-of-async-task-futures-the-same-type)
+          - [556. Can we run any number of async Task (Futures) different types?](#556-can-we-run-any-number-of-async-task-futures-different-types)
+          - [557. How we can get only one future result from many futures?](#557-how-we-can-get-only-one-future-result-from-many-futures)
+          - [558. In what order async runtime `race` run futures passed in as arguments?](#558-in-what-order-async-runtime-race-run-futures-passed-in-as-arguments)
+          - [559. How we can yield control from a long-running task to the Runtime?](#559-how-we-can-yield-control-from-a-long-running-task-to-the-runtime)
       - [17.4 Streams: Futures in Sequence](#174-streams-futures-in-sequence)
-          - [What is Streams in async Rust?](#what-is-streams-in-async-rust)
-          - [How we can create Stream from Iterator?](#how-we-can-create-stream-from-iterator)
-          - [How we can create stream of messages?](#how-we-can-create-stream-of-messages)
-          - [How we can merge streams?](#how-we-can-merge-streams)
+          - [560. What is Streams in async Rust?](#560-what-is-streams-in-async-rust)
+          - [561. How we can create Stream from Iterator?](#561-how-we-can-create-stream-from-iterator)
+          - [562. How we can create stream of messages?](#562-how-we-can-create-stream-of-messages)
+          - [563. How we can merge streams?](#563-how-we-can-merge-streams)
       - [17.5 A Closer Look at the Traits for Async](#175-a-closer-look-at-the-traits-for-async)
-          - [how Rust defines Future Trait?](#how-rust-defines-future-trait)
-          - [How named Future’s associated type?](#how-named-futures-associated-type)
-          - [What says Future’s associated type?](#what-says-futures-associated-type)
-          - [What method define Future Trait?](#what-method-define-future-trait)
-          - [Which takes and return the `poll` method of Future Trait?](#which-takes-and-return-the-poll-method-of-future-trait)
-          - [how Rust defines Poll type?](#how-rust-defines-poll-type)
-          - [What happen if caller call `pull` again after the future has returned Ready?](#what-happen-if-caller-call-pull-again-after-the-future-has-returned-ready)
-          - [How Rust compile code that uses `await`?](#how-rust-compile-code-that-uses-await)
-          - [What should Rust do when the future is still Pending?](#what-should-rust-do-when-the-future-is-still-pending)
-          - [What is self-referential data types?](#what-is-self-referential-data-types)
-          - [Way self-referential data types is unsafe?](#way-self-referential-data-types-is-unsafe)
-          - [What is Unpin and !Unpin Traits?](#what-is-unpin-and-unpin-traits)
-          - [What is Pin type?](#what-is-pin-type)
-          - [What does it affect Pin type?](#what-does-it-affect-pin-type)
-          - [Why we must wraps to Pin type a pointer-like types of Future for using it?](#why-we-must-wraps-to-pin-type-a-pointer-like-types-of-future-for-using-it)
-          - [Should we `pin` directly awaiting future?](#should-we-pin-directly-awaiting-future)
-          - [What is Stream trait?](#what-is-stream-trait)
-          - [How named Stream’s associated type?](#how-named-streams-associated-type)
-          - [Which method define Stream?](#which-method-define-stream)
-          - [What type return `poll_next` method of Stream?](#what-type-return-poll_next-method-of-stream)
-          - [What is StreamExt trait?](#what-is-streamext-trait)
+          - [564. how Rust defines Future Trait?](#564-how-rust-defines-future-trait)
+          - [565. How named Future’s associated type?](#565-how-named-futures-associated-type)
+          - [566. What says Future’s associated type?](#566-what-says-futures-associated-type)
+          - [567. What method define Future Trait?](#567-what-method-define-future-trait)
+          - [568. Which takes and return the `poll` method of Future Trait?](#568-which-takes-and-return-the-poll-method-of-future-trait)
+          - [569. how Rust defines Poll type?](#569-how-rust-defines-poll-type)
+          - [570. What happen if caller call `pull` again after the future has returned Ready?](#570-what-happen-if-caller-call-pull-again-after-the-future-has-returned-ready)
+          - [571. How Rust compile code that uses `await`?](#571-how-rust-compile-code-that-uses-await)
+          - [572. What should Rust do when the future is still Pending?](#572-what-should-rust-do-when-the-future-is-still-pending)
+          - [573. What is self-referential data types?](#573-what-is-self-referential-data-types)
+          - [574. Way self-referential data types is unsafe?](#574-way-self-referential-data-types-is-unsafe)
+          - [575. What is Unpin and !Unpin Traits?](#575-what-is-unpin-and-unpin-traits)
+          - [576. What is Pin type?](#576-what-is-pin-type)
+          - [577. What does it affect Pin type?](#577-what-does-it-affect-pin-type)
+          - [578. Why we must wraps to Pin type a pointer-like types of Future for using it?](#578-why-we-must-wraps-to-pin-type-a-pointer-like-types-of-future-for-using-it)
+          - [579. Should we `pin` directly awaiting future?](#579-should-we-pin-directly-awaiting-future)
+          - [580. What is Stream trait?](#580-what-is-stream-trait)
+          - [581. How named Stream’s associated type?](#581-how-named-streams-associated-type)
+          - [582. Which method define Stream?](#582-which-method-define-stream)
+          - [583. What type return `poll_next` method of Stream?](#583-what-type-return-poll_next-method-of-stream)
+          - [584. What is StreamExt trait?](#584-what-is-streamext-trait)
       - [17.6  Putting It All Together: Futures, Tasks, and Threads](#176--putting-it-all-together-futures-tasks-and-threads)
-          - [what rules should be followed when choosing between Async model and Treads?](#what-rules-should-be-followed-when-choosing-between-async-model-and-treads)
+          - [585. what rules should be followed when choosing between Async model and Treads?](#585-what-rules-should-be-followed-when-choosing-between-async-model-and-treads)
     - [18 Object-Oriented Programming Features of Rust](#18-object-oriented-programming-features-of-rust)
       - [18.1 Characteristics of Object-Oriented Languages](#181-characteristics-of-object-oriented-languages)
-          - [Which Characteristics of Object-Oriented Languages?](#which-characteristics-of-object-oriented-languages)
-          - [What is objects in OOP?](#what-is-objects-in-oop)
-          - [How Rust implement OOP objects?](#how-rust-implement-oop-objects)
-          - [What is encapsulation?](#what-is-encapsulation)
-          - [How Rust implements encapsulation?](#how-rust-implements-encapsulation)
-          - [What is inheritance?](#what-is-inheritance)
-          - [How Rust implements inheritance?](#how-rust-implements-inheritance)
-          - [How we can implement code reusing in Rust?](#how-we-can-implement-code-reusing-in-rust)
-          - [What is Polymorphism?](#what-is-polymorphism)
-          - [How Rust implements Polymorphism?](#how-rust-implements-polymorphism)
+          - [586. Which Characteristics of Object-Oriented Languages?](#586-which-characteristics-of-object-oriented-languages)
+          - [587. What is objects in OOP?](#587-what-is-objects-in-oop)
+          - [588. How Rust implement OOP objects?](#588-how-rust-implement-oop-objects)
+          - [589. What is encapsulation?](#589-what-is-encapsulation)
+          - [590. How Rust implements encapsulation?](#590-how-rust-implements-encapsulation)
+          - [591. What is inheritance?](#591-what-is-inheritance)
+          - [592. How Rust implements inheritance?](#592-how-rust-implements-inheritance)
+          - [593. How we can implement code reusing in Rust?](#593-how-we-can-implement-code-reusing-in-rust)
+          - [594. What is Polymorphism?](#594-what-is-polymorphism)
+          - [595. How Rust implements Polymorphism?](#595-how-rust-implements-polymorphism)
       - [18.2 Using Trait Objects That Allow for Values of Different Types](#182-using-trait-objects-that-allow-for-values-of-different-types)
-          - [How create vector that store different types?](#how-create-vector-that-store-different-types)
-          - [How implement common behavior (polymorphism) in Rust?](#how-implement-common-behavior-polymorphism-in-rust)
-          - [What is trait object?](#what-is-trait-object)
-          - [what is the difference in usage trait objects in place of a generic or concrete type?](#what-is-the-difference-in-usage-trait-objects-in-place-of-a-generic-or-concrete-type)
-          - [What happen if we use values that don’t implement the traits that the trait objects need?](#what-happen-if-we-use-values-that-dont-implement-the-traits-that-the-trait-objects-need)
+          - [596. How create vector that store different types?](#596-how-create-vector-that-store-different-types)
+          - [597. How implement common behavior (polymorphism) in Rust?](#597-how-implement-common-behavior-polymorphism-in-rust)
+          - [598. What is trait object?](#598-what-is-trait-object)
+          - [599. what is the difference in usage trait objects in place of a generic or concrete type?](#599-what-is-the-difference-in-usage-trait-objects-in-place-of-a-generic-or-concrete-type)
+          - [600. What happen if we use values that don’t implement the traits that the trait objects need?](#600-what-happen-if-we-use-values-that-dont-implement-the-traits-that-the-trait-objects-need)
       - [18.3 Implementing an Object-Oriented Design Pattern](#183-implementing-an-object-oriented-design-pattern)
-          - [What is state pattern?](#what-is-state-pattern)
-          - [What is advantage of using state pattern?](#what-is-advantage-of-using-state-pattern)
+          - [601. What is state pattern?](#601-what-is-state-pattern)
+          - [602. What is advantage of using state pattern?](#602-what-is-advantage-of-using-state-pattern)
     - [19 Patterns and Matching](#19-patterns-and-matching)
-          - [What is Patterns?](#what-is-patterns)
+          - [603. What is Patterns?](#603-what-is-patterns)
       - [19.1 All the Places Patterns Can Be Used](#191-all-the-places-patterns-can-be-used)
-          - [Where are used Patterns?](#where-are-used-patterns)
-          - [How using Pattern in match Arms?](#how-using-pattern-in-match-arms)
-          - [what is the mandatory requirement when using match Arms?](#what-is-the-mandatory-requirement-when-using-match-arms)
-          - [What method are for make exhaustive requirement for match expressions?](#what-method-are-for-make-exhaustive-requirement-for-match-expressions)
-          - [Which pattern can match anything?](#which-pattern-can-match-anything)
-          - [What pattern can be used for ignore  any value not specified?](#what-pattern-can-be-used-for-ignore--any-value-not-specified)
-          - [For what used `if let` Expressions?](#for-what-used-if-let-expressions)
-          - [What are downside of using `if let` expressions?](#what-are-downside-of-using-if-let-expressions)
-          - [For what used `while let` Conditional Loops?](#for-what-used-while-let-conditional-loops)
-          - [How to used a pattern in `for` Loops?](#how-to-used-a-pattern-in-for-loops)
-          - [How used pattern whit `let` Statements whit binging value?](#how-used-pattern-whit-let-statements-whit-binging-value)
-          - [How is used patterns whit Function parameters?](#how-is-used-patterns-whit-function-parameters)
+          - [604. Where are used Patterns?](#604-where-are-used-patterns)
+          - [605. How using Pattern in match Arms?](#605-how-using-pattern-in-match-arms)
+          - [606. what is the mandatory requirement when using match Arms?](#606-what-is-the-mandatory-requirement-when-using-match-arms)
+          - [607. What method are for make exhaustive requirement for match expressions?](#607-what-method-are-for-make-exhaustive-requirement-for-match-expressions)
+          - [608. Which pattern can match anything?](#608-which-pattern-can-match-anything)
+          - [609. What pattern can be used for ignore  any value not specified?](#609-what-pattern-can-be-used-for-ignore--any-value-not-specified)
+          - [610. For what used `if let` Expressions?](#610-for-what-used-if-let-expressions)
+          - [611. What are downside of using `if let` expressions?](#611-what-are-downside-of-using-if-let-expressions)
+          - [612. For what used `while let` Conditional Loops?](#612-for-what-used-while-let-conditional-loops)
+          - [613. How to used a pattern in `for` Loops?](#613-how-to-used-a-pattern-in-for-loops)
+          - [614. How used pattern whit `let` Statements whit binging value?](#614-how-used-pattern-whit-let-statements-whit-binging-value)
+          - [615. How is used patterns whit Function parameters?](#615-how-is-used-patterns-whit-function-parameters)
       - [19.2 Refutability: Whether a Pattern Might Fail to Match](#192-refutability-whether-a-pattern-might-fail-to-match)
-          - [When patterns are irrefutable?](#when-patterns-are-irrefutable)
-          - [When patterns are refutable?](#when-patterns-are-refutable)
-          - [Which type of pattern can accept function parameters, `let` statements, and `for` loops?](#which-type-of-pattern-can-accept-function-parameters-let-statements-and-for-loops)
-          - [Which type of pattern can accept `if let`, `while let` expressions and the `let-else` statement?](#which-type-of-pattern-can-accept-if-let-while-let-expressions-and-the-let-else-statement)
-          - [Why a compiler warns against irrefutable patterns in `if let`, `while let` expressions and the `let-else` statement?](#why-a-compiler-warns-against-irrefutable-patterns-in-if-let-while-let-expressions-and-the-let-else-statement)
-          - [How we can fix situation when we have a refutable pattern where an irrefutable pattern is needed?](#how-we-can-fix-situation-when-we-have-a-refutable-pattern-where-an-irrefutable-pattern-is-needed)
+          - [616. When patterns are irrefutable?](#616-when-patterns-are-irrefutable)
+          - [617. When patterns are refutable?](#617-when-patterns-are-refutable)
+          - [618. Which type of pattern can accept function parameters, `let` statements, and `for` loops?](#618-which-type-of-pattern-can-accept-function-parameters-let-statements-and-for-loops)
+          - [619. Which type of pattern can accept `if let`, `while let` expressions and the `let-else` statement?](#619-which-type-of-pattern-can-accept-if-let-while-let-expressions-and-the-let-else-statement)
+          - [620. Why a compiler warns against irrefutable patterns in `if let`, `while let` expressions and the `let-else` statement?](#620-why-a-compiler-warns-against-irrefutable-patterns-in-if-let-while-let-expressions-and-the-let-else-statement)
+          - [621. How we can fix situation when we have a refutable pattern where an irrefutable pattern is needed?](#621-how-we-can-fix-situation-when-we-have-a-refutable-pattern-where-an-irrefutable-pattern-is-needed)
       - [19.3 Pattern Syntax](#193-pattern-syntax)
-          - [How we can directly maths patterns match patterns against literals?](#how-we-can-directly-maths-patterns-match-patterns-against-literals)
-          - [How we can use named variables in patterns to match values?](#how-we-can-use-named-variables-in-patterns-to-match-values)
-          - [How we can match multiple patterns inside one match arm?](#how-we-can-match-multiple-patterns-inside-one-match-arm)
-          - [What is pattern 'or' operator?](#what-is-pattern-or-operator)
-          - [How we can Matching Ranges of Values?](#how-we-can-matching-ranges-of-values)
-          - [How to destructure Struct?](#how-to-destructure-struct)
-          - [How to destructure Enum?](#how-to-destructure-enum)
-          - [How to destructure Nested Structs and Enums?](#how-to-destructure-nested-structs-and-enums)
-          - [How to destructure mix of Structs and Tuples?](#how-to-destructure-mix-of-structs-and-tuples)
+          - [622. How we can directly maths patterns match patterns against literals?](#622-how-we-can-directly-maths-patterns-match-patterns-against-literals)
+          - [623. How we can use named variables in patterns to match values?](#623-how-we-can-use-named-variables-in-patterns-to-match-values)
+          - [624. How we can match multiple patterns inside one match arm?](#624-how-we-can-match-multiple-patterns-inside-one-match-arm)
+          - [625. What is pattern 'or' operator?](#625-what-is-pattern-or-operator)
+          - [626. How we can Matching Ranges of Values?](#626-how-we-can-matching-ranges-of-values)
+          - [627. How to destructure Struct?](#627-how-to-destructure-struct)
+          - [628. How to destructure Enum?](#628-how-to-destructure-enum)
+          - [629. How to destructure Nested Structs and Enums?](#629-how-to-destructure-nested-structs-and-enums)
+          - [630. How to destructure mix of Structs and Tuples?](#630-how-to-destructure-mix-of-structs-and-tuples)
         - [Ignoring Values in a Pattern](#ignoring-values-in-a-pattern)
-          - [Why is it sometimes necessary to ignore values ​​in a pattern?](#why-is-it-sometimes-necessary-to-ignore-values-in-a-pattern)
-          - [How to ignore entire value in a pattern?](#how-to-ignore-entire-value-in-a-pattern)
-          - [In which cases we can ignoring entire value in a pattern?](#in-which-cases-we-can-ignoring-entire-value-in-a-pattern)
-          - [Why might we need to ignore a value in a function?](#why-might-we-need-to-ignore-a-value-in-a-function)
-          - [How to ignore part of a value in patterns?](#how-to-ignore-part-of-a-value-in-patterns)
-          - [Why might we need to ignore a unused Variable?](#why-might-we-need-to-ignore-a-unused-variable)
-          - [How we can ignore a unused Variable?](#how-we-can-ignore-a-unused-variable)
-          - [What difference between using underscore `_` and underscore whit variable name `_x`?](#what-difference-between-using-underscore-_-and-underscore-whit-variable-name-_x)
-          - [How can we ignore Remaining Parts of a Value?](#how-can-we-ignore-remaining-parts-of-a-value)
+          - [631. Why is it sometimes necessary to ignore values ​​in a pattern?](#631-why-is-it-sometimes-necessary-to-ignore-values-in-a-pattern)
+          - [632. How to ignore entire value in a pattern?](#632-how-to-ignore-entire-value-in-a-pattern)
+          - [633. In which cases we can ignoring entire value in a pattern?](#633-in-which-cases-we-can-ignoring-entire-value-in-a-pattern)
+          - [634. Why might we need to ignore a value in a function?](#634-why-might-we-need-to-ignore-a-value-in-a-function)
+          - [635. How to ignore part of a value in patterns?](#635-how-to-ignore-part-of-a-value-in-patterns)
+          - [636. Why might we need to ignore a unused Variable?](#636-why-might-we-need-to-ignore-a-unused-variable)
+          - [637. How we can ignore a unused Variable?](#637-how-we-can-ignore-a-unused-variable)
+          - [638. What difference between using underscore `_` and underscore whit variable name `_x`?](#638-what-difference-between-using-underscore-_-and-underscore-whit-variable-name-_x)
+          - [639. How can we ignore Remaining Parts of a Value?](#639-how-can-we-ignore-remaining-parts-of-a-value)
         - [Extra Conditionals with Match Guards](#extra-conditionals-with-match-guards)
-          - [What is *match guard*?](#what-is-match-guard)
-          - [When allowed *match guard*?](#when-allowed-match-guard)
-          - [How we can use match guards to solve pattern-shadowing problem?](#how-we-can-use-match-guards-to-solve-pattern-shadowing-problem)
-          - [How we can use match guards whit 'or' operator `|`?](#how-we-can-use-match-guards-whit-or-operator-)
+          - [640. What is *match guard*?](#640-what-is-match-guard)
+          - [641. When allowed *match guard*?](#641-when-allowed-match-guard)
+          - [642. How we can use match guards to solve pattern-shadowing problem?](#642-how-we-can-use-match-guards-to-solve-pattern-shadowing-problem)
+          - [643. How we can use match guards whit 'or' operator `|`?](#643-how-we-can-use-match-guards-whit-or-operator-)
         - [@ Bindings](#-bindings)
-          - [For what used *at* `@` Bindings operator in patterns?](#for-what-used-at--bindings-operator-in-patterns)
+          - [644. For what used *at* `@` Bindings operator in patterns?](#644-for-what-used-at--bindings-operator-in-patterns)
     - [Advanced Features](#advanced-features)
       - [20.1 Unsafe Rust](#201-unsafe-rust)
-          - [What is Unsafe Rust?](#what-is-unsafe-rust)
-          - [What is Unsafe Rust for?](#what-is-unsafe-rust-for)
-          - [Why exists Unsafe Rust?](#why-exists-unsafe-rust)
+          - [645. What is Unsafe Rust?](#645-what-is-unsafe-rust)
+          - [646. What is Unsafe Rust for?](#646-what-is-unsafe-rust-for)
+          - [647. Why exists Unsafe Rust?](#647-why-exists-unsafe-rust)
         - [Unsafe Superpowers](#unsafe-superpowers)
-          - [How switch to unsafe Rust?](#how-switch-to-unsafe-rust)
-          - [There is the borrow checking in unsafe Rust?](#there-is-the-borrow-checking-in-unsafe-rust)
-          - [What is intent of 'unsafe' block?](#what-is-intent-of-unsafe-block)
-          - [What we call unsafe superpowers?](#what-we-call-unsafe-superpowers)
-          - [What is Safe API?](#what-is-safe-api)
+          - [648. How switch to unsafe Rust?](#648-how-switch-to-unsafe-rust)
+          - [649. There is the borrow checking in unsafe Rust?](#649-there-is-the-borrow-checking-in-unsafe-rust)
+          - [650. What is intent of 'unsafe' block?](#650-what-is-intent-of-unsafe-block)
+          - [651. What we call unsafe superpowers?](#651-what-we-call-unsafe-superpowers)
+          - [652. What is Safe API?](#652-what-is-safe-api)
         - [Dereferencing a Raw Pointer](#dereferencing-a-raw-pointer)
-          - [What is Raw Pointers?](#what-is-raw-pointers)
-          - [What are the raw pointers?](#what-are-the-raw-pointers)
-          - [How raw pointers are written?](#how-raw-pointers-are-written)
-          - [What means 'immutable' in the context of raw pointers?](#what-means-immutable-in-the-context-of-raw-pointers)
-          - [What different raw pointers from references and smart pointers?](#what-different-raw-pointers-from-references-and-smart-pointers)
-          - [Can we create raw pointers outside `unsafe` block in safe code?](#can-we-create-raw-pointers-outside-unsafe-block-in-safe-code)
-          - [What restrictions of using raw pointers in safe code?](#what-restrictions-of-using-raw-pointers-in-safe-code)
-          - [How create raw pointer?](#how-create-raw-pointer)
-          - [What is the danger of using raw pointers?](#what-is-the-danger-of-using-raw-pointers)
-          - [Why would ever use raw pointers?](#why-would-ever-use-raw-pointers)
-          - [What we can dereference raw pointers?](#what-we-can-dereference-raw-pointers)
+          - [653. What is Raw Pointers?](#653-what-is-raw-pointers)
+          - [654. What are the raw pointers?](#654-what-are-the-raw-pointers)
+          - [655. How raw pointers are written?](#655-how-raw-pointers-are-written)
+          - [656. What means 'immutable' in the context of raw pointers?](#656-what-means-immutable-in-the-context-of-raw-pointers)
+          - [657. What different raw pointers from references and smart pointers?](#657-what-different-raw-pointers-from-references-and-smart-pointers)
+          - [658. Can we create raw pointers outside `unsafe` block in safe code?](#658-can-we-create-raw-pointers-outside-unsafe-block-in-safe-code)
+          - [659. What restrictions of using raw pointers in safe code?](#659-what-restrictions-of-using-raw-pointers-in-safe-code)
+          - [660. How create raw pointer?](#660-how-create-raw-pointer)
+          - [661. What is the danger of using raw pointers?](#661-what-is-the-danger-of-using-raw-pointers)
+          - [662. Why would ever use raw pointers?](#662-why-would-ever-use-raw-pointers)
+          - [663. What we can dereference raw pointers?](#663-what-we-can-dereference-raw-pointers)
         - [Calling an Unsafe Function or Method](#calling-an-unsafe-function-or-method)
-          - [What is Unsafe Function?](#what-is-unsafe-function)
-          - [How is an unsafe function indicated?](#how-is-an-unsafe-function-indicated)
-          - [How call Unsafe Function?](#how-call-unsafe-function)
-          - [How we must perform unsafe operations in the body of an unsafe function?](#how-we-must-perform-unsafe-operations-in-the-body-of-an-unsafe-function)
-          - [Is the function unsafe if it contain unsafe code?](#is-the-function-unsafe-if-it-contain-unsafe-code)
-          - [What is FFI?](#what-is-ffi)
-          - [What is the `extern` Rust keyword used for?](#what-is-the-extern-rust-keyword-used-for)
-          - [Way need declare `extern` block by `unsafe` keyword?](#way-need-declare-extern-block-by-unsafe-keyword)
-          - [How to define an extern function defined in another language?](#how-to-define-an-extern-function-defined-in-another-language)
-          - [How to call an extern function defined in another language?](#how-to-call-an-extern-function-defined-in-another-language)
-          - [How call Rust Functions from Other Languages?](#how-call-rust-functions-from-other-languages)
-          - [What is *Mangling*?](#what-is-mangling)
+          - [664. What is Unsafe Function?](#664-what-is-unsafe-function)
+          - [665. How is an unsafe function indicated?](#665-how-is-an-unsafe-function-indicated)
+          - [666. How call Unsafe Function?](#666-how-call-unsafe-function)
+          - [667. How we must perform unsafe operations in the body of an unsafe function?](#667-how-we-must-perform-unsafe-operations-in-the-body-of-an-unsafe-function)
+          - [668. Is the function unsafe if it contain unsafe code?](#668-is-the-function-unsafe-if-it-contain-unsafe-code)
+          - [669. What is FFI?](#669-what-is-ffi)
+          - [670. What is the `extern` Rust keyword used for?](#670-what-is-the-extern-rust-keyword-used-for)
+          - [671. Way need declare `extern` block by `unsafe` keyword?](#671-way-need-declare-extern-block-by-unsafe-keyword)
+          - [672. How to define an extern function defined in another language?](#672-how-to-define-an-extern-function-defined-in-another-language)
+          - [673. How to call an extern function defined in another language?](#673-how-to-call-an-extern-function-defined-in-another-language)
+          - [674. How call Rust Functions from Other Languages?](#674-how-call-rust-functions-from-other-languages)
+          - [675. What is *Mangling*?](#675-what-is-mangling)
         - [Accessing or Modifying a Mutable Static Variable.](#accessing-or-modifying-a-mutable-static-variable)
-          - [How create static variable?](#how-create-static-variable)
-          - [What is Static Variables?](#what-is-static-variables)
-          - [Way convention of naming static variables?](#way-convention-of-naming-static-variables)
-          - [What value can store static variable?](#what-value-can-store-static-variable)
-          - [What is differences static variables from constants?](#what-is-differences-static-variables-from-constants)
-          - [Is it safe accessing and modifying mutable static variables?](#is-it-safe-accessing-and-modifying-mutable-static-variables)
-          - [What is unsafe using mutable static variables?](#what-is-unsafe-using-mutable-static-variables)
-          - [How we must access a mutable static variables?](#how-we-must-access-a-mutable-static-variables)
-          - [How we should comment unsafe function?](#how-we-should-comment-unsafe-function)
-          - [How we should comment unsafe operation?](#how-we-should-comment-unsafe-operation)
-          - [How create reference to static mutable variable?](#how-create-reference-to-static-mutable-variable)
+          - [676. How create static variable?](#676-how-create-static-variable)
+          - [677. What is Static Variables?](#677-what-is-static-variables)
+          - [678. Way convention of naming static variables?](#678-way-convention-of-naming-static-variables)
+          - [679. What value can store static variable?](#679-what-value-can-store-static-variable)
+          - [680. What is differences static variables from constants?](#680-what-is-differences-static-variables-from-constants)
+          - [681. Is it safe accessing and modifying mutable static variables?](#681-is-it-safe-accessing-and-modifying-mutable-static-variables)
+          - [682. What is unsafe using mutable static variables?](#682-what-is-unsafe-using-mutable-static-variables)
+          - [683. How we must access a mutable static variables?](#683-how-we-must-access-a-mutable-static-variables)
+          - [684. How we should comment unsafe function?](#684-how-we-should-comment-unsafe-function)
+          - [685. How we should comment unsafe operation?](#685-how-we-should-comment-unsafe-operation)
+          - [686. How create reference to static mutable variable?](#686-how-create-reference-to-static-mutable-variable)
         - [Implementing an Unsafe Trait](#implementing-an-unsafe-trait)
-          - [When Trait is unsafe?](#when-trait-is-unsafe)
-          - [How declare unsafe Trait?](#how-declare-unsafe-trait)
+          - [687. When Trait is unsafe?](#687-when-trait-is-unsafe)
+          - [688. How declare unsafe Trait?](#688-how-declare-unsafe-trait)
         - [Accessing Fields of a Union](#accessing-fields-of-a-union)
-          - [What is Union?](#what-is-union)
-          - [How to access a Union fields?](#how-to-access-a-union-fields)
+          - [689. What is Union?](#689-what-is-union)
+          - [690. How to access a Union fields?](#690-how-to-access-a-union-fields)
         - [Using Miri to check unsafe code](#using-miri-to-check-unsafe-code)
-          - [What is Miri?](#what-is-miri)
-          - [How Miri check unsafe code?](#how-miri-check-unsafe-code)
-          - [What is required to use Miri?](#what-is-required-to-use-miri)
-          - [How install Miri?](#how-install-miri)
-          - [How run Miri?](#how-run-miri)
-          - [Where deeper exploration of how to work effectively with unsafe Rust?](#where-deeper-exploration-of-how-to-work-effectively-with-unsafe-rust)
+          - [691. What is Miri?](#691-what-is-miri)
+          - [692. How Miri check unsafe code?](#692-how-miri-check-unsafe-code)
+          - [693. What is required to use Miri?](#693-what-is-required-to-use-miri)
+          - [694. How install Miri?](#694-how-install-miri)
+          - [695. How run Miri?](#695-how-run-miri)
+          - [696. Where deeper exploration of how to work effectively with unsafe Rust?](#696-where-deeper-exploration-of-how-to-work-effectively-with-unsafe-rust)
       - [20.2 Advanced Traits](#202-advanced-traits)
         - [Specifying Placeholder Types in Trait Definitions with Associated Types](#specifying-placeholder-types-in-trait-definitions-with-associated-types)
-          - [What is Trait whit associated type?](#what-is-trait-whit-associated-type)
-          - [What is used Trait whit associated type for?](#what-is-used-trait-whit-associated-type-for)
-          - [How to define Trait whit associated type?](#how-to-define-trait-whit-associated-type)
-          - [How implement Trait whit associated type?](#how-implement-trait-whit-associated-type)
+          - [697. What is Trait whit associated type?](#697-what-is-trait-whit-associated-type)
+          - [698. What is used Trait whit associated type for?](#698-what-is-used-trait-whit-associated-type-for)
+          - [699. How to define Trait whit associated type?](#699-how-to-define-trait-whit-associated-type)
+          - [700. How implement Trait whit associated type?](#700-how-implement-trait-whit-associated-type)
         - [Default Generic Type Parameters and Operator Overloading](#default-generic-type-parameters-and-operator-overloading)
-          - [Why can we specify a specific default type for a generic type?](#why-can-we-specify-a-specific-default-type-for-a-generic-type)
-          - [How specify a default type when declaring a generic type?](#how-specify-a-default-type-when-declaring-a-generic-type)
+          - [701. Why can we specify a specific default type for a generic type?](#701-why-can-we-specify-a-specific-default-type-for-a-generic-type)
+          - [702. How specify a default type when declaring a generic type?](#702-how-specify-a-default-type-when-declaring-a-generic-type)
         - [Fully Qualified Syntax for Disambiguation: Calling Methods with the Same Name](#fully-qualified-syntax-for-disambiguation-calling-methods-with-the-same-name)
-          - [How we can call method that have the same name in different trait that is implemented by  type or in self implementation?](#how-we-can-call-method-that-have-the-same-name-in-different-trait-that-is-implemented-by--type-or-in-self-implementation)
-          - [How we can call non-method function that have the same name in different implemented trait or in self implementation?](#how-we-can-call-non-method-function-that-have-the-same-name-in-different-implemented-trait-or-in-self-implementation)
-          - [Which is general fully qualified syntax?](#which-is-general-fully-qualified-syntax)
+          - [703. How we can call method that have the same name in different trait that is implemented by  type or in self implementation?](#703-how-we-can-call-method-that-have-the-same-name-in-different-trait-that-is-implemented-by--type-or-in-self-implementation)
+          - [704. How we can call non-method function that have the same name in different implemented trait or in self implementation?](#704-how-we-can-call-non-method-function-that-have-the-same-name-in-different-implemented-trait-or-in-self-implementation)
+          - [705. Which is general fully qualified syntax?](#705-which-is-general-fully-qualified-syntax)
         - [Using Supertraits to Require One Trait’s Functionality Within Another Trait](#using-supertraits-to-require-one-traits-functionality-within-another-trait)
-          - [What is Supertrait?](#what-is-supertrait)
-          - [How to define Supertrait?](#how-to-define-supertrait)
+          - [706. What is Supertrait?](#706-what-is-supertrait)
+          - [707. How to define Supertrait?](#707-how-to-define-supertrait)
         - [Using the Newtype Pattern to Implement External Traits on External Types](#using-the-newtype-pattern-to-implement-external-traits-on-external-types)
-          - [What is Newtype pattern used for?](#what-is-newtype-pattern-used-for)
-          - [How use Newtype pattern for Implement External Traits on External Types?](#how-use-newtype-pattern-for-implement-external-traits-on-external-types)
+          - [708. What is Newtype pattern used for?](#708-what-is-newtype-pattern-used-for)
+          - [709. How use Newtype pattern for Implement External Traits on External Types?](#709-how-use-newtype-pattern-for-implement-external-traits-on-external-types)
       - [20.3 Advanced Types.](#203-advanced-types)
         - [Using the Newtype Pattern for Type Safety and Abstraction.](#using-the-newtype-pattern-for-type-safety-and-abstraction)
-          - [What are the possibilities of using the Newtype pattern?](#what-are-the-possibilities-of-using-the-newtype-pattern)
+          - [710. What are the possibilities of using the Newtype pattern?](#710-what-are-the-possibilities-of-using-the-newtype-pattern)
         - [Creating Type Synonyms with Type Aliases.](#creating-type-synonyms-with-type-aliases)
-          - [How create Type Synonyms?](#how-create-type-synonyms)
-          - [What is Type Alias?](#what-is-type-alias)
+          - [711. How create Type Synonyms?](#711-how-create-type-synonyms)
+          - [712. What is Type Alias?](#712-what-is-type-alias)
         - [The Never Type that Never Returns.](#the-never-type-that-never-returns)
-          - [What is Never Type?](#what-is-never-type)
-          - [How denoted Never Type?](#how-denoted-never-type)
-          - [What is *diverging functions*?](#what-is-diverging-functions)
-          - [What use is a type you can never create values for?](#what-use-is-a-type-you-can-never-create-values-for)
+          - [713. What is Never Type?](#713-what-is-never-type)
+          - [714. How denoted Never Type?](#714-how-denoted-never-type)
+          - [715. What is *diverging functions*?](#715-what-is-diverging-functions)
+          - [716. What use is a type you can never create values for?](#716-what-use-is-a-type-you-can-never-create-values-for)
         - [Dynamically Sized Types and the Sized Trait](#dynamically-sized-types-and-the-sized-trait)
-          - [What is DST?](#what-is-dst)
-          - [What is "unsized type"?](#what-is-unsized-type)
-          - [What DSTs are there in Rust?](#what-dsts-are-there-in-rust)
-          - [How we can use DST?](#how-we-can-use-dst)
-          - [What is `Sized` trait?](#what-is-sized-trait)
-          - [How we can provide DST as type arguments to generic type parameters?](#how-we-can-provide-dst-as-type-arguments-to-generic-type-parameters)
-          - [Can we implement Trait for DSTs?](#can-we-implement-trait-for-dsts)
-          - [Can a struct contain a DST?](#can-a-struct-contain-a-dst)
+          - [717. What is DST?](#717-what-is-dst)
+          - [718. What is "unsized type"?](#718-what-is-unsized-type)
+          - [719. What DSTs are there in Rust?](#719-what-dsts-are-there-in-rust)
+          - [720. How we can use DST?](#720-how-we-can-use-dst)
+          - [721. What is `Sized` trait?](#721-what-is-sized-trait)
+          - [722. How we can provide DST as type arguments to generic type parameters?](#722-how-we-can-provide-dst-as-type-arguments-to-generic-type-parameters)
+          - [723. Can we implement Trait for DSTs?](#723-can-we-implement-trait-for-dsts)
+          - [724. Can a struct contain a DST?](#724-can-a-struct-contain-a-dst)
       - [20.4 Advanced Functions and Closures.](#204-advanced-functions-and-closures)
         - [Function Pointers](#function-pointers)
-          - [Can you pass a function to a function?](#can-you-pass-a-function-to-a-function)
-          - [What is Function pointer type?](#what-is-function-pointer-type)
-          - [How we can pass a function to a function?](#how-we-can-pass-a-function-to-a-function)
-          - [Can we specify `fn` as the parameter type directly?](#can-we-specify-fn-as-the-parameter-type-directly)
-          - [Can we pass function pointer as an argument for a function that expects a closure?](#can-we-pass-function-pointer-as-an-argument-for-a-function-that-expects-a-closure)
-          - [Can we used name of enum variant as closure to pass in to function?](#can-we-used-name-of-enum-variant-as-closure-to-pass-in-to-function)
+          - [725. Can you pass a function to a function?](#725-can-you-pass-a-function-to-a-function)
+          - [726. What is Function pointer type?](#726-what-is-function-pointer-type)
+          - [727. How we can pass a function to a function?](#727-how-we-can-pass-a-function-to-a-function)
+          - [728. Can we specify `fn` as the parameter type directly?](#728-can-we-specify-fn-as-the-parameter-type-directly)
+          - [729. Can we pass function pointer as an argument for a function that expects a closure?](#729-can-we-pass-function-pointer-as-an-argument-for-a-function-that-expects-a-closure)
+          - [730. Can we used name of enum variant as closure to pass in to function?](#730-can-we-used-name-of-enum-variant-as-closure-to-pass-in-to-function)
         - [Returning Closures](#returning-closures)
-          - [Can we return Closure directly?](#can-we-return-closure-directly)
-          - [How we can return Closure from function?](#how-we-can-return-closure-from-function)
+          - [731. Can we return Closure directly?](#731-can-we-return-closure-directly)
+          - [732. How we can return Closure from function?](#732-how-we-can-return-closure-from-function)
       - [20.5 Macros](#205-macros)
-          - [What read about how to write macros?](#what-read-about-how-to-write-macros)
-          - [What is macros?](#what-is-macros)
-          - [The Difference Between Macros and Functions](#the-difference-between-macros-and-functions)
-          - [What difference between Macros and Function?](#what-difference-between-macros-and-function)
+          - [733. What read about how to write macros?](#733-what-read-about-how-to-write-macros)
+          - [734. What is macros?](#734-what-is-macros)
+          - [735. The Difference Between Macros and Functions](#735-the-difference-between-macros-and-functions)
+          - [736. What difference between Macros and Function?](#736-what-difference-between-macros-and-function)
         - [Declarative Macros with macro\_rules! for General Metaprogramming](#declarative-macros-with-macro_rules-for-general-metaprogramming)
-          - [What is Declarative Macros?](#what-is-declarative-macros)
-          - [How define a Declarative Macros?](#how-define-a-declarative-macros)
+          - [737. What is Declarative Macros?](#737-what-is-declarative-macros)
+          - [738. How define a Declarative Macros?](#738-how-define-a-declarative-macros)
         - [Procedural Macros for Generating Code from Attributes](#procedural-macros-for-generating-code-from-attributes)
-          - [What is Procedural Macro?](#what-is-procedural-macro)
-          - [How is kinds of procedural macros?](#how-is-kinds-of-procedural-macros)
-          - [How create procedural macros?](#how-create-procedural-macros)
+          - [739. What is Procedural Macro?](#739-what-is-procedural-macro)
+          - [740. How is kinds of procedural macros?](#740-how-is-kinds-of-procedural-macros)
+          - [741. How create procedural macros?](#741-how-create-procedural-macros)
         - [How to Write a Custom derive Macro](#how-to-write-a-custom-derive-macro)
-          - [For what using derive Macro?](#for-what-using-derive-macro)
-          - [How to Write a Custom derive Macro?](#how-to-write-a-custom-derive-macro-1)
-          - [For what is used `proc_macro` crate?](#for-what-is-used-proc_macro-crate)
-          - [For what is used `syn` crate?](#for-what-is-used-syn-crate)
-          - [For what is used `quote` crate?](#for-what-is-used-quote-crate)
+          - [742. For what using derive Macro?](#742-for-what-using-derive-macro)
+          - [743. How to Write a Custom derive Macro?](#743-how-to-write-a-custom-derive-macro)
+          - [744. For what is used `proc_macro` crate?](#744-for-what-is-used-proc_macro-crate)
+          - [745. For what is used `syn` crate?](#745-for-what-is-used-syn-crate)
+          - [746. For what is used `quote` crate?](#746-for-what-is-used-quote-crate)
         - [Attribute-like macros](#attribute-like-macros)
-          - [What is Attribute-like macros](#what-is-attribute-like-macros)
-          - [How define and use Attribute-like macros?](#how-define-and-use-attribute-like-macros)
+          - [747. What is Attribute-like macros](#747-what-is-attribute-like-macros)
+          - [748. How define and use Attribute-like macros?](#748-how-define-and-use-attribute-like-macros)
         - [Function-like macros](#function-like-macros)
-          - [How define and use Function-like macros?](#how-define-and-use-function-like-macros)
+          - [749. How define and use Function-like macros?](#749-how-define-and-use-function-like-macros)
     - [Final Project: Building a Multithreaded Web Server](#final-project-building-a-multithreaded-web-server)
 
 
@@ -898,27 +898,27 @@ By default in Rust variables are immutable. Once a value is bound to a name, you
 
 Constants are values that are bound to a name and are not allowed to change, but there are a few differences between constants and variables.
 
-###### How differense between constants and variables?
+###### 3. How differense between constants and variables?
 
 - you aren’t allowed to use `mut` with constants.
 - You declare constants using the `const` keyword instead of the `let` keyword
 - the type of the value must be annotated.
 - The last difference is that constants may be set only to a constant expression, not the result of a value that could only be computed at runtime
 
-###### What Rust’s naming convention for constants? 
+###### 4. What Rust’s naming convention for constants? 
 
 Rust’s naming convention for constants is to use all uppercase with underscores between words.
 
-###### When Constants are valid?
+###### 5. When Constants are valid?
 
 Constants are valid for the entire time a program runs, within the scope in which they were declared.
 
 
-###### 3. What is Shadowing?
+###### 6. What is Shadowing?
 
 you can declare a new variable with the same name as a previous variable. We say that the first variable is shadowed by the second, which means that the second variable is what the compiler will see when you use the name of the variable. We can shadow a variable by using the same variable’s name and repeating the use of the let keyword.
 
-###### What different Shadowing from marking mut?
+###### 7. What different Shadowing from marking mut?
 
 Shadowing is different from marking a variable as mut because we’ll get a compile-time error if we accidentally try to reassign to this variable without using the let keyword
 
@@ -926,23 +926,23 @@ The other difference between `mut` and `shadowing` is that because we’re effec
 
 #### Data Types
 
-###### 4. What means data types?
+###### 8. What means data types?
 
 Every value in Rust is of a certain data type, which tells Rust what kind of data is being specified so it knows how to work with that data
 
-###### 5. What subsets of data types are there in rust?
+###### 9. What subsets of data types are there in rust?
 
 In rust a two data type subsets: scalar and compound
 
-###### 6. What means that rust is statically typed language?
+###### 10. What means that rust is statically typed language?
 
 This means that it must know the types of all variables at compile time.  
 
-###### How declared types in Rust?
+###### 11. How declared types in Rust?
 
 The compiler can usually infer what type we want to use based on the value and how we use it. In cases when many types are possible we must add a type annotation.
 
-###### 7. What is scalar data types?
+###### 12. What is scalar data types?
 
 scalar data types is subset of rust data types which includes:
 
@@ -951,11 +951,11 @@ scalar data types is subset of rust data types which includes:
 - Booleans
 - characters
 
-###### 8. What is integer data type?
+###### 13. What is integer data type?
 
 An integer is a number without a fractional component.
 
-###### 9. What are there integers data types?
+###### 14. What are there integers data types?
 
 - 8-bit	i8 u8
 - 16-bit i16 u16
@@ -964,70 +964,70 @@ An integer is a number without a fractional component.
 - 128-bit i128 u128
 - arch isize usize
 
-###### 10. What means Signed and Unsigned integer data type?
+###### 15. What means Signed and Unsigned integer data type?
 
 Signed and unsigned refer to whether it’s possible for the number to be negative—in other words, whether the number needs to have a sign with it (signed) or whether it will only ever be positive and can therefore be represented without a sign (unsigned).
 
-###### 11. How many value does it contain signed integer data types?
+###### 16. How many value does it contain signed integer data types?
 
 Each signed variant can store numbers from -(2^(n - 1)) to 2^(n - 1)-1 (two to the power of n minus one) inclusive, where n is the number of bits that variant uses
 
-###### 12. How many value does it contain unsigned integer data types?
+###### 17. How many value does it contain unsigned integer data types?
 
 Each unsigned variant can store numbers from 0 to 2^n-1 inclusive, where n is the number of bits that variant uses
 
-###### 13. what length are they `isize` and `usize` types? 
+###### 18. what length are they `isize` and `usize` types? 
 
 length `isize` and `usize` types depend on the architecture of the computer your program is running on, which is denoted in the table as “arch”: 64 bits if you’re on a 64-bit architecture and 32 bits if you’re on a 32-bit architecture
 
-###### 14. what is the default integer data type in Rust?
+###### 19. what is the default integer data type in Rust?
 
 If the integer data type is not specified, Rust uses default i32
 
-###### 15. What is integer overflow?
+###### 20. What is integer overflow?
 
 Let’s say you have a variable of type u8 that can hold values between 0 and 255. If you try to change the variable to a value outside that range, such as 256, integer overflow will occur, which can result in one of two behaviors. When you’re compiling in debug mode, Rust includes checks for integer overflow that cause your program to panic at runtime if this behavior occurs. Rust uses the term panicking when a program exits with an error;
 
 When you’re compiling in release mode with the --release flag, Rust does not include checks for integer overflow that cause panics. Instead, if overflow occurs, Rust performs two’s complement wrapping. In short, values greater than the maximum value the type can hold “wrap around” to the minimum of the values the type can hold. In the case of a u8, the value 256 becomes 0, the value 257 becomes 1, and so on. The program won’t panic, but the variable will have a value that probably isn’t what you were expecting it to have. 
 
-###### 15. What method are used to explicitly handle the possibility of integer overflow?
+###### 21. What method are used to explicitly handle the possibility of integer overflow?
 
 - Wrap in all modes with the `wrapping_*` methods, such as `wrapping_add`.
 - Return the `None` value if there is overflow with the `checked_*` methods.
 - Return the `value` and a `boolean` indicating whether there was overflow with the `overflowing_*` methods.
 - Saturate at the value’s minimum or maximum values with the `saturating_*` methods.
 
-###### 16. What is floating-point data type?
+###### 22. What is floating-point data type?
 
 floating-point data type are numbers with decimal points. Rust’s floating-point types are f32 and f64, which are 32 bits and 64 bits in size, respectively. 
 
-###### 17. what is the default floating-point data type in Rust? 
+###### 23. what is the default floating-point data type in Rust? 
 
 The default floating-point is f64 because on modern CPUs, it’s roughly the same speed as f32 but is capable of more precision. 
 
-###### 18. Signed or unsigned floating-point types? 
+###### 24. Signed or unsigned floating-point types? 
 
 All floating-point types are signed.
 
-###### 19. What is boolean data type?
+###### 25. What is boolean data type?
 
 a Boolean type in Rust has two possible values: `true` and `false`, is specified using `bool`, Booleans are one byte in size.
 
-###### 20. What is char data type?
+###### 26. What is char data type?
 
 Rust’s char type is four bytes in size and represents a Unicode Scalar Value. We specify char literals with single quotes,
 
-###### 21. What is compound data types?
+###### 27. What is compound data types?
 
 Compound types can group multiple values into one type. Rust has two primitive compound types: tuples and arrays.
 
-###### 22. What is tuple data type?
+###### 28. What is tuple data type?
 
 A tuple is a general way of grouping together a number of values with a variety of types into one compound type. Tuples have a fixed length: once declared, they cannot grow or shrink in size.
 
 We create a tuple by writing a comma-separated list of values inside parentheses. Each position in the tuple has a type, and the types of the different values in the tuple don’t have to be the same.
 
-###### 22. What is pattern matching data type?
+###### 29. What is pattern matching data type?
 
 This is hte way destructure a tuple value, like this:
 
@@ -1041,19 +1041,19 @@ fn main() {
 }
 ```
 
-###### 23. How to get access to tuple value?
+###### 30. How to get access to tuple value?
 
 We can use pattern matching or by using a period (.) followed by index of the value we want to access.
 
-###### 24. What is it called tuple  without any values?
+###### 31. What is it called tuple  without any values?
 
 tuple  without any values called `unit`. This value and its corresponding type are both written () and represent an empty value or an empty return type. Expressions implicitly return the unit value if they don’t return any other value.
 
-###### 25. what do expressions return f they don’t return any other value.
+###### 32. what do expressions return f they don’t return any other value.
 
 Expressions implicitly return the unit value if they don’t return any other value.
 
-###### 26. What is Array type?
+###### 33. What is Array type?
 
 Array is a way to have a collection of multiple values. Unlike a tuple, every element of an array must have the same type. Unlike arrays in some other languages, arrays in Rust have a fixed length.
 
@@ -1061,7 +1061,7 @@ Arrays are useful when you want your data allocated on the stack, rather than th
 
 Arrays are more useful when you know the number of elements will not need to change.
 
-###### How create array?
+###### 34. How create array?
 
 - list values ​​in square brackets
   `let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];`
@@ -1069,7 +1069,7 @@ Arrays are more useful when you know the number of elements will not need to cha
   `let a: [i32; 5] = [1, 2, 3, 4, 5];`
 - initialize an array to contain the same value for each element by specifying the initial value, followed by a semicolon, and then the length of the array in square brackets, as shown here `let a = [3; 5];`
 
-###### 27. How Accessing Array Elements?
+###### 35. How Accessing Array Elements?
 
 An array is a single chunk of memory of a known, fixed size that can be allocated on the stack. You can access elements of an array using indexing, like this:
 
@@ -1084,23 +1084,23 @@ fn main() {
 
 #### Functions
 
-###### 28. What is the entry point in program in Rust
+###### 36. What is the entry point in program in Rust
 
 `main` function is the entry point of many programs.
 
-###### 29. How to define function
+###### 37. How to define function
 
 We define a function in Rust by entering fn followed by a function name and a set of parentheses. The curly brackets tell the compiler where the function body begins and ends.
 
-###### 30. How to write correctly function name?
+###### 38. How to write correctly function name?
 
 Rust code uses snake case as the conventional style for function and variable names, in which all letters are lowercase and underscores separate words
 
-###### 31. How to call function
+###### 39. How to call function
 
 We can call any function we’ve defined by entering its name followed by a set of parentheses.
 
-###### 32. What is parameters function?
+###### 40. What is parameters function?
 
 Parameters are special variables that are part of a function’s signature, separated by commas. When a function has parameters, you can provide it with concrete values for those parameters. Technically, the concrete values are called arguments, but in casual conversation, people tend to use the words parameter and argument interchangeably for either the variables in a function’s definition or the concrete values passed in when you call a function.
 
@@ -1108,7 +1108,7 @@ In function signatures, you must declare the type of each parameter.
 
 #### Statements and Expressions
 
-###### 33. What is Statement and Expression
+###### 41. What is Statement and Expression
 
 - Statements are instructions that perform some action and do not return a value.
   
@@ -1146,7 +1146,7 @@ In function signatures, you must declare the type of each parameter.
 
   - Expressions do not include ending semicolons. If you add a semicolon to the end of an expression, you turn it into a statement, and it will then not return a value
 
-###### 34. How function return values?
+###### 42. How function return values?
 
   1. Functions can return values to the code that calls them. 
   2. We don’t name return values, but we must declare their type after an arrow (->). 
@@ -1181,7 +1181,7 @@ In function signatures, you must declare the type of each parameter.
 
 #### Comments
 
-###### 35. How in Rust write comment?
+###### 43. How in Rust write comment?
 
 comment starts with two slashes, and the comment continues until the end of the line. For comments that extend beyond a single line, you’ll need to include // on each line
 
@@ -1191,7 +1191,7 @@ Rust also has another kind of comment, documentation comments
 
 #### Control Flow - If expression
 
-###### 36. what is "If" expression used for?
+###### 44. what is "If" expression used for?
 
 An if expression allows you to branch your code depending on conditions. if expressions start with the keyword if, followed by a condition. In this case, the condition checks whether or not the variable number has a value less than 5. We place the block of code to execute if the condition is true immediately after the condition inside curly brackets. Blocks of code associated with the conditions in if expressions are sometimes called arms, just like the arms in match expressions
 
@@ -1211,7 +1211,7 @@ fn main() {
 }
 ```
 
-###### 37. Can use If expression in  let statement?
+###### 45. Can use If expression in  let statement?
 
 Because if is an expression, and therefore return value, we can use it on the right side of a let statement to assign the outcome to a variable.  Values that have the potential to be results from each arm of the if must be the same type
 
@@ -1226,17 +1226,17 @@ fn main() {
 
 #### Control Flow - Loops
 
-###### 39. what are Loops needed for
+###### 46. what are Loops needed for
 
 It’s often useful to execute a block of code more than once
 
-###### 40. what types of iterations are there in Rust
+###### 47. what types of iterations are there in Rust
 
 - loop
 - while
 - for
 
-###### 41. what is "loop" keyword used for?
+###### 48. what is "loop" keyword used for?
 
 The `loop` keyword tells Rust to execute a block of code over and over again forever or until you explicitly tell it to stop.
 
@@ -1248,16 +1248,16 @@ fn main() {
 }
 ```
 
-###### 42. how stop execution `loop`?
+###### 49. how stop execution `loop`?
 
 You can place the `break` keyword within the loop to tell the program when to stop executing the loop
 
-###### 43. how to continue a `loop` from the beginning at a certain point?
+###### 50. how to continue a `loop` from the beginning at a certain point?
 
 used `continue`, which in a loop tells the program to skip over any remaining code in this iteration of the loop and go to the next iteration.
 
 
-###### 44. How return value from `loop`
+###### 51. How return value from `loop`
 
 add the value you want returned after the break expression you use to stop the loop; that value will be returned out of the loop so you can use it
 
@@ -1279,7 +1279,7 @@ fn main() {
 
 You can also `return` from inside a loop. While `break` only exits the current loop, return always exits the current function.
 
-###### 45. How use Labels in Loops?
+###### 52. How use Labels in Loops?
 
 If you have loops within loops, `break` and `continue` apply to the innermost loop at that point. You can optionally specify a `loop label` on a loop that you can then use with break or continue to specify that those keywords apply to the labeled loop instead of the innermost loop. Loop labels must begin with a single quote. Here’s an example with two nested loops:
 
@@ -1309,7 +1309,7 @@ fn main() {
 
 The first `break` that doesn’t specify a label will exit the inner loop only. The `break 'counting_up`; statement will exit the outer loop
 
-###### 46. how can i implement conditional iteration - while
+###### 53. how can i implement conditional iteration - while
 
 conditional iteration can implement by using a combination of `loop`, `if`, `else`, and `break` or by using `while` language construct
 
@@ -1329,7 +1329,7 @@ fn main() {
 
 While a condition evaluates to true, the code runs; otherwise, it exits the loop.
 
-###### 47. how can i implement iteration of collection of elements - for
+###### 54. how can i implement iteration of collection of elements - for
 
 iteration over collection elements cat implement by using `loop`, `if`, `else`, and `break` set or by using `while` language construct changing the index counter at each iteration. But a more convenient way are using a `for` loop and execute some code for each item in a collection
 
@@ -1343,7 +1343,7 @@ fn main() {
 }
 ```
 
-###### 48. countdown example by using `for` loop
+###### 55. countdown example by using `for` loop
 
 ```rust
 fn main() {
@@ -1356,13 +1356,13 @@ fn main() {
 
 ### 4. Understanding Ownership
 
-###### What concepts ensure memory safety in Rust programs at compile time
+###### 56. What concepts ensure memory safety in Rust programs at compile time
 
 ownership, borrowing, and slices 
 
 #### Ownership
 
-###### 49. Why do you need to manage memory?
+###### 57. Why do you need to manage memory?
 
 The program operates on data during execution. The data that the program operates on is stored in memory. Depending on the nature of the data, there are two types of storage: stack and heap.
 In stack the execution data of the functions are stored as stack frames. Each frame is a block of space where the data required for that function is stored. For example, every time a function declares a new variable, it is "pushed" onto the topmost block in the stack. Then every time a function exits, the topmost block is cleared, thus all of the variables pushed onto the stack by that function, are cleared. The size of the data stored on the stack must be known at compile time.
@@ -1371,7 +1371,7 @@ Typical data that are stored on stack are local variables(value types or primiti
 If the size of the data operated by the program is not known at the compilation stage, the data will be allocated in the heap. When you put data on the heap, you request a certain amount of space. The memory allocator finds an empty spot in the heap that is big enough, marks it as being in use, and returns a pointer, which is the address of that location. This process is called allocating on the heap and is sometimes abbreviated as just allocating (pushing values onto the stack is not considered allocating). Because the pointer to the heap is a known, fixed size, you can store the pointer on the stack, but when you want the actual data, you must follow the pointer.
 Unlike the stack, where memory space is freed automatically after a function exits, heap memory space must be cleared explicitly when the data stored in it is no longer needed, which is called "memory management".
 
-###### 51. What's the difference between stack and heap
+###### 58. What's the difference between stack and heap
 
 The stack stores values in the order it gets them and removes the values in the opposite order. This is referred to as last in, first out. Adding data is called pushing onto the stack, and removing data is called popping off the stack. All data stored on the stack must have a known, fixed size. Data with an unknown size at compile time or a size that might change must be stored on the heap instead.
 
@@ -1383,7 +1383,7 @@ Accessing data in the heap is slower than accessing data on the stack because yo
 
 When your code calls a function, the values passed into the function (including, potentially, pointers to data on the heap) and the function’s local variables get pushed onto the stack. When the function is over, those values get popped off the stack.
 
-###### 51.1 What is Stack?
+###### 59. What is Stack?
 
 The stack is used for static memory allocation and as the name suggests it is a last in first out(LIFO) stack (Think of it as a stack of boxes).
 
@@ -1396,7 +1396,7 @@ The stack is used for static memory allocation and as the name suggests it is a 
 - This is where you would encounter stack overflow errors as the size of the stack is limited compared to the Heap.
 - There is a limit on the size of value that can be stored on the Stack for most languages.
   
-###### 51.2 What is Heap?
+###### 60. What is Heap?
 
 Heap is used for dynamic memory allocation and unlike stack, the program needs to look up the data in heap using pointers (Think of it as a big multi-level library).
 
@@ -1408,56 +1408,56 @@ Heap is used for dynamic memory allocation and unlike stack, the program needs t
 - This is where you would encounter out of memory errors if your application tries to use more memory than the allocated heap(Though there are many other factors at play here like GC, compacting).
 - Generally, there is no limit on the size of the value that can be stored on the heap. Of course, there is the upper limit of how much memory is allocated to the application.
 
-###### 49. What are the methods of memory management?
+###### 61. What are the methods of memory management?
 
 Some languages have garbage collection that regularly looks for no-longer-used memory as the program runs; in other languages, the programmer must explicitly allocate and free the memory. Rust uses a third approach: memory is managed through a system of ownership with a set of rules that the compiler checks. If any of the rules are violated, the program won’t compile.
 
-###### 50. What is the problem associated with memory management?
+###### 62. What is the problem associated with memory management?
 
 In most languages without a GC, it’s our responsibility to identify when memory is no longer being used and to call code to explicitly free it. Doing this correctly a difficult programming problem. If we forget, we’ll waste memory. If we do it too early, we’ll have an invalid variable. If we do it twice, that’s a bug too. We need to pair exactly one allocate with exactly one free.
 
-###### 49. What Is Ownership?
+###### 63. What Is Ownership?
 
 Ownership is a set of rules that govern how a Rust program manages memory.
 
-###### 52. Ownership Rules?
+###### 64. Ownership Rules?
 
 - Each value in Rust has an owner.
 - There can only be one owner at a time.
 - When the owner goes out of scope, the value will be dropped.
 
-###### 53. how does memory allocation happen in Rust?
+###### 65. how does memory allocation happen in Rust?
 
 We declare a variable and assign its value. The value can be simple or composite, i.e. consist of several values, but all value must be scalar, i.e. its size known at compile time, in this case the variable with its value is pushed into the stack, if the data is not scalar, dynamic, i.e. the size of the data is not known at compile time, then a request is made to the allocator and a reference to the area in the heap is placed into the stack.
 
-###### 53. What is scope?
+###### 66. What is scope?
 
 A scope is the range within a program for which an item is valid
 
-###### 54. how does memory free happen in Rust?
+###### 67. how does memory free happen in Rust?
 
 When a variable goes out of scope, Rust calls a special method `drop`, it frees heep.
 When we assign a completely new value to an existing variable, Rust will call drop and free the original value’s memory immediately.
 
-###### 53. What happens when we assign a variable to another variable?
+###### 68. What happens when we assign a variable to another variable?
 
 when one variable is assigned to another variable, a shallow copy of the first variable's value is created and bound to the second variable. If the variable's value includes a value or values ​​of dynamic types, i.e. types whose values ​​are stored on the heap, then the first variable becomes invalid and a reference to it further in the code causes a compilation error.
 
-###### 54. What is Move?
+###### 69. What is Move?
 
 when we assign a variable to another variable and the value of that variable is stored on the heap, a shallow copy is created, i.e. the stack data is copied, including pointers to the data on the heap, but the value on the heap is not copied, and rust marks the original variable as invalid, this process is called "Move" transfer ownership.
 
 By by means of "Move" occurs transfer ownership.
 
-###### 54. where in a code a variable is valid?
+###### 70. where in a code a variable is valid?
 
 variable is valid from the point at which it’s declared until the end of the current scope or until it is assigned to another variable, if its value is stored on the heap
 
-###### 55. What is ownership pattern?
+###### 71. What is ownership pattern?
 
 assigning a value to another variable moves it. When a variable that includes data on the heap goes out of scope, the value will be cleaned up by drop unless ownership of the data has been moved to another variable.
 
-###### 55 What do deep copy i.e. not only copy of stack data, bat heep data
+###### 72. What do deep copy i.e. not only copy of stack data, bat heep data
 
 we can use a method called `clone`
 
@@ -1468,15 +1468,15 @@ let s2 = s1.clone();
 println!("s1 = {s1}, s2 = {s2}");
 ```
 
-###### 56 what happens when we assign a variable whose value type implements the Copy trait, to another variable?
+###### 73. what happens when we assign a variable whose value type implements the Copy trait, to another variable?
 
 variables that use it do not move, but rather are trivially copied, making them still valid after assignment to another variable.
 
-###### 57 what happens when we annotate a type with Copy if the type, or any of its parts, has implemented the Drop trait?
+###### 74. what happens when we annotate a type with Copy if the type, or any of its parts, has implemented the Drop trait?
 
 we’ll get a compile-time error
 
-###### 58. What types implement the Copy trait?
+###### 75. What types implement the Copy trait?
 
 A general rule: any group of simple scalar values can implement Copy, and nothing that requires allocation or is some form of resource can implement Copy. Here are some of the types that implement Copy:
 
@@ -1486,7 +1486,7 @@ A general rule: any group of simple scalar values can implement Copy, and nothin
 - The character type, char.
 - Tuples, if they only contain types that also implement Copy. For example, (i32, i32) implements Copy, but (i32, String) does not.
 
-###### 59. What happen when we passing a value to a function?
+###### 76. What happen when we passing a value to a function?
 
 Passing a variable to a function will move or copy, variable depending on the type of data bound to the variable, just as it happens with assignment
 
@@ -1494,7 +1494,7 @@ Returning values from function can also transfer ownership
 
 #### References and Borrowing
 
-###### 60. What is reference?
+###### 77. What is reference?
 
 A reference is an address we can follow to access the data stored at that address; that data is owned by some other variable. Unlike a pointer, a reference is guaranteed to point to a valid value of a particular type for the life of that reference.
 
@@ -1512,7 +1512,7 @@ fn calculate_length(s: &String) -> usize {
 }
 ```
 
-###### 61. why do we need to pass a reference and not a value?
+###### 78. why do we need to pass a reference and not a value?
 
 By means passing reference we do not transfer Ownership. We can refer to some value without taking ownership of it. Because reference does not own value, the value it points to will not be dropped when the reference stops being used. When functions have references as parameters instead of the actual values, we won’t need to return the values in order to give back ownership, because we never had ownership.
 
@@ -1524,11 +1524,11 @@ fn calculate_length(s: &String) -> usize { // s is a reference to a String
   // it refers to, it is not dropped.
 ```
 
-###### What is Borrowing?
+###### 79. What is Borrowing?
 
 creating a reference called borrowing
 
-###### what happens if we try to modify something we’re borrowing? 
+###### 80. what happens if we try to modify something we’re borrowing? 
 
 ```rust
 fn main() {
@@ -1544,7 +1544,7 @@ fn change(some_string: &String) {
 
 Just as variables are immutable by default, so are references. We’re not allowed to modify something we have a reference to - we get a compile error.
 
-###### What needs to be done to create a mutable reference?
+###### 81. What needs to be done to create a mutable reference?
 
 We must create variable whit keyword 'mut' and pass a reference whit '&mut' key.
 a function that takes a mutable reference must declare the parameter type with &mut keyword
@@ -1561,7 +1561,7 @@ fn change(some_string: &mut String) {
 }
 ```
 
-###### What is a reference’s scope
+###### 82. What is a reference’s scope
 
 a reference’s scope starts from where it is introduced and continues through the last time that reference is used
 
@@ -1579,15 +1579,15 @@ this code will compile because the last usage of the immutable references, the p
     println!("{r3}");
 ```
 
-###### What restriction have a mutable references?
+###### 83. What restriction have a mutable references?
 
 if you have a mutable reference to a value, you can have no other references to that value within the scope of the first reference.
 
-###### What is a dangling pointer?
+###### 84. What is a dangling pointer?
 
 Dangling pointer—a pointer that references a location in memory that may have been given to someone else—by freeing some memory while preserving a pointer to that memory
 
-###### How the problem of dangling pointer solved in Rust?
+###### 85. How the problem of dangling pointer solved in Rust?
 
 In Rust, by contrast, the compiler guarantees that references will never be dangling references: if you have a reference to some data, the compiler will ensure that the data will not go out of scope before the reference to the data does.
 
@@ -1601,22 +1601,22 @@ fn dangle() -> &String { // dangle returns a reference to a String
   // Danger!
 ```
 
-###### Rules of References?
+###### 86. Rules of References?
 
 - At any given time, you can have either one mutable reference or any number of immutable references.
 - References must always be valid.
 
 #### The Slice Type
 
-###### What is Slice?
+###### 87. What is Slice?
 
 Slice are reference a contiguous sequence of elements in a collection.
 
-###### Does Slice have Ownership?
+###### 88. Does Slice have Ownership?
 
 A slice is a kind of reference, so it does not have ownership.
 
-###### What is String Slices?
+###### 89. What is String Slices?
 
 A string slice is a reference to part of a String, and it looks like this:
 
@@ -1627,7 +1627,7 @@ A string slice is a reference to part of a String, and it looks like this:
     let world = &s[6..11];
 ```
 
-###### How in Slice to start at index 0?
+###### 90. How in Slice to start at index 0?
 
  drop the value before the two periods. In other words, these are equal:
 
@@ -1638,7 +1638,7 @@ let slice = &s[0..2];
 let slice = &s[..2];
 ```
 
-###### How to go to the last index in slice?
+###### 91. How to go to the last index in slice?
 
 drop the trailing number. That means these are equal:
 
@@ -1651,7 +1651,7 @@ let slice = &s[3..len];
 let slice = &s[3..];
 ```
 
-###### How to get all String in Slice?
+###### 92. How to get all String in Slice?
 
 drop both values to take a slice of the entire string. So these are equal:
 
@@ -1664,7 +1664,7 @@ let slice = &s[0..len];
 let slice = &s[..];
 ```
 
-###### How  rewrite first_word to return a slice?
+###### 93. How  rewrite first_word to return a slice?
 
 ```rust
 fn first_word(s: &String) -> &str {
@@ -1680,14 +1680,14 @@ fn first_word(s: &String) -> &str {
 }
 ```
 
-###### What type string literal?
+###### 94. What type string literal?
 
 ```rust
 //string literal type - string slice
 &str
 ```
 
-###### How we can pass a String to string slice?
+###### 95. How we can pass a String to string slice?
 
 We can pass String to string slice as slice or as reference to the String
 
@@ -1727,25 +1727,25 @@ fn first_word(s: &String) -> &str {
 
 ### 5. Using Structs to Structure Related Data
 
-###### What is Struct?
+###### 96. What is Struct?
 
 A struct, or structure, is a custom data type that lets you package together and name multiple related values that make up a meaningful group.
 
 #### 5.1 Defining and Instantiating Structs
 
-###### What is the similarity structs and tuples?
+###### 97. What is the similarity structs and tuples?
 
 that both hold multiple related values. Like tuples, the pieces of a struct can be different types.
 
-###### What is the difference structs and tuples?
+###### 98. What is the difference structs and tuples?
 
 Unlike with tuples, in a struct you’ll name each piece of data so it’s clear what the values mean.
 
-###### How are structures over tuples more flexible?
+###### 99. How are structures over tuples more flexible?
 
 Unlike with tuples, in a struct you’ll name each piece of data so it’s clear what the values mean. Adding these names means that structs are more flexible than tuples: you don’t have to rely on the order of the data to specify or access the values of an instance.
 
-###### How define Struct?
+###### 100. How define Struct?
 
 To define a struct, we enter the keyword struct and name the entire struct. A struct’s name should describe the significance of the pieces of data being grouped together. Then, inside curly brackets, we define the names and types of the pieces of data, which we call fields.
 
@@ -1758,15 +1758,15 @@ struct User {
 }
 ```
 
-###### What are Struct fields?
+###### 101. What are Struct fields?
 
 The Struct fields are names with data type that are defined inside curly brackets
 
-###### How is defined Struct used?
+###### 102. How is defined Struct used?
 
 after we’ve defined struct, we create an instance of that struct by specifying concrete values for each of the fields.
 
-###### How we create instance of the struct?
+###### 103. How we create instance of the struct?
 
 We create an instance by stating the name of the struct and then add curly brackets containing key: value pairs, where the keys are the names of the fields and the values are the data we want to store in those fields
 
@@ -1781,12 +1781,12 @@ fn main() {
 }
 ```
 
-###### In what order do we specify field when creating struct?
+###### 104. In what order do we specify field when creating struct?
 
 We don’t have to specify the fields in the same order in which we declared them in the struct. We specify field in any order.
 
 
-###### How to get a specific value from a struct?
+###### 105. How to get a specific value from a struct?
 
 To get a specific value from a struct, we use dot notation
 
@@ -1794,7 +1794,7 @@ To get a specific value from a struct, we use dot notation
 user1.email = String::from("anotheremail@example.com");
 ```
 
-###### What is needed to be able to change the value of the Struct field?
+###### 106. What is needed to be able to change the value of the Struct field?
 
 in order to be able to change the value of a field of a structure instance, the structure instance must be mutable
 
@@ -1811,7 +1811,7 @@ fn main() {
 }
 ```
 
-###### What is 'field init shorthand' syntax?
+###### 107. What is 'field init shorthand' syntax?
 
 when we use the build function to create a struct instance, we must pass the struct instance field values ​​to the parameters of this function, which will later be assigned to the instance fields.
 
@@ -1839,7 +1839,7 @@ fn build_user(email: String, username: String) -> User {
 }
 ```
 
-###### What is 'struct update' syntax?
+###### 108. What is 'struct update' syntax?
 
 It’s often useful to create a new instance of a struct that includes most of the values from another instance, but changes some
 
@@ -1873,11 +1873,11 @@ we specify the fields with new values ​​and then two dots with name of the i
 
 If struct field data are heap-allocated it will be moved to fields of the new instance and sours struct instance will become invalid, it will not be possible to use it further.
 
-###### What is Tuple Structs?
+###### 109. What is Tuple Structs?
 
 Tuple structs have the added meaning the struct name provides but don’t have names associated with their fields; rather, they just have the types of the fields. Tuple structs are useful when you want to give the whole tuple a name and make the tuple a different type from other tuples, and when naming each field as in a regular struct would be verbose or redundant.
 
-###### How define Tuple Struct?
+###### 110. How define Tuple Struct?
 
 To define a tuple struct, start with the struct keyword and the struct name followed by the types in the tuple.
 
@@ -1893,7 +1893,7 @@ fn main() {
 
 we cannot use instances of different structure types interchangeably even if they have the same element types
 
-###### What is Unit-Like Structs?
+###### 111. What is Unit-Like Structs?
 
 This is struct that don’t have any fields?
 
@@ -1905,15 +1905,15 @@ fn main() {
 }
 ```
 
-###### How define Unit-Like Struct?
+###### 112. How define Unit-Like Struct?
 
 we use the struct keyword, the name we want, and then a semicolon
 
-###### What are Unit-Like Structs for?
+###### 113. What are Unit-Like Structs for?
 
 Unit-like structs can be useful when you need to implement a trait on some type but don’t have any data that you want to store in the type itself
 
-###### Is it possible to create a structure that stores references to data that someone else owned?
+###### 114. Is it possible to create a structure that stores references to data that someone else owned?
 
 It’s possible, but to do so requires the use of lifetimes. Lifetimes ensure that the data referenced by a struct is valid for as long as the struct is.
 
@@ -1960,11 +1960,11 @@ fn area(rectangle: &Rectangle) -> u32 {
 }
 ```
 
-###### What means curly brackets in 'println!'?
+###### 115. What means curly brackets in 'println!'?
 
 the curly brackets tell println! to use formatting known as Display: output intended for direct end user consumption
 
-###### How we can add printing an instance of Struct while we’re debugging our program and see the values for all its fields?
+###### 116. How we can add printing an instance of Struct while we’re debugging our program and see the values for all its fields?
 
 ```rust
 struct Rectangle {
@@ -2001,7 +2001,7 @@ fn main() {
 }
 ```
 
-###### How we can implement Display or Debug trait in Struct?
+###### 117. How we can implement Display or Debug trait in Struct?
 
 We must add the outer attribute `#[derive(Debug)]` just before the struct definition
 
@@ -2022,7 +2022,7 @@ fn main() {
 }
 ```
 
-###### What is difference between `println!` and `dbg!` macro
+###### 118. What is difference between `println!` and `dbg!` macro
 
 - `dbg!` macro takes ownership of an expression as opposed to `println!`, which takes a reference, its prints the file and line number of where that `dbg!` macro call occurs in your code along with the resultant value of that expression, and returns ownership of the value.
 - `dbg!` macro prints to the standard error console stream (stderr), as opposed to `println!`, which prints to the standard output console stream (stdout).
@@ -2057,17 +2057,17 @@ $ cargo run
 }
 ```
 
-###### What other attributes are there besides 'derive'?
+###### 119. What other attributes are there besides 'derive'?
 
 for more information, [see the “Attributes” section of the Rust Reference](https://doc.rust-lang.org/reference/attributes.html)?
 
 #### 5.3 Method Syntax
 
-###### What is a "Method"?
+###### 120. What is a "Method"?
 
 Methods are similar to functions: we declare them with the fn keyword and a name, they can have parameters and a return value, and they contain some code that’s run when the method is called from somewhere else. Unlike functions, methods are defined within the context of a struct (or an enum or a trait object), and their first parameter is always self, which represents the instance of the struct the method is being called on.
 
-###### How to define a method?
+###### 121. How to define a method?
 
 To define a method i.е. function within the context of Struct type, we start an `impl` (implementation) block for Struct type. Everything within this impl block will be associated with the Struct type we a defined. Then we move a function that we want define in context of Struct into the impl curly brackets and add the first parameter to be `self` in the signature and everywhere within the body.
 
@@ -2097,7 +2097,7 @@ fn main() {
 }
 ```
 
-###### What difference using `&self` `&mut self` and `self` in method?
+###### 122. What difference using `&self` `&mut self` and `self` in method?
 
 In case using `&self` we pass inside reference and therefore can only read data from struct instance.
 
@@ -2105,7 +2105,7 @@ In case using `&mut self` we pass muted reference and therefore can modify insta
 
 In case using `self` we pass ownership (make move). This technique is usually used when the method transforms self into something else and you want to prevent the caller from using the original instance after the transformation.
 
-###### Do we can use equal names for fields and methods in Struct?
+###### 123. Do we can use equal names for fields and methods in Struct?
 
 We can use equal names for fields and methods in Struct. In this case  if we follow `var.name` with parentheses, Rust knows we mean the method width. When we don’t use parentheses, Rust knows we mean the field width.
 
@@ -2128,11 +2128,11 @@ fn main() {
 }
 ```
 
-###### How called all functions defined in Struct impl block? 
+###### 124. How called all functions defined in Struct impl block? 
 
 All functions defined within an impl block are called associated functions because they’re associated with the type named after the impl
 
-###### Do can we create association function without self as first argument?
+###### 125. Do can we create association function without self as first argument?
 
 Yes. Associated functions that aren’t methods are often used for constructors that will return a new instance of the struct.
 
@@ -2149,7 +2149,7 @@ impl Rectangle {
 
 The Self keywords in the return type and in the body of the function are aliases for the type that appears after the impl keyword, which in this case is Rectangle.
 
-###### How do we call association function?
+###### 126. How do we call association function?
 
 To call associated function, we use the `::` syntax with the struct name
 
@@ -2159,7 +2159,7 @@ To call associated function, we use the `::` syntax with the struct name
 
 is an example. This function is namespaced by the struct: the :: syntax is used for both associated functions and namespaces created by modules.
 
-###### How many impl Blocks can do have Struct? 
+###### 127. How many impl Blocks can do have Struct? 
 
 Each struct is allowed to have multiple impl blocks
 
@@ -2179,13 +2179,13 @@ impl Rectangle {
 
 ### 6. Enums and Pattern Matching
 
-###### What is enum used for?
+###### 128. What is enum used for?
 
 Enums allow you to define a type by enumerating its possible variants. enums give you a way of saying a value is one of a possible set of values. For example, we may want to say that Rectangle is one of a set of possible shapes that also includes Circle and Triangle
 
 #### 6.1 Defining an Enum
 
-###### How define Enum?
+###### 129. How define Enum?
 
 We write keyword `enum` followed by name of enum and in curly brackets we list instance name of that enum.
 
@@ -2212,11 +2212,11 @@ enum Message {
 }
 ```
 
-###### what called enum instances?
+###### 130. what called enum instances?
 
 enum variants
 
-###### How can we get an enum variant?
+###### 131. How can we get an enum variant?
 
 We write enum name, two colons and instance name
 
@@ -2225,7 +2225,7 @@ We write enum name, two colons and instance name
     let six = IpAddrKind::V6;
 ```
 
-###### Do can we used enum type as function parameter?
+###### 132. Do can we used enum type as function parameter?
 
 We can used enum type as any other type as function parameter
 
@@ -2236,15 +2236,15 @@ route(IpAddrKind::V4);
 route(IpAddrKind::V6);
 ```
 
-###### How we can define method in enum?
+###### 133. How we can define method in enum?
 
 This is being done as with struct: impl followed enum name and curly brackets whit method definition. The body of the method would use 'self' to get the value that we called the method on.
 
-###### What is Null value?
+###### 134. What is Null value?
 
 Null value is value that currently invalid or absent for some reason.
 
-###### How in Rust implementing Null value?
+###### 135. How in Rust implementing Null value?
 
 In rust Null value implemented by using `enum Option<T>`. This enum encode the concept of a value being present or absent.
 
@@ -2257,7 +2257,7 @@ enum Option<T> {
 
 `enum Option<T>` have two variant None - that represent absent value; and Some(T) - that represent present value some type T. This variants included in prelude thus its not need bring into scope explicitly
 
-###### How do we can use Options variants?
+###### 136. How do we can use Options variants?
 
 ```rust
     let some_number = Some(5);
@@ -2268,7 +2268,7 @@ enum Option<T> {
 
 we can not annotate type of Some variable i.e. rust can infer in, can do with using None type
 
-###### For what using `Options<T>` type?
+###### 137. For what using `Options<T>` type?
 
 you have to convert an `Option<T>` to a T before you can perform T operations with it. Generally, this helps catch one of the most common issues with null: assuming that something isn’t null when it actually is.
 
@@ -2279,7 +2279,7 @@ So how do you get the T value out of a Some variant when you have a value of typ
 #### 6.2 The match Control Flow Construct
 
 
-###### What is `match`?
+###### 138. What is `match`?
 
 Rust has an extremely powerful control flow construct called match that allows you to compare a value against a series of patterns and then execute code based on which pattern matches
 
@@ -2301,7 +2301,7 @@ fn value_in_cents(coin: Coin) -> u8 {
 }
 ```
 
-###### How `match` works?
+###### 139. How `match` works?
 
 - First we list the match keyword followed by an expression. Expression can be evaluate to any type.
 - Next are the match arms in curly brackets. 
@@ -2329,7 +2329,7 @@ fn value_in_cents(coin: Coin) -> u8 {
 }
 ```
 
-######  How to extract values out of enum variants? 
+###### 140. How to extract values out of enum variants? 
 
 Another useful feature of match arms is that they can bind to the parts of the values that match the pattern. This is how we can extract values out of enum variants.
 
@@ -2362,7 +2362,7 @@ fn value_in_cents(coin: Coin) -> u8 {
 ```
 If we were to call value_in_cents(Coin::Quarter(UsState::Alaska)), coin would be Coin::Quarter(UsState::Alaska). When we compare that value with each of the match arms, none of them match until we reach Coin::Quarter(state). At that point, the binding for state will be the value UsState::Alaska. We can then use that binding in the println! expression, thus getting the inner state value out of the Coin enum variant for Quarter.
 
-######  How to extract values out of `Option<T>` enum? 
+###### 141. How to extract values out of `Option<T>` enum? 
 
 Matching with `Option<T>`
 
@@ -2379,7 +2379,7 @@ Matching with `Option<T>`
     let none = plus_one(None);
 ```
 
-###### Do we match all possibilities in match expression?
+###### 142. Do we match all possibilities in match expression?
 
 the arms patterns must cover all possibilities. If aur match code do not cover all possibilities, this is a bug and it won't compile:
 
@@ -2391,7 +2391,7 @@ the arms patterns must cover all possibilities. If aur match code do not cover a
     } // error[E0004]: non-exhaustive patterns: `None` not covered
 ```
 
-###### What are methods for match all possibilities in match expression?
+###### 143. What are methods for match all possibilities in match expression?
 
 - use `other` keyword in last arm pattern.
 
@@ -2423,7 +2423,7 @@ the arms patterns must cover all possibilities. If aur match code do not cover a
     fn reroll() {}
 ```
 
-###### What is difference between usage `other` and `_` keyword in `match`
+###### 144. What is difference between usage `other` and `_` keyword in `match`
 
 If we using `other` rust will pass it in code part of match arm, and we can using its value inside
 
@@ -2443,7 +2443,7 @@ If we using `_` - this suggests what we do not want using its value in code
 
 #### 6.3 Concise Control Flow with if let and let else
 
-###### What is `if let` control flow syntax?
+###### 145. What is `if let` control flow syntax?
 
 The syntax `if let` takes a pattern and an expression separated by an equal sign. It works the same way as a match, where the expression is given to the match and the pattern is its first arm. In this case, the pattern is Some(max), and the max binds to the value inside the Some. We can then use max in the body of the if let block in the same way we used max in the corresponding match arm. The code in the if let block only runs if the value matches the pattern.
 
@@ -2551,68 +2551,68 @@ fn describe_state_quarter(coin: Coin) -> Option<String> {
 
 #### 7.1 Packages and Crates
 
-###### What is Crate?
+###### 146. What is Crate?
 
 A crate is the smallest amount of code that the Rust compiler considers at a time. Even if you run rustc rather than cargo and pass a single source code file, the compiler considers that file to be a crate. Crates can contain modules, and the modules may be defined in other files that get compiled with the crate, as we’ll see in the coming sections.
 
-###### What forms crates exists?
+###### 147. What forms crates exists?
 
 - binary crates
 - library crates
 
-###### What is Binary crates?
+###### 148. What is Binary crates?
 
 Binary crates are programs you can compile to an executable that you can run, such as a command-line program or a server. Each must have a function called main that defines what happens when the executable runs.
 
-###### what is the distinctive feature Binary crates?
+###### 149. what is the distinctive feature Binary crates?
 
 Binary crates must have a function called main that defines what happens when the executable runs.
 
-###### What is Library crates?
+###### 150. What is Library crates?
 
 Library crates define functionality intended to be shared with multiple projects, its don’t have a main function, and they don’t compile to an executable.
 
-###### What is crate root?
+###### 151. What is crate root?
 
 The crate root is a source file that the Rust compiler starts from and makes up the root module of your crate.
 
-###### What is package?
+###### 152. What is package?
 
 A package is a bundle of one or more crates that provides a set of functionality. A package contains a Cargo.toml file that describes how to build those crates.
 
-###### How many crates can have package?
+###### 153. How many crates can have package?
 
 A package must contain at least one crate, whether that’s a library or binary crate.
 
-###### How many library crates can have package?
+###### 154. How many library crates can have package?
 
 only one library crate
 
-###### How many binary crates can have package?
+###### 155. How many binary crates can have package?
 
 A package can contain as many binary crates as you like, but at most only one library crate. 
 
-###### What is Cargo?
+###### 156. What is Cargo?
 
 Cargo is actually a package that contains the binary crate for the command-line tool you’ve been using to build your code. The Cargo package also contains a library crate that the binary crate depends on. Other projects can depend on the Cargo library crate to use the same logic the Cargo command-line tool uses.
 
-###### How create package?
+###### 157. How create package?
 
 `cargo new package-name`
 
-###### what structure of package directory created 'cargo new'?
+###### 158. what structure of package directory created 'cargo new'?
 
 Cargo.toml, src/main.rs
 
-###### How cargo understands what a package contain binary crate?
+###### 159. How cargo understands what a package contain binary crate?
 
 Cargo follows a convention that src/main.rs is the crate root of a binary crate with the same name as the package
 
-###### How cargo understands what a package contain library crate?
+###### 160. How cargo understands what a package contain library crate?
 
 Cargo knows that if the package directory contains src/lib.rs, the package contains a library crate with the same name as the package, and src/lib.rs is its crate root
 
-###### How a package can have multiple binary crate?
+###### 161. How a package can have multiple binary crate?
 
 A package can have multiple binary crates by placing files in the src/bin directory: each file will be a separate binary crate?
 
@@ -2660,11 +2660,11 @@ Here, `pub mod vegetables`; means the code in `src/garden/vegetables.rs` is incl
 pub struct Asparagus {}
 ```
 
-###### What is first a compiler does when it compiles a crate?
+###### 162. What is first a compiler does when it compiles a crate?
 
 When compiling a crate, the compiler first looks in the crate root file (usually src/lib.rs for a library crate or src/main.rs for a binary crate) for code to compile.
 
-###### Where compiler look for module code for module declared in crate root, i.e. src/lib.rs or src/main.rs?
+###### 163. Where compiler look for module code for module declared in crate root, i.e. src/lib.rs or src/main.rs?
 
 if we declare module, say `mod mod_name;`, the compiler  will look for the module’s code in these places:
 
@@ -2672,7 +2672,7 @@ if we declare module, say `mod mod_name;`, the compiler  will look for the modul
 - In the file `src/mod_name.rs`
 - In the file `src/mod_name/mod.rs`
 
-###### Where compiler look for module code for module declared in any file other than crate root, i.e. code for submodule?
+###### 164. Where compiler look for module code for module declared in any file other than crate root, i.e. code for submodule?
 
 if we declare sub module, say `mod sub_mod_name;` in file `src/parent_mod.rs`, the compiler  will look for the sub module’s code in these places:
 
@@ -2680,38 +2680,38 @@ if we declare sub module, say `mod sub_mod_name;` in file `src/parent_mod.rs`, t
 - In the file `src/parent_mod/sub_mod_name.rs`
 - In the file `src/parent_mod/sub_mod_name/mod.rs`
 
-###### When and How we can refer to code in module?
+###### 165. When and How we can refer to code in module?
 
 - When - Module should be part of our crate
 - How - if we have type `SomeType` in `src/parent_mod/sub_mod.rs` we cat refer to in as `crate::parent_mod::sub_mod::SomeType` if the privacy rules allow.
 
-###### How to do within module public?
+###### 166. How to do within module public?
 
 Code within a module is private from its parent modules by default. To make a module public, declare it with pub mod instead of mod. To make items within a public module public as well, use pub before their declarations.
 
-###### For what is used `use` keyword?
+###### 167. For what is used `use` keyword?
 
 Within a scope, the `use` keyword creates shortcuts to items to reduce repetition of long paths. In any scope that can refer to `crate::parent_mod::sub_mod::SomeType`, you can create a shortcut with `use crate::parent_mod::sub_mod::SomeType`; and from then on you only need to write `Asparagus` to make use of that type in the scope.
 
-###### For what is used modules?
+###### 168. For what is used modules?
 
 Modules let us organize code within a crate for readability and easy reuse. Modules also allow us to control the privacy of items because code within a module is private by default.
 
 By using modules, we can group related definitions together and name why they’re related. Programmers using this code can navigate the code based on the groups rather than having to read through all the definitions, making it easier to find the definitions relevant to them. Programmers adding new functionality to this code would know where to place the code to keep the program organized.
 
-###### For what is used private items?
+###### 169. For what is used private items?
 
 Private items are internal implementation details not available for outside use. 
 
-###### For what is make modules and the items within them public.
+###### 170. For what is make modules and the items within them public.
 
 We can choose to make modules and the items within them public, which exposes them to allow external code to use and depend on them.
 
-###### How we can create library crate?
+###### 171. How we can create library crate?
 
 `cargo new restaurant --lib`
 
-###### How we can structure crate?
+###### 172. How we can structure crate?
 
 we can organize its functions into nested modules. We define a module with the mod keyword followed by the name of the module (in this case, front_of_house). The body of the module then goes inside curly brackets. Inside modules, we can place other modules, as in this case with the modules hosting and serving. Modules can also hold definitions for other items, such as structs, enums, constants, traits, and functions.
 
@@ -2735,7 +2735,7 @@ mod front_of_house {
 }
 ```
 
-###### Why `src/main.rs` and `src/lib.rs` are called crate roots?
+###### 173. Why `src/main.rs` and `src/lib.rs` are called crate roots?
 
 The reason for their name is that the contents of either of these two files form a module named crate at the root of the crate’s module structure, known as the module tree
 
@@ -2751,30 +2751,30 @@ crate
          └── take_payment
 ```
 
-###### What is module tree?
+###### 174. What is module tree?
 
 module tree is crate’s module structure.
 This tree shows how some of the modules nest inside other modules; for example, hosting nests inside front_of_house. The tree also shows that some modules are siblings, meaning they’re defined in the same module; hosting and serving are siblings defined within front_of_house. If module A is contained inside module B, we say that module A is the child of module B and that module B is the parent of module A. Notice that the entire module tree is rooted under the implicit module named crate.
 
-###### What does means that some modules a *siblings*?
+###### 175. What does means that some modules a *siblings*?
 
 This means that this modules are defined in the same module
 
-###### What does means that some module a child of other module?
+###### 176. What does means that some module a child of other module?
 
  If module A is contained inside module B, we say that module A is the child of module B.
 
-###### What does means that some module a parent of other module?
+###### 177. What does means that some module a parent of other module?
 
  If module A is contained inside module B, we say that module B is the parent of module A.
 
 #### 7.3 Paths for Referring to an Item in the Module Tree
 
-###### For what using Paths?
+###### 178. For what using Paths?
 
 Paths used to show Rust where to find an item in module tree. To call a function, we need to know its path.
 
-###### What forms does Path have?
+###### 179. What forms does Path have?
 
 A path can take two forms:
 
@@ -2801,19 +2801,19 @@ pub fn eat_at_restaurant() {
 }
 ```
 
-###### What is absolute path?
+###### 180. What is absolute path?
 
 An absolute path is the full path starting from a crate root; for code from an external crate, the absolute path begins with the crate name, and for code from the current crate, it starts with the literal `crate`.
 
 Path are followed by one or more identifiers separated by double colons (`::`).
 
-###### What is relative path?
+###### 181. What is relative path?
 
 A relative path starts from the current module and uses `self`, `super`, or `an` identifier in the current module.
 
 Path are followed by one or more identifiers separated by double colons (`::`).
 
-###### How to choose whether to use a relative or absolute path?
+###### 182. How to choose whether to use a relative or absolute path?
 
 This is a decision you’ll make based on your project, and it depends on whether you’re more likely to move item definition code separately from or together with the code that uses the item.
 
@@ -2821,27 +2821,27 @@ For example, if we moved the front_of_house module and the eat_at_restaurant fun
 
 Our preference in general is to specify absolute paths because it’s more likely we’ll want to move code definitions and item calls independently of each other.
 
-###### What a items in Rust?
+###### 183. What a items in Rust?
 
 functions, methods, structs, enums, modules, and constants.
 
-###### What is the default visibility of items in Rust
+###### 184. What is the default visibility of items in Rust
 
 In Rust, all items (functions, methods, structs, enums, modules, and constants) are private to parent modules by default. Items in a parent module can’t use the private items inside child modules, but items in child modules can use the items in their ancestor modules.
 
-###### Can child items use the items it their ancestor modules?
+###### 185. Can child items use the items it their ancestor modules?
 
 items in child modules can use the items in their ancestor modules, but items in a parent module can’t use the private items inside child modules. This is because child modules wrap and hide their implementation details, but the child modules can see the context in which they’re defined.
 
-###### What make item private?
+###### 186. What make item private?
 
 If you want to make an item like a function or struct private, you put it in a module.
 
-###### How  to expose inner parts of child modules’ code?
+###### 187. How  to expose inner parts of child modules’ code?
 
 Using the `pub` keyword to make an item public.
 
-###### How to construct relative paths that begin in the parent module?
+###### 188. How to construct relative paths that begin in the parent module?
 
 by using `super` at the start of the path
 
@@ -2862,11 +2862,11 @@ mod back_of_house {
 
 This is like starting a filesystem path with the `..` syntax. Using super allows us to reference an item that we know is in the parent module, which can make rearranging the module tree easier when the module is closely related to the parent but the parent might be moved elsewhere in the module tree someday.
 
-###### what are the default fields of a structure?
+###### 189. what are the default fields of a structure?
 
 Private
 
-###### How to create an struct instance from struct whit a private fields?
+###### 190. How to create an struct instance from struct whit a private fields?
 
 This struct must provide a public associated function that construct an instance.
 
@@ -2899,11 +2899,11 @@ pub fn eat_at_restaurant() {
     
 ```
 
-###### what are the default enum variants?
+###### 191. what are the default enum variants?
 
 Public
 
-###### How to make enum variants public?
+###### 192. How to make enum variants public?
 
 if we make an enum public, all of its variants are then public
 
@@ -2923,7 +2923,7 @@ pub fn eat_at_restaurant() {
 
 #### 7.4 Bringing Paths into Scope with the use Keyword
 
-###### Why use `use` keyword?
+###### 193. Why use `use` keyword?
 
 To call a function from other module we must every time write full path to that function that can be inconvenient and repetitive.  To simplify this process we can create a shortcut to a path with the `use` keyword once, and then use the shorter name everywhere else in the scope.
 
@@ -2961,7 +2961,7 @@ mod customer {
 }
 ```
 
-###### How do I make a name obtained with the "use" keyword available to code in another scope?
+###### 194. How do I make a name obtained with the "use" keyword available to code in another scope?
 
 When we bring a name into scope with the use keyword, the name available in the new scope is private. To enable the code that calls our code to refer to that name as if it had been defined in that code’s scope, we can combine pub and use. This technique is called re-exporting because we’re bringing an item into scope but also making that item available for others to bring into their scope
 
@@ -3014,11 +3014,11 @@ Before this change, external code would have to call the add_to_waitlist functio
    }
    ```
 
-###### How to use External Packages?
+###### 195. How to use External Packages?
 
 We most specify package_name = package_version in Cargo.toml file as dependencies. This tells Cargo to download the package and any dependencies from crates.io and make it available to our project. Then we can use paths and `use` keyword to bring the crate API available to our code. If the crate is included in standard library we don't need specify it in Cargo.toml.
 
-###### How we can bring multiple items defined in the same crate or same module into scope by using one line?
+###### 196. How we can bring multiple items defined in the same crate or same module into scope by using one line?
 
 We must use nested paths. We do this by specifying the common part of the path, followed by two colons, and then curly brackets around a list of the parts of the paths that differ
 
@@ -3035,7 +3035,7 @@ use std::{cmp::Ordering, io};
 // --snip--
 ```
 
-###### When we can use 'self' into 'use' statement?
+###### 197. When we can use 'self' into 'use' statement?
 
 if some paths have common part and this part is entirely one path we can merge these paths by using 'nested path' where in curly brackets common part is indicated as 'self'
 
@@ -3049,7 +3049,7 @@ use std::io::Write;
 use std::io::{self, Write};
 ```
 
-###### How we can brings all public items defined in path into scope?
+###### 198. How we can brings all public items defined in path into scope?
 
 We must specify that path followed by the * glob operator.
 
@@ -3059,7 +3059,7 @@ use std::collections::*;
 
 #### Separating Modules into Different Files
 
-###### How we can extract module defined in file to its own file?
+###### 199. How we can extract module defined in file to its own file?
 
 First. We must create file whit name of extracted module in the same directory as file contained module or directory named as extracted module name whit file mod.rs. If we extracting sub module from module we can create file module_name/sub_module_name.rs or module_name/sub_module_name/mod.rs 
 Second. Remove the module code inside the curly brackets, living only the 'mod mod_name;' declaration.
@@ -3102,7 +3102,7 @@ pub mod hosting;
 pub fn add_to_waitlist() {}
 ```
 
-###### How Rust package system allow you organize program code?
+###### 200. How Rust package system allow you organize program code?
 
 Rust lets you split a package into multiple crates and a crate into modules so you can refer to items defined in one module from another module. You can do this by specifying absolute or relative paths. These paths can be brought into scope with a use statement so you can use a shorter path for multiple uses of the item in that scope. Module code is private by default, but you can make definitions public by adding the pub keyword
 
@@ -3110,23 +3110,23 @@ Rust lets you split a package into multiple crates and a crate into modules so y
 
 <https://doc.rust-lang.org/std/collections/index.html>
 
-###### How unique are collections compared to other types?
+###### 201. How unique are collections compared to other types?
 
 Most other data types represent one specific value, but collections can contain multiple values
 
-###### What difference between collections and array and tuple?
+###### 202. What difference between collections and array and tuple?
 
 Unlike the built-in array and tuple types, the data these collections point to is stored on the heap, which means the amount of data does not need to be known at compile time and can grow or shrink as the program runs.
 
-###### What is Vector collection?
+###### 203. What is Vector collection?
 
 Vector is collection that allow to store a variable number of values next to each other.
 
-###### What is String collection?
+###### 204. What is String collection?
 
 A string is a collection of characters
 
-###### What is Hash Map collection?
+###### 205. What is Hash Map collection?
 
 A hash map allows you to associate a value with a specific key. It’s a particular implementation of the more general data structure called a map
 
@@ -3137,7 +3137,7 @@ Note: For more on the implementation details of the `Vec<T>` type, see “[The R
 the API [documentation](https://doc.rust-lang.org/std/vec/struct.Vec.html) for all of the many useful methods defined on `Vec<T>` by the standard library
 
 
-###### How create vector instance?
+###### 206. How create vector instance?
 
 We can call 'Vec::new()' method and assign value to variable with annotated variable type, or call  'vec!' macro with pointing vector values and with this case we no need annotated variable type because Rust inferred it.
 
@@ -3146,7 +3146,7 @@ let v: Vec<i32> = Vec::new();
 let v = vec![1, 2, 3];
 ```
 
-###### How update a Vector?
+###### 207. How update a Vector?
 
 Vector variable must be defined as mutable and then we can used 'push' method to insert value to vector
 
@@ -3161,14 +3161,14 @@ Vector variable must be defined as mutable and then we can used 'push' method to
 
 The numbers we place inside are all of type i32, and Rust infers this from the data, so we don’t need the `Vec<i32>` annotation
 
-###### How we can to read Elements of Vectors?
+###### 208. How we can to read Elements of Vectors?
 
 We have two ways to reference a value stored in a vector.
 
 - via indexing. In this case we indicate a vector variable with followed square brackets with value index inside. Index numbering starts from zero.
 - by means `get` method. In this case as argument we pass to `get` method vector value index also. This method return `Option<&T>` type.
 
-###### What is difference between reference vector value by index and by means `get` method?
+###### 209. What is difference between reference vector value by index and by means `get` method?
 
 In case reference by index we get a value or value reference and if we specify not existing index this will cause the program to panic.
 In case of reference by method `get` we get `Option<&T>` type and if we pass not-existing index we get `None` variant of `Option<&T>`
@@ -3186,7 +3186,7 @@ In case of reference by method `get` we get `Option<&T>` type and if we pass not
     }
 ```
 
-###### In what cases did we used a reference to vector value by index?
+###### 210. In what cases did we used a reference to vector value by index?
 
 This method is best used when you want your program to crash if there’s an attempt to access an element past the end of the vector.
 
@@ -3197,11 +3197,11 @@ This method is best used when you want your program to crash if there’s an att
     let does_not_exist = v.get(100);
 ```
 
-###### In what cases did we used a reference to vector value by means `get` method?
+###### 211. In what cases did we used a reference to vector value by means `get` method?
 
 You would use this method if accessing an element beyond the range of the vector may happen occasionally under normal circumstances. Your code will then have logic to handle having either `Some(&element)` or `None`
 
-###### Can we have immutable and mutable reference to vector value?
+###### 212. Can we have immutable and mutable reference to vector value?
 
 We can not have immutable and mutable reference to vector value in the same scope
 
@@ -3216,7 +3216,7 @@ We can not have immutable and mutable reference to vector value in the same scop
     println!("The first element is: {first}"); // immutable borrow later used here
 ```
 
-###### How we can Iterating Over the immutable Values in a Vector?
+###### 213. How we can Iterating Over the immutable Values in a Vector?
 
 We must use `for` loop with immutable reference to vector variable
 
@@ -3227,7 +3227,7 @@ We must use `for` loop with immutable reference to vector variable
     }
 ```
 
-###### How we can Iterating Over the mutable Values in a Vector?
+###### 214. How we can Iterating Over the mutable Values in a Vector?
 
 We must use `for` loop with mutable reference to vector variable and use the * dereference operator to get to the value in i before we can use the += operator
 
@@ -3238,16 +3238,16 @@ We must use `for` loop with mutable reference to vector variable and use the * d
     }
 ```
 
-###### Can we modify the entire vector while iterating over the vector?
+###### 215. Can we modify the entire vector while iterating over the vector?
 
 Iterating over a vector, whether immutably or mutably, is safe because of the borrow checker’s rules. If we attempted to insert or remove items in the for loop bodies we would get a compiler error. The reference to the vector that the for loop holds prevents simultaneous modification of the whole vector.
 
 
-###### Can we store in vector values different types?
+###### 216. Can we store in vector values different types?
 
 Vectors can only store values that are of the same type
 
-###### How we can store in vector values different types?
+###### 217. How we can store in vector values different types?
 
 We can define an enum whose variants will hold the different value types, and all the enum variants will be considered the same type: that of the enum. Then we can create a vector to hold that enum and so, ultimately, hold different types
 
@@ -3265,27 +3265,27 @@ We can define an enum whose variants will hold the different value types, and al
     ];
 ```
 
-###### In case of using a vector with enum values holds different types, how can we handle these values?
+###### 218. In case of using a vector with enum values holds different types, how can we handle these values?
 
 Using a `match` expression whit the exhaustive set of types.
 
-###### Where vector API?
+###### 219. Where vector API?
 
 the API [documentation](https://doc.rust-lang.org/std/vec/struct.Vec.html) for all of the many useful methods defined on `Vec<T>` by the standard library
 
 #### 8.2 Storing UTF-8 Encoded Text with Strings
 
-###### What Is a String?
+###### 220. What Is a String?
 
 Rust has only one string type in the core language, which is the string slice str that is usually seen in its borrowed form &str. String literals, for example, are stored in the program’s binary and are therefore string slices.
 
 The String type, which is provided by Rust’s standard library rather than coded into the core language, is a growable, mutable, owned, UTF-8 encoded string type. When Rustaceans refer to “strings” in Rust, they might be referring to either the String or the string slice &str types, not just one of those types.
 
-###### How implemented String type?
+###### 221. How implemented String type?
 
 String is implemented as a wrapper around a vector of bytes with some extra guarantees, restrictions, and capabilities
 
-###### How create new String?
+###### 222. How create new String?
 
 - By using function `new`
 
@@ -3310,7 +3310,7 @@ let mut s = String::new();
     let s = String::from("initial contents");
 ```
 
-###### How update a String?
+###### 223. How update a String?
 
 - by using the `push_str` method to append a string slice `&str`
 
@@ -3347,7 +3347,7 @@ let mut s = String::new();
     let s = format!("{s1}-{s2}-{s3}");
 ```
 
-###### What happen when we perform String Concatenation with the + Operator?
+###### 224. What happen when we perform String Concatenation with the + Operator?
 
 the `+` Operator uses the `add` method by accepting first operand as first parameter, taking it ownership and second operand as second parameter as string slice (&str). When we instead &str passes into `add` function String reference (&String) Rust uses a `deref coercion`, which turns &String into &String[..] (&str). Next `add` takes ownership of first parameter, appends a copy of the contents of second parameters, and then returns ownership of the result. Because add does not take ownership of the second parameter, second parameter variable will still be a valid String after this operation unlike first parameter.
 
@@ -3358,7 +3358,7 @@ the `+` Operator uses the `add` method by accepting first operand as first param
     // fn add(self, s: &str) -> String {
 ```
 
-###### How `format!` macro works?
+###### 225. How `format!` macro works?
 
 The `format!` macro works like println!, but instead of printing the output to the screen, it returns a String with the contents. The code generated by the format! macro uses references so that this its call doesn’t take ownership of any of its parameters.
 
@@ -3370,19 +3370,19 @@ The `format!` macro works like println!, but instead of printing the output to t
     let s = format!("{s1}-{s2}-{s3}");
 ```
 
-###### What is string `deref coercion`?
+###### 226. What is string `deref coercion`?
 
 Many String methods accept as parameters string slice type (&str). When we pass it a &String type argument, Rust performs a type coercion - &String to &String[..] (&str), which is called `deref coercion`
 
-###### Can we access parts of a String using indexing syntax?
+###### 227. Can we access parts of a String using indexing syntax?
 
 If we try to index a String, we well get an error.
 
-###### Why doesn't Rust allow you to index a string?
+###### 228. Why doesn't Rust allow you to index a string?
 
 A string is a collection of chars. Rust uses UTF-8 to encode chars, and so each char can take up between one and four bytes. In Rust, a string is implemented as a byte vector, which is a collection of bytes, and when we index a String, we are referencing a single byte, which doesn't make sense in the context of a String.
 
-###### Can we slicing a String?
+###### 229. Can we slicing a String?
 
 We can slicing a String, but it is bad practice. Each char of String can take range up between one and four bytes, when we do slice we get reference to individual bytes, not whole characters and if we do not capture the entire byte range of the char, we will get a panic at runtime and program crash.
 
@@ -3394,7 +3394,7 @@ let hello = "Здравствуйте";
 let s = &hello[0..1]; // byte index 1 is not a char boundary; it is inside 'З' (bytes 0..2) of `Здравствуйте`
 ```
 
-###### How we can iterate over String by Char?
+###### 230. How we can iterate over String by Char?
 
 We must used `chars()` method
 
@@ -3411,7 +3411,7 @@ This code will print the following:
 д
 ```
 
-###### How we can iterate over String by Bytes?
+###### 231. How we can iterate over String by Bytes?
 
 We must used `bytes()` method
 
@@ -3432,15 +3432,15 @@ This code will print the four bytes that make up this string:
 
 #### 8.3 Storing Keys with Associated Values in Hash Maps
 
-###### What is Hash Maps?
+###### 232. What is Hash Maps?
 
 The type HashMap<K, V> stores a mapping of keys of type K to values of type V using a hashing function, which determines how it places these keys and values into memory. 
 
-###### What are Hash Maps used for?
+###### 233. What are Hash Maps used for?
 
 Hash maps are useful when you want to look up data not by using an index, as you can with vectors, but by using a key that can be of any type.
 
-###### How to create hash maps?
+###### 234. How to create hash maps?
 
 One way to create an empty hash `map` is to use new and to add elements with `insert`
 
@@ -3453,7 +3453,7 @@ One way to create an empty hash `map` is to use new and to add elements with `in
     scores.insert(String::from("Yellow"), 50);
 ```
 
-###### How to access a value in Hash Map?
+###### 235. How to access a value in Hash Map?
 
 We can get a value out of the hash map by providing its key to the `get` method
 
@@ -3471,11 +3471,11 @@ We can get a value out of the hash map by providing its key to the `get` method
 
 The `get` method returns an `Option<&V>`; if there’s no value for that key in the hash map, `get` will return None. This program handles the Option by calling copied to get an `Option<i32>` rather than an `Option<&i32>`, then unwrap_or to set score to zero if scores doesn’t have an entry for the key
 
-###### What type does the `get` method of Hash Map return?
+###### 236. What type does the `get` method of Hash Map return?
 
 Option<&V>
 
-###### How we can iterate over each key–value pair in a hash map?
+###### 237. How we can iterate over each key–value pair in a hash map?
 
 Using the `for` loop
 
@@ -3499,7 +3499,7 @@ Yellow: 50
 Blue: 10
 ```
 
-###### How Hash Map to process Ownership?
+###### 238. How Hash Map to process Ownership?
 
 For types that implement the Copy trait, like i32, the values are copied into the hash map. For owned values like String, the values will be moved and the hash map will be the owner of those values
 
@@ -3519,7 +3519,7 @@ We aren’t able to use the variables field_name and field_value after they’ve
 
 If we insert references to values into the hash map, the values won’t be moved into the hash map. The values that the references point to must be valid for at least as long as the hash map is valid
 
-###### What happens if you insert a value into a hash map for an existing key?
+###### 239. What happens if you insert a value into a hash map for an existing key?
 
 Old value will be overwritten
 
@@ -3534,7 +3534,7 @@ Old value will be overwritten
     println!("{scores:?}"); //{"Blue": 25}
 ```
 
-###### How insert a Key and Value Only If a Key Isn’t Present?
+###### 240. How insert a Key and Value Only If a Key Isn’t Present?
 
 Hash maps have a special API for this called `entry` that takes the key you want to check as a parameter. The return value of the entry method is an enum called `Entry` that represents a value that might or might not exist. The `or_insert` method on `Entry` is defined to return a mutable reference to the value for the corresponding `Entry` key if that key exists, and if not, it inserts the parameter as the new value for this key and returns a mutable reference to the new value.
 
@@ -3550,7 +3550,7 @@ Hash maps have a special API for this called `entry` that takes the key you want
     println!("{scores:?}"); // {"Yellow": 50, "Blue": 10}
 ```
 
-###### How to Update a Value Based on the Old Value?
+###### 241. How to Update a Value Based on the Old Value?
 
 ```rust
     use std::collections::HashMap;
@@ -3568,32 +3568,32 @@ Hash maps have a special API for this called `entry` that takes the key you want
     println!("{map:?}"); // {"world": 2, "hello": 1, "wonderful": 1}
 ```
 
-###### In what order does iteration occur in a hash map?
+###### 242. In what order does iteration occur in a hash map?
 
 iterating over a hash map happens in an arbitrary order.
 
-###### What hashing function used in Hash Map?
+###### 243. What hashing function used in Hash Map?
 
 SipHash <https://en.wikipedia.org/wiki/SipHash>
 
 ### 9. Error Handling
 
-###### What error categories exist in Rust?
+###### 244. What error categories exist in Rust?
 
 Rust groups errors into two major categories: recoverable and unrecoverable errors. For a recoverable error, such as a file not found error, we most likely just want to report the problem to the user and retry the operation. Unrecoverable errors are always symptoms of bugs, such as trying to access a location beyond the end of an array, and so we want to immediately stop the program.
 
 #### 9.1 Unrecoverable Errors with panic!
 
-###### What is unrecoverable errors?
+###### 245. What is unrecoverable errors?
 
 Unrecoverable errors are always symptoms of bugs, such as trying to access a location beyond the end of an array, and so we want to immediately stop the program.
 
-###### What are alternative actions of Rust in case of panic?
+###### 246. What are alternative actions of Rust in case of panic?
 
 - unwinding. Rust walks back up the stack and cleans up the data from each function it encounters. The default action.
 - aborting, which ends the program without cleaning up. Memory that the program was using will then need to be cleaned up by the operating system
 
-###### How and why switch from unwinding to aborting?
+###### 247. How and why switch from unwinding to aborting?
 
 If in your project you need to make the resultant binary as small as possible, you can switch from unwinding to aborting upon a panic by adding panic = 'abort' to the appropriate `[profile]` sections in your Cargo.toml file
 
@@ -3602,7 +3602,7 @@ If in your project you need to make the resultant binary as small as possible, y
 panic = 'abort'
 ```
 
-###### What ways to cause a panic in practice?
+###### 248. What ways to cause a panic in practice?
 
 - by taking an action that causes our code to panic (such as accessing an array past the end) 
 
@@ -3622,33 +3622,33 @@ fn main() {
 }
 ```
 
-###### What actions does Rust take when panic occurs?
+###### 249. What actions does Rust take when panic occurs?
 
 panics will print a failure message, unwind, clean up the stack, and quit
 
-###### what is backtrace?
+###### 250. what is backtrace?
 
 A backtrace is a list of all the functions that have been called to get to this point
 
-###### How to read a backtrace?
+###### 251. How to read a backtrace?
 
 To start from the top and read until you see files you wrote. That’s the spot where the problem originated. The lines above that spot are code that your code has called; the lines below are code that called your code. These before-and-after lines might include core Rust code, standard library code, or crates that you’re using
 
-###### what settings are needed to print the backtrace?
+###### 252. what settings are needed to print the backtrace?
 
  debug symbols must be enabled. Debug symbols are enabled by default when using `cargo build` or `cargo run` without the --release flag
 
 #### 9.2 Recoverable Errors with Result
 
-###### What is recoverable error?
+###### 253. What is recoverable error?
 
 For a recoverable error we most likely just want to report the problem to the user and retry the operation, for example file not found error.
 
-###### How does Rust program handle recoverable error?
+###### 254. How does Rust program handle recoverable error?
 
 Functions or methods that may encounter a recoverable error must return enum Result type. The calling code must handle the various enum Result type `Ok` or `Err` variants.
 
-###### What is enum Result type?
+###### 255. What is enum Result type?
 
 enum Result type is type that returned from function than can generated recoverable error. Enum Result type has two variants `Ok` and `Err` which are bound to  generic type parameters `T` and `E`. `T` represents the type of the value that will be returned in a success case within the Ok variant, and E represents the type of the error that will be returned in a failure case within the Err variant. Because Result has these generic type parameters, we can use the Result type and the functions defined on it in many different situations where the success value and error value we want to return may differ.
 
@@ -3659,7 +3659,7 @@ enum Result<T, E> {
 }
 ```
 
-###### How recoverable error handled using Result type?
+###### 256. How recoverable error handled using Result type?
 
 Function return Result type value. This value is checked using a match expression, depending on whether `Ok` or `Err` matches, the corresponded arm selected. Usually, in case `Ok`  bound value returned, in case `Err` error handled.
 
@@ -3705,7 +3705,7 @@ fn main() {
 }
 ```
 
-###### What is the result of the `unwrap()` method?
+###### 257. What is the result of the `unwrap()` method?
 
 If the Result value is the Ok variant, unwrap will return the value inside the Ok. If the Result is the Err variant, unwrap will call the panic! macro for us. Here is an example of unwrap in action:
 
@@ -3723,7 +3723,7 @@ fn main() {
 
 ```
 
-###### What is the result of the `expect()` method?
+###### 258. What is the result of the `expect()` method?
 
 If the Result value is the Ok variant, `expect()` will return the value inside the Ok. If the Result is the Err variant, `expect()` will call the panic! macro. Error message used by expect in its call to panic! will be the parameter that we pass to expect, rather than the default panic! message that unwrap uses
 
@@ -3740,11 +3740,11 @@ fn main() {
 // hello.txt should be included in this project: Os { code: 2, kind: NotFound, message: "No such file or directory" }
 ```
 
-###### What is Propagating Errors?
+###### 259. What is Propagating Errors?
 
 If we get a variant of the `Err` Result inside our function, we can pass it on to the calling code to handle. This called Propagating Errors.
 
-###### How we can Propagate Error?
+###### 260. How we can Propagate Error?
 
 We must annotate the return type as `Result<T, E>` whit appropriate success and error types and wraps return result of the function execution in appropriate of the variant Result enum 
 
@@ -3769,7 +3769,7 @@ fn read_username_from_file() -> Result<String, io::Error> {
 }
 ```
 
-###### What does the `?` operator?
+###### 261. What does the `?` operator?
 
 We must used `?` operator in function that Propagate Error, i.e. it receive and return Result type. The ? placed after a received Result type value - if the value of the Result is an Ok, the value inside the Ok will get returned from this expression, and the program will continue. If the value is an Err, the Err will be returned from the whole function as if we had used the return keyword so the error value gets propagated to the calling code.
 
@@ -3813,11 +3813,11 @@ This function returns Option<char> because it’s possible that there is a chara
 
 The ? extracts the string slice, and we can call chars on that string slice to get an iterator of its characters. We’re interested in the last character in this first line, so we call last to return the last item in the iterator. This is an Option because it’s possible that the first line is the empty string; for example, if text starts with a blank line but has characters on other lines, as in "\nhi". However, if there is a last character on the first line, it will be returned in the Some variant. The ? operator in the middle gives us a concise way to express this logic, allowing us to implement the function in one line. If we couldn’t use the ? operator on Option, we’d have to implement this logic using more method calls or a match expression.
 
-###### What happen when `Err` Result value have called `?` operator?
+###### 262. What happen when `Err` Result value have called `?` operator?
 
 `Err` Result value go through the `from` function, defined in the From trait in the standard library, which is used to convert values from one type into another. When the ? operator calls the `from` function, the error type received is converted into the error type defined in the return type of the current function. This is useful when a function returns one error type to represent all the ways a function might fail, even if parts might fail for many different reasons.
 
-###### What does the `fs::read_to_string` function?
+###### 263. What does the `fs::read_to_string` function?
 
 Reading a file into a string is a fairly common operation, so the standard library provides the convenient `fs::read_to_string` function that opens the file, creates a new String, reads the contents of the file, puts the contents into that String, and returns it in `Ok` Result or `Err` in case error.
 
@@ -3830,11 +3830,11 @@ fn read_username_from_file() -> Result<String, io::Error> {
 }
 ```
 
-###### Can `?` operator automatically convert a Result to an Option or vice versa?
+###### 264. Can `?` operator automatically convert a Result to an Option or vice versa?
 
 The ? operator won’t automatically convert a Result to an Option or vice versa; in those cases, you can use methods like the `ok` method on Result or the `ok_or` method on Option to do the conversion explicitly.
 
-###### What type can the main function return?
+###### 265. What type can the main function return?
 
 The main function may return any types that implement the `std::process::Termination` trait, which contains a function `report` that returns an `ExitCode`.
 
@@ -3859,17 +3859,17 @@ When a main function returns a Result<(), E>, the executable will exit with a va
 
 #### 9.3 To panic! or Not to panic!
 
-###### when call panic! and when return Result?
+###### 266. when call panic! and when return Result?
 
 When code panics, there’s no way to recover. You could call panic! for any error situation, whether there’s a possible way to recover or not, but then you’re making the decision that a situation is unrecoverable on behalf of the calling code. When you choose to return a Result value, you give the calling code options. The calling code could choose to attempt to recover in a way that’s appropriate for its situation, or it could decide that an Err value in this case is unrecoverable, so it can call panic! and turn your recoverable error into an unrecoverable one. Therefore, returning Result is a good default choice when you’re defining a function that might fail.
 
 ### 10 Generic Types, Traits, and Lifetimes
 
-###### What are generics for?
+###### 267. What are generics for?
 
 For effectively handling code duplication. Functions can take parameters of some generic type, instead of a concrete type like i32 or String, in the same way they take parameters with unknown values to run the same code on multiple concrete values.
 
-###### How to extract duplicate code?
+###### 268. How to extract duplicate code?
 
 1. Identify duplicate code.
 2. Extract the duplicate code into the body of the function, and specify the inputs and return values of that code in the function signature.
@@ -3877,12 +3877,12 @@ For effectively handling code duplication. Functions can take parameters of some
 
 #### 10.1 Generic Data Types
 
-###### How to name type parameters?
+###### 269. How to name type parameters?
 
 To parameterize the types in a function, struct, enum we need to name the type parameters. We can use any identifier as a type parameter name following Rust’s type-naming convention that is UpperCamelCase. But, by convention, type parameter names in Rust are short, often just one letter.
 
 
-###### How define function that uses generics?
+###### 270. How define function that uses generics?
 
 To define a generic function, we place type name declarations inside angle brackets, <>, between the name of the function and the parameter list and declare this parameter names in the signature as parameter type annotation and return type annotation. Then we can use type names in function body.
 We read generic function definition as: the function some_function name is generic over some types T S ...
@@ -3913,14 +3913,14 @@ fn main() {
 }
 ```
 
-###### What is parameter type Restriction?
+###### 271. What is parameter type Restriction?
 
 In some situations where some operations are performed on generic type parameters, we must restrict generic types to only types that support those operations. This is done by annotating the generic type name definition in angle brackets with Traits that define those operations.
 
 `fn largest<T: std::cmp::PartialOrd>(list: &[T]) -> &T `
 
 
-###### How define struct that uses generics?
+###### 272. How define struct that uses generics?
 
 To define a generic struct, we place type name declarations inside angle brackets, <>, between the name of the struct and struct body. Then we can use type names in struct body as struct field type annotations.
 We read generic struct definition as: the struct some_struct name is generic over some types T S ...
@@ -3938,7 +3938,7 @@ fn main() {
 }
 ```
 
-###### How define enum that uses generics?
+###### 273. How define enum that uses generics?
 
 To define a generic enum, we place type name declarations inside angle brackets, <>, between the name of the enum and enum body. Then we can use type names in enum body as enum variants bound value type annotations.
 We read generic enum definition as: the enum some_enum name is generic over some types T S ...
@@ -3955,7 +3955,7 @@ enum Result<T, E> {
 }
 ```
 
-###### How define method that uses generics?
+###### 274. How define method that uses generics?
 
 To define a generic method of a struct or enum, we put the type name declarations in angle brackets, <>, between the `impl` keyword and the struct or enum name, also with the type names in angle brackets. We can then define the generic method itself. When defining a particular method, we can use different type names than those used when defining the struct or enum.
 
@@ -4003,7 +4003,7 @@ fn main() {
 }
 ```
 
-###### How we can specify constraints on generic types when defining methods on the type?
+###### 275. How we can specify constraints on generic types when defining methods on the type?
 
 We can also specify constraints on generic types when defining methods on the type. We could, for example, implement methods only on `Point<f32>` instances rather than on `Point<T>` instances with any generic type.
 
@@ -4019,7 +4019,7 @@ impl Point<f32> {
 
 This code means the type Point<f32> will have a distance_from_origin method; other instances of Point<T> where T is not of type f32 will not have this method defined. The method measures how far our point is from the point at coordinates (0.0, 0.0) and uses mathematical operations that are available only for floating-point types
 
-###### What is Monomorphization?
+###### 276. What is Monomorphization?
 
 This process that Rust compiler performs at compiler time.
 the process of turning generic code into specific code by filling in the concrete types that are used when compiled. The compiler looks at all the places where generic code is called and generates code for the concrete types that the generic code is called with.
@@ -4049,23 +4049,23 @@ fn main() {
 
 #### 10.2 Traits: Defining Shared Behavior
 
-###### What is Trait for?
+###### 277. What is Trait for?
 
 A trait defines the functionality a particular type has and can share with other types. We can use traits to define shared behavior in an abstract way. We can use trait bounds to specify that a generic type can be any type that has certain behavior.
 
-###### What determines the behavior of a type?
+###### 278. What determines the behavior of a type?
 
 The behavior of a type is defined by the set of methods we can call on that type.
 
-###### When types shares the same behavior?
+###### 279. When types shares the same behavior?
 
  Different types share the same behavior if we can call the same methods on all of those types.
 
-######  Hwo in Rust define a shared behavior?
+###### 280. Hwo in Rust define a shared behavior?
 
 Trait definitions are a way to group method signatures together to define a set of behaviors necessary to accomplish some purpose.
 
-###### How define Trait?
+###### 281. How define Trait?
 
 We declare a trait using the trait keyword and then the trait’s name. We also must declare a trait as pub so that crates depending on this crate can make use of this trait too. Inside the curly brackets, we declare the method signatures that describe the behaviors of the types that implement this trait. After the method signature, instead of providing an implementation within curly brackets, we use a semicolon. 
 
@@ -4076,7 +4076,7 @@ pub trait Summary {
 }
 ```
 
-###### How a type implements a trait?
+###### 282. How a type implements a trait?
 
 Each type implementing a trait must provide its own custom behavior for the body of a trait methods. The compiler will enforce that any type that has a trait will have methods defined its  signatures exactly.
 
@@ -4116,7 +4116,7 @@ impl Summary for Tweet {
 }
 ```
 
-###### How should we use a types that implement a trait?
+###### 283. How should we use a types that implement a trait?
 
 When a type implement a trait we can call trait method on an instance of the type in the same way we call regular methods. The only difference is that the user must bring the trait into scope as well as the types
 
@@ -4137,13 +4137,13 @@ fn main() {
 }
 ```
 
-###### Can we implement external traits on external types?
+###### 284. Can we implement external traits on external types?
 
 we can’t implement external traits on external types. For example, we can’t implement the Display trait on Vec<T> within our aggregator crate because Display and Vec<T> are both defined in the standard library and aren’t local to our aggregator crate.
 
 we can implement a trait on a type only if either the trait or the type, or both, are local to our crate.
 
-###### Can a trait contain an implementation of the method it defines?
+###### 285. Can a trait contain an implementation of the method it defines?
 
 A trait can contain method whit implementation. This is called "Default Implementations"
 
@@ -4156,7 +4156,7 @@ pub trait Summary {
 }
 ```
 
-###### What happen if a type implement trait whit default implemented methods
+###### 286. What happen if a type implement trait whit default implemented methods
 
 We can call a methods of the trait on type instance. In case the type make own implementations this methods (this called 'overriding') - will be called this methods, otherwise will be called default implemented  methods  of the trait.
 
@@ -4176,7 +4176,7 @@ let article = NewsArticle {
 println!("New article available! {}", article.summarize());
 ```
 
-###### Can default implemented trait methods call other methods of the trait?
+###### 287. Can default implemented trait methods call other methods of the trait?
 
 Default implementations can call other methods in the same trait, even if those other methods don’t have a default implementation. In this way, a trait can provide a lot of useful functionality and only require implementors to specify a small part of it.
 
@@ -4209,20 +4209,20 @@ let tweet = Tweet {
 println!("1 new tweet: {}", tweet.summarize());
 ```
 
-###### How to call the default implementation from an overriding implementation of that same method?
+###### 288. How to call the default implementation from an overriding implementation of that same method?
 
 it isn’t possible
 
-###### How type of argument can accept function parameter annotated by trait type? 
+###### 289. How type of argument can accept function parameter annotated by trait type? 
 
 This parameter can accepts any type that implements that trait.
 
-###### What syntaxes used to define functions that accept many types?
+###### 290. What syntaxes used to define functions that accept many types?
 
 - `impl Trait_name` syntax
 - Trait Bound Syntax
 
-###### How to use `impl trait_name` syntax to define functions that accept many different types?
+###### 291. How to use `impl trait_name` syntax to define functions that accept many different types?
 
 in function signature, instead of a concrete type for the parameter, we specify the `impl` keyword and the trait name.
 
@@ -4239,7 +4239,7 @@ pub fn notify(item: &(impl Summary + Display)) {
 ```
 
 
-###### How to use Trait Bound Syntax to define functions that accept many different types?
+###### 292. How to use Trait Bound Syntax to define functions that accept many different types?
 
 in definition of generic function, with the declaration of the generic type parameter inside angle brackets we place trait bounds after a parameter name followed by colon.
 
@@ -4276,7 +4276,7 @@ where
 {
 ```
 
-###### How to use Trait in defining a function's return type?
+###### 293. How to use Trait in defining a function's return type?
 
 We can use `impl Trait` syntax. We specify in definition of function return type keyword `impl` followed Trait name.
 
@@ -4326,7 +4326,7 @@ fn returns_summarizable(switch: bool) -> impl Summary {
 
 Returning either a NewsArticle or a Tweet isn’t allowed due to restrictions around how the impl Trait syntax is implemented in the compiler. We’ll cover how to write a function with this behavior in the “Using Trait Objects That Allow for Values of Different Types” section of Chapter 18.
 
-###### What can we Conditionally Implement Methods by Using Trait Bounds?
+###### 294. What can we Conditionally Implement Methods by Using Trait Bounds?
 
 If we have generic Struct on Enum, by defining a method we can specify in angel bracket of `impl` definition parts Trait Bounds, that is name of parameter type followed colon and list of Traits connected `+`.
 
@@ -4356,7 +4356,7 @@ impl<T: Display + PartialOrd> Pair<T> {
 }
 ```
 
-###### What is blanket implementations?
+###### 295. What is blanket implementations?
 
 We can also conditionally implement a trait for any type that implements another trait. Implementations of a trait on any type that satisfies the trait bounds are called blanket implementations and are used extensively in the Rust standard library. For example, the standard library implements the ToString trait on any type that implements the Display trait. The impl block in the standard library looks similar to this code:
 
@@ -4368,25 +4368,25 @@ impl<T: Display> ToString for T {
 
 #### 10.3 Validating References with Lifetimes
 
-###### What is lifetime?
+###### 296. What is lifetime?
 
 - as generic. Lifetime is kind of generic that ensure that references are valid as long as we need them to be.
 
 - as property of reference. Every reference in Rust has a lifetime. Reference lifetime is program scope for which the reference is valid.
 
-###### What is mean - reference is valid?
+###### 297. What is mean - reference is valid?
 
 This means that the value referenced by this reference will not be dropped from memory due to going out of scope of the owner that value.
 
-###### When we must annotate a Lifetime?
+###### 298. When we must annotate a Lifetime?
 
 Most of the time, lifetimes are implicit and inferred, just like most of the time, types are inferred. We  must annotate lifetimes when the lifetimes of references could be related in a few different ways. Rust requires us to annotate the relationships using generic lifetime parameters to ensure the actual references used at runtime will definitely be valid.
 
-###### What main aim of lifetimes?
+###### 299. What main aim of lifetimes?
 
 The main aim of lifetimes is to prevent dangling references, which cause a program to reference data other than the data it’s intended to reference
 
-###### What does Borrow Checker do?
+###### 300. What does Borrow Checker do?
 
 The Rust compiler has a borrow checker that compares scopes to determine whether all borrows are valid.
 At compile time, Rust compares the size of the two lifetimes and sees that r has a lifetime of 'a but that it refers to memory with a lifetime of 'b. The program is rejected because 'b is shorter than 'a: the subject of the reference doesn’t live as long as the reference.
@@ -4417,25 +4417,25 @@ fn main() {
 }                         // ----------+
 ```
 
-###### What is mean when function return borrowed value (reference)?
+###### 301. What is mean when function return borrowed value (reference)?
 
 This means that this borrowing comes from one of the function parameters.
 
-###### When we must annotate return value of function by lifetime parameter?
+###### 302. When we must annotate return value of function by lifetime parameter?
 
 If we define function that accept some borrows and return borrow and we do not definitely determine from what parameter  borrowed return value we must specify to compiler how determine lifetime of return borrow. This hint to the compiler is made using the lifetime parameter.
 
-###### Can have  parameters of function different reference lifetime? 
+###### 303. Can have  parameters of function different reference lifetime? 
 
 functions can accept references with any lifetime by specifying a generic lifetime parameter.
 
-###### What describe Lifetime annotations?
+###### 304. What describe Lifetime annotations?
 
 They describe the relationships of the lifetimes of multiple references to each other without affecting the lifetimes.
 
 annotations are meant to tell Rust how generic lifetime parameters of multiple references relate to each other
 
-###### What syntax have Lifetime annotation?
+###### 305. What syntax have Lifetime annotation?
 
 the names of lifetime parameters must start with an apostrophe (') and are usually all lowercase and very short, like generic types. Most people use the name 'a for the first lifetime annotation. We place lifetime parameter annotations after the & of a reference, using a space to separate the annotation from the reference’s type.
 
@@ -4445,7 +4445,7 @@ the names of lifetime parameters must start with an apostrophe (') and are usual
 &'a mut i32 // a mutable reference with an explicit lifetime
 ```
 
-###### How to use lifetime annotations in function signatures?
+###### 306. How to use lifetime annotations in function signatures?
 
 To use lifetime annotations in function signatures, we need to declare the generic lifetime parameters inside angle brackets between the function name and the parameter list,
 
@@ -4463,11 +4463,11 @@ fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
 
 The function signature now tells Rust that for some lifetime 'a, the function takes two parameters, both of which are string slices that live at least as long as lifetime 'a. The function signature also tells Rust that the string slice returned from the function will live at least as long as lifetime 'a. In practice, it means that the lifetime of the reference returned by the longest function is the same as the smaller of the lifetimes of the values referred to by the function arguments. These relationships are what we want Rust to use when analyzing this code.
 
-###### What means  If the reference returned from function does not refer to one of the parameters?
+###### 307. What means  If the reference returned from function does not refer to one of the parameters?
 
 Returned reference would be a dangling reference because the value will go out of scope at the end of the function.
 
-###### How we can define struct whit field contained reference?
+###### 308. How we can define struct whit field contained reference?
 
 We can define structs to hold references, but in that case we would need to add a lifetime annotation on every reference in the struct’s definition.
 
@@ -4487,23 +4487,23 @@ fn main() {
 
 we declare the name of the generic lifetime parameter inside angle brackets after the name of the struct so we can use the lifetime parameter in the body of the struct definition. This annotation means an instance of ImportantExcerpt can’t outlive the reference it holds in its part field.
 
-###### Can we specify lifetime parameters for every functions or structs that use references?
+###### 309. Can we specify lifetime parameters for every functions or structs that use references?
 
  In early versions (pre-1.0) of Rust every reference needed an explicit lifetime. In this time some pattern lifetime annotations programmed into the compiler’s code so the borrow checker could infer the lifetimes in these situations and wouldn’t need explicit annotations.
 
-######  What is lifetime elision rules?
+###### 310. What is lifetime elision rules?
 
 Patterns programmed into Rust’s analysis of references for recognition lifetime annotations patterns.
 
-###### What is Input lLifetimes?
+###### 311. What is Input lLifetimes?
 
 Lifetimes on function or method parameters are called input lifetimes
 
-###### What is Output Lifetimes?
+###### 312. What is Output Lifetimes?
 
  lifetimes on return values are called output lifetimes
 
-###### How compiler analysis of references in context of recognition lifetime annotations patterns?
+###### 313. How compiler analysis of references in context of recognition lifetime annotations patterns?
 
 The compiler uses three rules to figure out the lifetimes of the references when there aren’t explicit annotations. The first rule applies to input lifetimes, and the second and third rules apply to output lifetimes. If the compiler gets to the end of the three rules and there are still references for which it can’t figure out lifetimes, the compiler will stop with an error. These rules apply to `fn` definitions as well as `impl` blocks.
 
@@ -4513,7 +4513,7 @@ The second rule is that, if there is exactly one input lifetime parameter, that 
 
 The third rule is that, if there are multiple input lifetime parameters, but one of them is `&self` or `&mut self` because this is a method, the lifetime of self is assigned to all output lifetime parameters. This third rule makes methods much nicer to read and write because fewer symbols are necessary.
 
-###### What annotate lifetime in Method Definitions?
+###### 314. What annotate lifetime in Method Definitions?
 
 Lifetime names for struct fields always need to be declared after the impl keyword and then used after the struct’s name because those lifetimes are part of the struct’s type.
 
@@ -4542,11 +4542,11 @@ impl<'a> ImportantExcerpt<'a> {
 
 There are two input lifetimes, so Rust applies the first lifetime elision rule and gives both &self and announcement their own lifetimes. Then, because one of the parameters is &self, the return type gets the lifetime of &self, and all lifetimes have been accounted for.
 
-###### What is Static Lifetime?
+###### 315. What is Static Lifetime?
 
 'static Lifetime denotes that the affected reference can live for the entire duration of the program
 
-###### What Lifetime have string literal?
+###### 316. What Lifetime have string literal?
 
 All string literals have the 'static lifetime, which we can annotate as follows:
 
@@ -4556,7 +4556,7 @@ let s: &'static str = "I have a static lifetime.";
 
 The text of this string is stored directly in the program’s binary, which is always available. Therefore, the lifetime of all string literals is 'static.
 
-###### How used Generic Type Parameters, Trait Bounds, and Lifetimes Together?
+###### 317. How used Generic Type Parameters, Trait Bounds, and Lifetimes Together?
 
 ```rust
 use std::fmt::Display;
@@ -4584,11 +4584,11 @@ This is the longest function from Listing 10-21 that returns the longer of two s
 
 #### 11.1 How to Write Tests
 
-###### What is tests?
+###### 318. What is tests?
 
 Tests are Rust functions that verify that the non-test code is functioning in the expected manner.
 
-###### What perform body of test function?
+###### 319. What perform body of test function?
 
 The bodies of test functions typically perform these three actions:
 
@@ -4596,23 +4596,23 @@ The bodies of test functions typically perform these three actions:
 - Run the code you want to test.
 - Assert that the results are what you expect.
 
-###### What is Attribute
+###### 320. What is Attribute
 
  Attributes are metadata about pieces of Rust code
 
-###### How from function make test function?
+###### 321. How from function make test function?
 
 To change a function into a test function, add `#[test]` attribute annotation on the line before `fn`
 
-###### How we run tests?
+###### 322. How we run tests?
 
 we run tests by the `cargo test` command
 
-###### What happen when we run tests with the cargo test command?
+###### 323. What happen when we run tests with the cargo test command?
 
 Rust builds a test runner binary that runs the annotated functions and reports on whether each test function passes or fails.
 
-###### What happen in testing context when we make a new library project with Cargo?
+###### 324. What happen in testing context when we make a new library project with Cargo?
 
 A test module with a test function in it is automatically generated for us. This module gives you a template for writing your tests so you don’t have to look up the exact structure and syntax every time you start a new project. You can add as many additional test functions and as many test modules as you want!
 
@@ -4640,7 +4640,7 @@ mod tests {
 }
 ```
 
-###### Can we have a non-test function in a test module?
+###### 325. Can we have a non-test function in a test module?
 
 We might have non-test functions in the tests module to help set up common scenarios or perform common operations, so we always need to indicate which functions are tests.
 
@@ -4650,7 +4650,7 @@ We might have non-test functions in the tests module to help set up common scena
 
 [Documentation Comments as Tests](https://doc.rust-lang.org/book/ch14-02-publishing-to-crates-io.html#documentation-comments-as-tests)
 
-###### When tests fail?
+###### 326. When tests fail?
 
 Tests fail when something in the test function panics. Each test is run in a new thread, and when the main thread sees that a test thread has died, the test is marked as failed
 
@@ -4678,7 +4678,7 @@ mod tests {
 }
 ```
 
-###### What is the `assert!` macro used for?
+###### 327. What is the `assert!` macro used for?
 
 The assert! macro, provided by the standard library, is useful when you want to ensure that some condition in a test evaluates to true. We give the assert! macro an argument that evaluates to a Boolean. If the value is true, nothing happens and the test passes. If the value is false, the assert! macro calls panic! to cause the test to fail. Using the assert! macro helps us check that our code is functioning in the way we intend.
 
@@ -4717,7 +4717,7 @@ mod tests {
 }
 ```
 
-###### What is the `assert_eq!` and `assert_ne!` Macros used for?
+###### 328. What is the `assert_eq!` and `assert_ne!` Macros used for?
 
 to test for equality between the result of the code under test and the value you expect the code to return
 
@@ -4742,7 +4742,7 @@ mod tests {
 
 Under the surface, the assert_eq! and assert_ne! macros use the operators == and !=, respectively. When the assertions fail, these macros print their arguments using debug formatting, which means the values being compared must implement the PartialEq and Debug traits. All primitive types and most of the standard library types implement these traits. For structs and enums that you define yourself, you’ll need to implement PartialEq to assert equality of those types. You’ll also need to implement Debug to print the values when the assertion fails. Because both traits are derivable traits, as mentioned in Listing 5-12 in Chapter 5, this is usually as straightforward as adding the #[derive(PartialEq, Debug)] annotation to your struct or enum definition. See Appendix C, “Derivable Traits,” for more details about these and other derivable traits.
 
-###### How to add custom  Custom Failure Messages?
+###### 329. How to add custom  Custom Failure Messages?
 
 You can also add a custom message to be printed with the failure message as optional arguments to the assert!, assert_eq!, and assert_ne! macros.
 
@@ -4766,7 +4766,7 @@ mod tests {
 }
 ```
 
-###### How we can test that our code handles error conditions as we expect?
+###### 330. How we can test that our code handles error conditions as we expect?
 
 We do this by adding the attribute `should_panic` to our test function. The test passes if the code inside the function panics; the test fails if the code inside the function doesn’t panic.
 
@@ -4798,7 +4798,7 @@ mod tests {
 }
 ```
 
-###### What needs to be done to make `should_panic` tests more precise?
+###### 331. What needs to be done to make `should_panic` tests more precise?
 
 A `should_panic` test would pass even if the test panics for a different reason from the one we were expecting. To make `should_panic` tests more precise, we can add an optional `expected` parameter to the `should_panic` attribute. The test harness will make sure that the failure message contains the provided text
 
@@ -4832,7 +4832,7 @@ mod tests {
     }
 ```
 
-###### How we can use Result type for testing our code?
+###### 332. How we can use Result type for testing our code?
 
 We must define the Result type as the return type of test and return `Err()` variant in case error and `Ok()` otherwise. 
 
@@ -4863,25 +4863,25 @@ You can’t use the `#[should_panic]` annotation on tests that use `Result<T, E>
 
 #### 11.2 Controlling How Tests Are Run
 
-###### How default behavior of the binary produced by `cargo test`?
+###### 333. How default behavior of the binary produced by `cargo test`?
 
 Run all the tests in parallel and capture output generated during test runs, preventing the output from being displayed and making it easier to read the output related to the test results.
 
-###### How to change default `cargo test` behavior?
+###### 334. How to change default `cargo test` behavior?
 
 Specify command line options to change this default behavior.
 
-###### How to separate command line options go to cargo test, and those that go to the resultant test binary
+###### 335. How to separate command line options go to cargo test, and those that go to the resultant test binary
 
 To separate these two types of arguments, you list the arguments that go to cargo test followed by the separator `--` and then the ones that go to the test binary. Running `cargo test --help` displays the options you can use with cargo test, and running `cargo test -- --help` displays the options you can use after the separator. Those options are also documented in the [“Tests” section](https://doc.rust-lang.org/rustc/tests/index.html) of the the [rustc book](https://doc.rust-lang.org/rustc/index.html).
 
-###### How by default Cargo run test?
+###### 336. How by default Cargo run test?
 
 by default they run in parallel using threads, meaning they finish running faster and you get feedback quicker
 
 By default, if a test passes, Rust’s test library captures anything printed to standard output. For example, if we call println! in a test and the test passes, we won’t see the println! output in the terminal; we’ll see only the line that indicates the test passed. If a test fails, we’ll see whatever was printed to standard output with the rest of the failure message.
 
-###### How to run tests consistently?
+###### 337. How to run tests consistently?
 
 you can send the `--test-threads` flag and the number of threads you want to use to the test binary.
 
@@ -4889,7 +4889,7 @@ you can send the `--test-threads` flag and the number of threads you want to use
 $ cargo test -- --test-threads=1
 ```
 
-###### What we should do if wont to see printed values for passing tests?
+###### 338. What we should do if wont to see printed values for passing tests?
 
 we can tell Rust to also show the output of successful tests with `--show-output`:
 
@@ -4897,7 +4897,7 @@ we can tell Rust to also show the output of successful tests with `--show-output
 $ cargo test -- --show-output
 ```
 
-###### How we can Running Single Tests?
+###### 339. How we can Running Single Tests?
 
 We can pass the name of any test function to cargo test to run only that test
 
@@ -4934,7 +4934,7 @@ mod tests {
 $ cargo test one_hundred
 ```
 
-###### How to Filtering to Run Multiple Tests?
+###### 340. How to Filtering to Run Multiple Tests?
 
 We can specify part of a test name, and any test whose name matches that value will be run. For example, because two of our tests’ names contain `add`, we can run those two by running 
 
@@ -4944,7 +4944,7 @@ cargo test add
 
 This command ran all tests with add in the name and filtered out the test named one_hundred. Also note that the module in which a test appears becomes part of the test’s name, so we can run all the tests in a module by filtering on the module’s name.
 
-###### How to Ignoring Some Tests?
+###### 341. How to Ignoring Some Tests?
 
 We can  annotate the tests using the ignore attribute to exclude them
 
@@ -4967,7 +4967,7 @@ mod tests {
 }
 ```
 
-###### How we can run only tests marked as `ignored`?
+###### 342. How we can run only tests marked as `ignored`?
 
 we can use cargo test `-- --ignored`
 
@@ -4975,17 +4975,17 @@ we can use cargo test `-- --ignored`
 cargo test -- --ignored
 ```
 
-###### How we can run all tests include marked as `ignored`?
+###### 343. How we can run all tests include marked as `ignored`?
 
 you can run `cargo test -- --include-ignored`
 
 #### 11.3 Test Organization
 
-###### What purpose of unit tests?
+###### 344. What purpose of unit tests?
 
 The purpose of unit tests is to test each unit of code in isolation from the rest of the code to quickly pinpoint where code is and isn’t working as expected.
 
-###### What convention fo organization unit tests?
+###### 345. What convention fo organization unit tests?
 
 The convention is put unit tests in the src directory in each file with the code that they’re testing, create a module named `tests` in each file to contain the test functions and to annotate the module with `cfg(test)`
 
@@ -5009,15 +5009,15 @@ mod tests {
 }
 ```
 
-###### How role of `#[cfg(test)]` annotation?
+###### 346. How role of `#[cfg(test)]` annotation?
 
 The `#[cfg(test)]` annotation on the tests module tells Rust to compile and run the test code only when you run cargo test, not when you run cargo build.
 
-###### Should to test Private Functions?
+###### 347. Should to test Private Functions?
 
 There’s debate within the testing community about whether or not private functions should be tested directly, and other languages make it difficult or impossible to test private functions.
 
-###### Does allow Rust to test of Private Function?
+###### 348. Does allow Rust to test of Private Function?
 
 Regardless of which testing ideology you adhere to, Rust’s privacy rules do allow you to test private functions.
 
@@ -5043,11 +5043,11 @@ mod tests {
 }
 ```
 
-###### What is purpose of integration tests?
+###### 349. What is purpose of integration tests?
 
 to test whether many parts of your library work together correctly. In Rust, integration tests are entirely external to your library. They use your library in the same way any other code would, which means they can only call functions that are part of your library’s public API. 
 
-###### Where are located integration tests?
+###### 350. Where are located integration tests?
 
 We create a tests directory at the top level of our project directory, next to src. Cargo knows to look for integration test files in this directory.
 
@@ -5061,11 +5061,11 @@ adder
     └── integration_test.rs
 ```
 
-###### How many files whit integration tests we can create?
+###### 351. How many files whit integration tests we can create?
 
 We can make as many test files as we want
 
-###### How Cargo compile files whit integration tests?
+###### 352. How Cargo compile files whit integration tests?
 
 Cargo will compile each of the files as an individual crate, so we need to bring our library into each test crate’s scope
 
@@ -5081,7 +5081,7 @@ fn it_adds_two() {
 }
 ```
 
-###### Should we annotate any code in integration tests with `#[cfg(test)]`?
+###### 353. Should we annotate any code in integration tests with `#[cfg(test)]`?
 
 We don’t need to annotate any code in tests/integration_test.rs with `#[cfg(test)]`. Cargo treats the tests directory specially and compiles files in this directory only when we run `cargo test`. Run cargo test now:
 
@@ -5089,7 +5089,7 @@ We don’t need to annotate any code in tests/integration_test.rs with `#[cfg(te
 $ cargo test
 ```
 
-###### How we can run a particular integration test function?
+###### 354. How we can run a particular integration test function?
 
 We can run a particular integration test function by specifying the test function’s name as an argument to `cargo test`
 
@@ -5097,7 +5097,7 @@ We can run a particular integration test function by specifying the test functio
 cargo test it_adds_two
 ```
 
-###### How we can run all function in particular integration test file?
+###### 355. How we can run all function in particular integration test file?
 
 To run all the tests in a particular integration test file, use the `--test` argument of `cargo test` followed by the name of the file:
 
@@ -5105,7 +5105,7 @@ To run all the tests in a particular integration test file, use the `--test` arg
 $ cargo test --test integration_test
 ```
 
-###### How we can make shared code for integrated tests?
+###### 356. How we can make shared code for integrated tests?
 
 Each file in the tests directory is compiled as its own separate crate. This means that files in the tests directory don’t share the same behavior as files in src do, regarding how to separate code into modules and files.
 
@@ -5154,7 +5154,7 @@ fn it_adds_two() {
 $ cargo test
 ```
 
-###### How can we make integration testing of binary crates?
+###### 357. How can we make integration testing of binary crates?
 
 If our project is a binary crate that only contains a src/main.rs file and doesn’t have a src/lib.rs file, we can’t create integration tests in the tests directory and bring functions defined in the src/main.rs file into scope with a use statement. Only library crates expose functions that other crates can use; binary crates are meant to be run on their own.
 
@@ -5164,7 +5164,7 @@ This is one of the reasons Rust projects that provide a binary have a straightfo
 
 #### 12.1 Accepting Command Line Arguments
 
-###### How we can pass command line arguments our program when running `cargo run`?
+###### 358. How we can pass command line arguments our program when running `cargo run`?
 
 two hyphens to indicate the following arguments are for our program rather than for `cargo`, a string to search for, and a path to a file to search in
 
@@ -5172,11 +5172,11 @@ two hyphens to indicate the following arguments are for our program rather than 
 $ cargo run -- searchstring example-filename.txt
 ```
 
-###### Where we can look for existing libraries for our needs?
+###### 359. Where we can look for existing libraries for our needs?
 
 Some existing libraries on crates.io can help with writing a programs.
 
-###### Which Rust standard library function can we use to read the values ​​of command line arguments?
+###### 360. Which Rust standard library function can we use to read the values ​​of command line arguments?
 
 `std::env::args` function. This function returns an iterator of the command line arguments passed to program.
 
@@ -5190,13 +5190,13 @@ fn main() {
 }
 ```
 
-###### What does the `args().collect()` method do?
+###### 361. What does the `args().collect()` method do?
 
 This function returns an iterator of the command line arguments passed to program.
 
 #### 12.2 Reading a File
 
-###### How we can read file to string?
+###### 362. How we can read file to string?
 
 `std::fs::read_to_string` function takes the file_path, opens that file, and returns a value of type `std::io::Result<String>` that contains the file’s contents.
 
@@ -5231,15 +5231,15 @@ fn main() {
 
 #### 12.3 Refactoring to Improve Modularity and Error Handling
 
-###### Why refactor?
+###### 363. Why refactor?
 
 As our program grows, the number of separate tasks the main function handles will increase. As a function gains responsibilities, it becomes more difficult to reason about, harder to test, and harder to change without breaking one of its parts. It’s best to separate functionality so each function is responsible for one task.
 
-###### What is main Rust pattern about separating concerns?
+###### 364. What is main Rust pattern about separating concerns?
 
 main.rs handles running the program and lib.rs handles all the logic of the task at hand. Because you can’t test the main function directly, this structure lets you test all of your program’s logic by moving it into functions in lib.rs. The code that remains in main.rs will be small enough to verify its correctness by reading it.
 
-###### How we can do refactoring?
+###### 365. How we can do refactoring?
 
 move some functionality to function
 
@@ -5462,7 +5462,7 @@ fn main() {
 
 #### 12.4 Developing the Library’s Functionality with Test-Driven Development
 
-###### What is TDD?
+###### 366. What is TDD?
 
 TDD is an acronym for Test-Driven Development. This is concept of write software  of writing the test before you write the code. The test-driven development (TDD) process with the following steps:
 
@@ -5471,7 +5471,7 @@ TDD is an acronym for Test-Driven Development. This is concept of write software
 3. Refactor the code you just added or changed and make sure the tests continue to pass.
 4. Repeat from step 1!
 
-###### How Write a Failing Test?
+###### 367. How Write a Failing Test?
 
 ```rust
 // Filename: src/lib.rs
@@ -5497,7 +5497,7 @@ Pick three.";
 }
 ```
 
-###### How write code to pass the test?
+###### 368. How write code to pass the test?
 
 ```rust
 // Filename: src/lib.rs
@@ -5514,7 +5514,7 @@ pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
 }
 ```
 
-###### Hwo Using the search Function in the run Function?
+###### 369. Hwo Using the search Function in the run Function?
 
 ```rust
 // Filename: src/lib.rs
@@ -5667,7 +5667,7 @@ $ IGNORE_CASE=1 cargo run -- to poem.txt
 
 
 
-###### What module contain features for dealing with environment variable?
+###### 370. What module contain features for dealing with environment variable?
 
 `std::env`
 
@@ -5678,7 +5678,7 @@ Docs
 
 #### 12.6 Writing Error Messages to Standard Error Instead of Standard Output
 
-###### How make what our program print error massages to Standard Error Instead of Standard Output?
+###### 371. How make what our program print error massages to Standard Error Instead of Standard Output?
 
 In cases where we want our program to print messages to standard error instead of standard output, we should use the `eprintln!` macros instead of `println!`.
 
@@ -5709,21 +5709,21 @@ Problem parsing arguments: not enough arguments
 
 #### 13.1 Closures: Anonymous Functions that Capture Their Environment
 
-###### What is Closures?
+###### 372. What is Closures?
 
 Rust’s closures are anonymous functions you can save in a variable or pass as arguments to other functions. You can create the closure in one place and then call the closure elsewhere to evaluate it in a different context. Unlike functions, closures can capture values from the scope in which they’re defined.
 
-###### Should we annotate the types of the parameters or return value of Closures?
+###### 373. Should we annotate the types of the parameters or return value of Closures?
 
 Closures don’t usually require you to annotate the types of the parameters or the return value like fn functions do
 
-###### Why we do not require annotate the types of the parameters or return value of Closures?
+###### 374. Why we do not require annotate the types of the parameters or return value of Closures?
 
 Type annotations are required on functions because the types are part of an explicit interface exposed to your users. Defining this interface rigidly is important for ensuring that everyone agrees on what types of values a function uses and returns. Closures, on the other hand, aren’t used in an exposed interface like this: they’re stored in variables and used without naming them and exposing them to users of our library.
 
 Closures are typically short and relevant only within a narrow context rather than in any arbitrary scenario. Within these limited contexts, the compiler can infer the types of the parameters and the return type, similar to how it’s able to infer the types of most variables (there are rare cases where the compiler needs closure type annotations too).
 
-###### Can we annotate the types of the parameters or return value of Closures?
+###### 375. Can we annotate the types of the parameters or return value of Closures?
 
 As with variables, we can add type annotations if we want to increase explicitness and clarity at the cost of being more verbose than is strictly necessary.
 
@@ -5736,7 +5736,7 @@ Filename: src/main.rs
     };
 ```
 
-###### How define Closure?
+###### 376. How define Closure?
 
 ```rust
 fn  add_one_v1   (x: u32) -> u32 { x + 1 } // function
@@ -5745,7 +5745,7 @@ let add_one_v3 = |x|             { x + 1 }; // remove the type annotations from 
 let add_one_v4 = |x|               x + 1  ; // remove the brackets, which are optional because the closure body has only one expression
 ```
 
-###### What compiler determine parameters and return types of Closure?
+###### 377. What compiler determine parameters and return types of Closure?
 
 For closure definitions, the compiler will infer one concrete type for each of their parameters and for their return value at compile time the first time the closure is used. Further usage Closure whit different types will result in compile error.
 
@@ -5759,7 +5759,7 @@ For closure definitions, the compiler will infer one concrete type for each of t
     let n = example_closure(5); // error
 ```
 
-###### How Closure capture environment values?
+###### 378. How Closure capture environment values?
 
 Closures can capture values from their environment in three ways, which directly map to the three ways a function can take a parameter:
 
@@ -5767,7 +5767,7 @@ Closures can capture values from their environment in three ways, which directly
 - borrowing mutably,
 - taking ownership.
 
-###### How does Closure determine what capture methods to use?
+###### 379. How does Closure determine what capture methods to use?
 
 The closure will decide which capture methods to use based on what the body of the closure does with the captured values.
 
@@ -5800,7 +5800,7 @@ fn main() {
 }
 ```
 
-###### What we should do whit ownership when passing a closure to a new thread?
+###### 380. What we should do whit ownership when passing a closure to a new thread?
 
 We must force move values passed to closure by `move` keyword before the parameter list.
 
@@ -5820,26 +5820,26 @@ fn main() {
 }
 ```
 
-###### What closure body can do whit captured value?
+###### 381. What closure body can do whit captured value?
 
 - move a captured value out of the closure
 - mutate the captured value,
 - neither move nor mutate the value, 
 - capture nothing from the environment to begin with.
 
-###### What does it depend the way a closure captures and handles values from the environment?
+###### 382. What does it depend the way a closure captures and handles values from the environment?
 
 How a closure captures and processes values ​​from the environment depends on what traits the closure implements. And accordingly, the trait that implement closures are what kinds of closures functions and struct can use.
 
-###### What does it depend what kinds of closures can use functions and struct?
+###### 383. What does it depend what kinds of closures can use functions and struct?
 
 What kinds of closures can use functions and struct depends on what traits the closure implements.
 
-###### Must we declare which traits must implement the closure?
+###### 384. Must we declare which traits must implement the closure?
 
 Closures will automatically implement one, two, or all three of `Fn` traits, in an additive fashion, depending on how the closure’s body handles the values.
 
-###### Which traits can implement closure?
+###### 385. Which traits can implement closure?
 
 Closures will automatically implement one, two, or all three of `Fn` traits:
 
@@ -5861,29 +5861,29 @@ impl<T> Option<T> {
 }
 ```
 
-###### Which trait must implement closure that moves captured values out of its body?
+###### 386. Which trait must implement closure that moves captured values out of its body?
 
 A closure that moves captured values out of its body will only implement `FnOnce` and none of the other `Fn` traits, because it can only be called once.
 
-###### Which trait must implement closure that don’t move captured values out of their body, but that might mutate the captured values?
+###### 387. Which trait must implement closure that don’t move captured values out of their body, but that might mutate the captured values?
 
 `FnMut` applies to closures that don’t move captured values out of their body, but that might mutate the captured values. These closures can be called more than once.
 
-###### Which trait must implement closure that don’t move captured values out of their body and that don’t mutate captured values, as well as capture nothing from their environment?
+###### 388. Which trait must implement closure that don’t move captured values out of their body and that don’t mutate captured values, as well as capture nothing from their environment?
 
 `Fn` applies to closures that don’t move captured values out of their body and that don’t mutate captured values, as well as closures that capture nothing from their environment. These closures can be called more than once without mutating their environment, which is important in cases such as calling a closure multiple times concurrently.
 
 #### 13.2 Processing a Series of Items with Iterators
 
-###### What is the iterator pattern used for?
+###### 389. What is the iterator pattern used for?
 
 The iterator pattern allows you to perform some task on a sequence of items in turn. An iterator is responsible for the logic of iterating over each item and determining when the sequence has finished.
 
-###### What is means - iterators are lazy?
+###### 390. What is means - iterators are lazy?
 
 In Rust, iterators are lazy, meaning they have no effect until you call methods that consume the iterator to use it up.
 
-###### What is Iterator in Rust?
+###### 391. What is Iterator in Rust?
 
 In rust Iterator is type that implement Iterator Trait.
 
@@ -5904,11 +5904,11 @@ pub trait Iterator {
 ```
 
 
-###### What method define Iterator Trait?
+###### 392. What method define Iterator Trait?
 
 `fn next(&mut self) -> Option<Self::Item>;`
 
-###### How can we get immutable references to values ​​in vector using iterator syntax?
+###### 393. How can we get immutable references to values ​​in vector using iterator syntax?
 
 we must get mutable reference `mur_ref` from vector value by using `vec_var.iter()` and then using it by call method `mur_ref.next()`
 
@@ -5926,19 +5926,19 @@ we must get mutable reference `mur_ref` from vector value by using `vec_var.iter
     }
 ```
 
-###### How can we get mutable references to values ​​in vector using iterator syntax?
+###### 394. How can we get mutable references to values ​​in vector using iterator syntax?
 
 we must get mutable reference `mut_ref` from vector value by using `vec_var.iter_mut()` and then using it by call method `mut_ref.next()`
 
-###### How can we get ownership of vector type and returns owned values using iterator syntax?
+###### 395. How can we get ownership of vector type and returns owned values using iterator syntax?
 
 we can call `into_iter` instead of `iter` on the vector value
 
-###### What is 'consuming adapters' methods?
+###### 396. What is 'consuming adapters' methods?
 
 The Iterator trait has a number of different methods with default implementations provided by the standard library. Some of these methods use the `next` method, these are called 'consuming adapters' because their call uses the iterator. For example `sum` method.
 
-###### How the `sum` Iterator method works
+###### 397. How the `sum` Iterator method works
 
 the `sum` method 'consuming adapter' it takes ownership of the iterator and iterates through the items by repeatedly calling next, thus consuming the iterator. As it iterates through, it adds each item to a running total and returns the total when iteration is complete. We aren’t allowed to use v1_iter after the call to sum because sum takes ownership of the iterator we call it on.
 
@@ -5956,11 +5956,11 @@ the `sum` method 'consuming adapter' it takes ownership of the iterator and iter
     }
 ```
 
-###### What is 'Iterator adapters' methods?
+###### 398. What is 'Iterator adapters' methods?
 
 Iterator adapters are methods defined on the Iterator trait that don’t consume the iterator. Instead, they produce different iterators by changing some aspect of the original iterator. For example `map` method
 
-###### How the `map` Iterator method works?
+###### 399. How the `map` Iterator method works?
 
 method `map` are 'Iterator adapter' it takes a closure to call on each item as the items are iterated through. The `map` method returns a new iterator that produces the modified items. The closure here creates a new iterator in which each item from the vector will be incremented by 1
 
@@ -5975,11 +5975,11 @@ method `map` are 'Iterator adapter' it takes a closure to call on each item as t
     }
 ```
 
-###### How we must combine 'Iterator adapters' and 'consuming adapters' method?
+###### 400. How we must combine 'Iterator adapters' and 'consuming adapters' method?
 
 You can chain multiple calls to 'iterator adapters' to perform complex actions in a readable way. But because all iterators are lazy, you have to call one of the consuming adapter methods to get results from calls to iterator adapters.
 
-###### Can we Using Closures that Capture Their Environment in iterators?
+###### 401. Can we Using Closures that Capture Their Environment in iterators?
 
 ```rust
 // Filename: src/lib.rs
@@ -6034,7 +6034,7 @@ mod tests {
 }
 ```
 
-###### How the `filter` Iterator method works?
+###### 402. How the `filter` Iterator method works?
 
 The `filter` method takes a closure. The closure gets an item from the iterator and returns a `bool`. If the closure returns `true`, the value will be included in the iteration produced by filter. If the closure returns `false`, the value won’t be included.
 
@@ -6122,12 +6122,12 @@ pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
 
 #### 13.4 Comparing Performance: Loops vs. Iterators
 
-###### What code implementation faster on: `for loop` or Iterators?
+###### 403. What code implementation faster on: `for loop` or Iterators?
 
 iterators, although a high-level abstraction, get compiled down to roughly the same code as if you’d written the lower-level code yourself. Iterators are one of Rust’s zero-cost abstractions, by which we mean using the abstraction imposes no additional runtime overhead.
 The implementations of closures and iterators are such that runtime performance is not affected.
 
-###### What is 'zero-cost abstractions'?
+###### 404. What is 'zero-cost abstractions'?
 
 This mean using the abstraction imposes no additional runtime overhead
 
@@ -6139,18 +6139,18 @@ full explanation of all Cargo features, see its [documentation](https://doc.rust
 
 For the full list of configuration options and defaults for each profile, see Cargo’s [documentation](https://doc.rust-lang.org/cargo/reference/profiles.html).
 
-###### What is 'release profiles'?
+###### 405. What is 'release profiles'?
 
 In Rust, release profiles are predefined and customizable profiles with different configurations that allow a programmer to have more control over various options for compiling code.
 
-###### What release profiles exist?
+###### 406. What release profiles exist?
 
 - the `dev` profile Cargo uses when you run `cargo build`. The `dev` profile is defined with good defaults for development
 - the `release` profile Cargo uses when you run `cargo build --release`. the release profile has good defaults for release builds.
 - `test`
 - `bench`
 
-###### What happen if we add `[profile.*]` sections for any profile?
+###### 407. What happen if we add `[profile.*]` sections for any profile?
 
 Cargo has default settings for each of the profiles that apply when you haven’t explicitly added any `[profile.*]` sections in the project’s Cargo.toml file. By adding `[profile.*]` sections for any profile you want to customize, you override any subset of the default settings.
 
@@ -6164,17 +6164,17 @@ opt-level = 0
 opt-level = 3
 ```
 
-###### What controls the `opt-level` profile setting? 
+###### 408. What controls the `opt-level` profile setting? 
 
 The `opt-level` setting controls the number of optimizations Rust will apply to your code, with a range of 0 to 3. Applying more optimizations extends compiling time, so if you’re in development and compiling your code often, you’ll want fewer optimizations to compile faster even if the resulting code runs slower. The default opt-level for dev is therefore 0. When you’re ready to release your code, it’s best to spend more time compiling. You’ll only compile in release mode once, but you’ll run the compiled program many times, so release mode trades longer compile time for code that runs faster. That is why the default opt-level for the release profile is 3.
 
 #### 14.2 Publishing a Crate to Crates.io
 
-###### what are documentation comments for?
+###### 409. what are documentation comments for?
 
 they will generate HTML documentation. HTML displays the contents of documentation comments for public API elements, intended for programmers interested in how to use your container, rather than how it is implemented.
 
-###### how are documentation comments pointed?
+###### 410. how are documentation comments pointed?
 
 Documentation comments use three slashes, `///`. Place documentation comments just before the item they’re documenting.
 
@@ -6194,23 +6194,23 @@ pub fn add_one(x: i32) -> i32 {
 }
 ```
 
-###### what markup can be used in documentation comments?
+###### 411. what markup can be used in documentation comments?
 
 Markdown
 
-###### what sections can be used in documentation?
+###### 412. what sections can be used in documentation?
 
 - **Examples**
 - **Panics**: The scenarios in which the function being documented could panic. Callers of the function who don’t want their programs to panic should make sure they don’t call the function in these situations.
 - **Errors**: If the function returns a Result, describing the kinds of errors that might occur and what conditions might cause those errors to be returned can be helpful to callers so they can write code to handle the different kinds of errors in different ways.
 - **Safety**: If the function is unsafe to call (we discuss unsafety in Chapter 20), there should be a section explaining why the function is unsafe and covering the invariants that the function expects callers to uphold.
 
-###### How we can tests code in documentation comments?
+###### 413. How we can tests code in documentation comments?
 
 We must add Example section of 'documentation comments' and inside this section, using markdown syntax, write code that can be used as test.  If we run cargo test with the documentation we will see the section Doc-tests in the test results.
 Now if we change either the function or the example so the assert_eq! in the example panics and run cargo test again, we’ll see that the doc tests catch that the example and the code are out of sync with each other!
 
-###### how to create a doc comment that does not refer to a specific code?
+###### 414. how to create a doc comment that does not refer to a specific code?
 
 The style of doc comment `//!` adds documentation to the item that contains the comments rather than to the items following the comments. We typically use these doc comments inside the crate root file (src/lib.rs by convention) or inside a module to document the crate or the module as a whole.
 
@@ -6226,7 +6226,7 @@ Filename: src/lib.rs
 // --snip--
 ```
 
-###### How to remove the internal organization from the public AP?
+###### 415. How to remove the internal organization from the public AP?
 
 We can modify the crate top level module code to add pub use statements to re-export the items placed at the below level. The API documentation that `cargo doc` generates for this crate will now list and link re-exports on the front page.
 The crate users can still see and use the internal structure or they can use the more convenient structure re-exports structure.
@@ -6304,7 +6304,7 @@ fn main() {
 }
 ```
 
-###### How to Setting Up a Crates.io Account?
+###### 416. How to Setting Up a Crates.io Account?
 
 - visit the home page at crates.io
 - log in via a GitHub account.
@@ -6318,7 +6318,7 @@ abcdefghijklmnopqrstuvwxyz012345
 
 This command will inform Cargo of your API token and store it locally in `~/.cargo/`credentials. Note that this token is a secret: do not share it with anyone else. If you do share it with anyone for any reason, you should revoke it and generate a new token on crates.io.
 
-###### How to Publishing a Crate to Crates.io?
+###### 417. How to Publishing a Crate to Crates.io?
 
 - create Crates.io account
 - saved your API token
@@ -6337,15 +6337,15 @@ This command will inform Cargo of your API token and store it locally in `~/.car
 
 - Run the `cargo publish` command
 
-###### How Publishing a New Version of an Existing Crate?
+###### 418. How Publishing a New Version of an Existing Crate?
 
 change the version value specified in your Cargo.toml file and republish
 
-###### what are the versification rules,
+###### 419. what are the versification rules,
 
 Use the [Semantic Versioning rules](http://semver.org/)
 
-###### How to prevent any future projects from adding Deprecating Crate Versions as a new dependency?
+###### 420. How to prevent any future projects from adding Deprecating Crate Versions as a new dependency?
 
 run cargo yank and specify which version you want to yank.
 
@@ -6364,19 +6364,19 @@ $ cargo yank --vers 1.0.1 --undo
       Unyank guessing_game@1.0.1
 ```
 
-###### What is 'yanking a crate version'?
+###### 421. What is 'yanking a crate version'?
 
 Although you can’t remove previous versions of a crate, you can prevent any future projects from adding them as a new dependency. This is useful when a crate version is broken for one reason or another. In such situations, Cargo supports yanking a crate version.
 Yanking a version prevents new projects from depending on that version while allowing all existing projects that depend on it to continue. Essentially, a yank means that all projects with a Cargo.lock will not break, and any future Cargo.lock files generated will not use the yanked version.
 
 #### 14.3 Cargo Workspaces
 
-###### What is Cargo Workspace?
+###### 422. What is Cargo Workspace?
 
 As your project develops, you might find that the library crate continues to get bigger and you want to split your package further into multiple library crates. Cargo offers a feature called workspaces that can help manage multiple related packages that are developed in tandem.
 A workspace is a set of packages that share the same Cargo.lock and output directory.
 
-###### How to create a Workspace?
+###### 423. How to create a Workspace?
 
 - First we must create workspace directory
 
@@ -6400,7 +6400,7 @@ $ touch Cargo.toml
 resolver = "2"
 ```
 
-###### How to create package in Workspace?
+###### 424. How to create package in Workspace?
 
 When we have a Workspace and and we are in Workspace directory, we can create a binary or library crate by running `cargo new package_name [--lib]` within the workspace directory. This automatically adds the newly created package to the `members` key in the `[workspace]` section in the workspace Cargo.toml file
 
@@ -6416,11 +6416,11 @@ resolver = "2"
 members = ["adder"]
 ```
 
-###### What we can build Workspace?
+###### 425. What we can build Workspace?
 
 We can build a workspace by running `cargo build` command in top-level Workspace dir
 
-###### Which file and directories does `cargo build` create in Workspace?
+###### 426. Which file and directories does `cargo build` create in Workspace?
 
 `Cargo.lock` file and `target` dir
 
@@ -6444,7 +6444,7 @@ tree -L 3
         └── incremental
 ```
 
-###### How many packages we can create in Workspace?
+###### 427. How many packages we can create in Workspace?
 
 We can create many packages in Workspace. All packages will be automatically added to the `members` key in the `[workspace]` section in the workspace Cargo.toml and will use the same Cargo.lock file and `target` directory.
 
@@ -6474,11 +6474,11 @@ resolver = "2"
 members = ["adder", "add_one"]
 ```
 
-###### What files and directories shares all packages in Workspace?
+###### 428. What files and directories shares all packages in Workspace?
 
 All packages in workspace shares `Cargo.lock` file and `target` directory.
 
-###### What should we do if our container code depends on code from another Workspace package?
+###### 429. What should we do if our container code depends on code from another Workspace package?
 
 - If our crate code depends on code from another Workspace package, we should specify that package in the `[dependencies]` section of our crate package's Cargo.toml file. In this case, we specify the relative path to the package that we will reference in our code
 
@@ -6510,7 +6510,7 @@ fn main() {
 $ cargo build
 ```
 
-###### How we should run binary crate in Workspace?
+###### 430. How we should run binary crate in Workspace?
 
 To run a binary crate in Workspace, we should specify which package in the workspace we want to run by using the `-p` argument and the package name with `cargo run`:
 
@@ -6518,7 +6518,7 @@ To run a binary crate in Workspace, we should specify which package in the works
 $ cargo run -p adder
 ```
 
-###### How we should add dependencies in Workspace packages?
+###### 431. How we should add dependencies in Workspace packages?
 
 We should add the dependency to the Cargo.toml file of each package where this dependency is required.
 
@@ -6529,41 +6529,41 @@ We should add the dependency to the Cargo.toml file of each package where this d
 rand = "0.8.5"
 ```
 
-###### Where located Cargo.lock file of Workspace package?
+###### 432. Where located Cargo.lock file of Workspace package?
 
 Workspace has only one Cargo.lock file at the top level, rather than having a Cargo.lock in each crate’s directory. This ensures that all crates are using the same version of all dependencies.
 
-###### What happen If crates in the workspace specify incompatible versions of the same dependency?
+###### 433. What happen If crates in the workspace specify incompatible versions of the same dependency?
 
 Cargo will resolve each of them, but will still try to resolve as few versions as possible.
 
-###### How we can run tests in Workspace?
+###### 434. How we can run tests in Workspace?
 
 If we call `cargo test` command  in top-level Workspace dir - cargo execute test in all Workspace packages. We can add `-p` flag whit name of a package - in this case cargo execute only tests specified package.
 
-###### How we should publish Workspace crate?
+###### 435. How we should publish Workspace crate?
 
 If we wont publish Workspace crates to crates.io, we should each crate in the workspace publish separately. We can publish a particular crate in our workspace by using the `-p` flag and specifying the name of the crate we want to publish.
 
 #### 14.5 Installing Binaries with cargo install
 
-###### For what used `cargo install` command?
+###### 436. For what used `cargo install` command?
 
 The cargo install command allows you to install and use binary crates locally. This isn’t intended to replace system packages; it’s meant to be a convenient way for Rust developers to install tools that others have shared on crates.io. Note that you can only install packages that have binary targets.
 
-###### How we can install a binary cartes locally?
+###### 437. How we can install a binary cartes locally?
 
 The cargo install command allows you to install and use binary crates locally.
 
-###### What is 'binary target'?
+###### 438. What is 'binary target'?
 
 A binary target is the runnable program that is created if the crate has a src/main.rs file or another file specified as a binary, as opposed to a library target that isn’t runnable on its own but is suitable for including within other programs
 
-###### Where is information about crate target?
+###### 439. Where is information about crate target?
 
 Usually, crates have information in the README file about whether a crate is a library, has a binary target, or both.
 
-###### Where are a binaries installed with `cargo install` stored?
+###### 440. Where are a binaries installed with `cargo install` stored?
 
 All binaries installed with cargo install are stored in the installation root’s bin folder. If you installed Rust using `rustup.rs` and don’t have any custom configurations, this directory will be `$HOME/.cargo/bin`. Ensure that directory is in your $PATHto be able to run programs you’ve installed with `cargo install`.
 
@@ -6585,43 +6585,43 @@ $ rg --help
 
 #### 14.6 Extending Cargo with Custom Commands
 
-###### How we can extend Cargo with new subcommands without having to modify Cargo?
+###### 441. How we can extend Cargo with new subcommands without having to modify Cargo?
 
 We can use `cargo install` to install extensions and then run them just like the built-in Cargo tools. If a binary in our $PATH is named `cargo-something`, you can run it as if it was a Cargo subcommand by running `cargo something`. Custom commands like this are also listed when you run `cargo --list`.
 
 ### 15 Smart Pointers.
 
-###### What is a Pointer?
+###### 442. What is a Pointer?
 
 A pointer is a general concept for a variable that contains an address in memory. This address refers to, or “points at,” some other data.
 
-###### How Pointers implemented in Rust?
+###### 443. How Pointers implemented in Rust?
 
 The most common kind of pointer in Rust is a reference. References are indicated by the & symbol and borrow the value they point to. They don’t have any special capabilities other than referring to data, and have no overhead.
 
-###### What is 'Smart Pointers'?
+###### 444. What is 'Smart Pointers'?
 
 Smart pointers, on the other hand, are data structures that act like a pointer but also have additional metadata and capabilities. Rust, with its concept of ownership and borrowing, has an additional difference between references and smart pointers: while references only borrow data, in many cases, smart pointers own the data they point to.
 
-###### How Smart Pointers implemented in Rust?
+###### 445. How Smart Pointers implemented in Rust?
 
 Smart pointers are usually implemented using structs. Unlike an ordinary struct, smart pointers implement the `Deref` and `Drop` traits.
 
-###### What role `Deref` trait in Smart pointers?
+###### 446. What role `Deref` trait in Smart pointers?
 
 The Deref trait allows an instance of the smart pointer struct to behave like a reference so you can write your code to work with either references or smart pointers. 
 
-###### What role `Drop` trait in Smart pointers?
+###### 447. What role `Drop` trait in Smart pointers?
 
 The Drop trait allows you to customize the code that’s run when an instance of the smart pointer goes out of scope.
 
 #### 15.1 Using `Box<T>` to Point to Data on the Heap
 
-###### What is `Box<T>` type?
+###### 448. What is `Box<T>` type?
 
 The `Box<T>` type is a smart pointer because it implements the Deref trait, which allows `Box<T>` values to be treated like references. When a `Box<T>` value goes out of scope, the heap data that the box is pointing to is cleaned up as well because of the Drop trait implementation. Boxes allow you to store data on the heap rather than the stack.
 
-###### Why use `Box<T>`?
+###### 449. Why use `Box<T>`?
 
 Boxes allow you to store data on the heap rather than the stack. What remains on the stack is the pointer to the heap data. Refer Boxes don’t have performance overhead, other than storing their data on the heap instead of on the stack. But they don’t have many extra capabilities either.
 
@@ -6629,7 +6629,7 @@ Boxes allow you to store data on the heap rather than the stack. What remains on
 - When you have a large amount of data and you want to transfer ownership but ensure the data won’t be copied when you do so
 - When you want to own a value and you care only that it’s a type that implements a particular trait rather than being of a specific type
 
-###### How define Box value?
+###### 450. How define Box value?
 
 We define a variable to have the value of a Box that point to the some value, which is located on the heap.
 
@@ -6641,19 +6641,19 @@ fn main() {
 }
 ```
 
-###### What is recursive type?
+###### 451. What is recursive type?
 
 A value of recursive type can have another value of the same type as part of itself.
 
-###### Why Recursive types pose an issue?
+###### 452. Why Recursive types pose an issue?
 
 At compile time Rust needs to know how much space a type takes up. However, the nesting of values of recursive types could theoretically continue infinitely, so Rust can’t know how much space the value needs.
 
-###### How does Box solve issue of Recursive types?
+###### 453. How does Box solve issue of Recursive types?
 
 nesting of values of recursive types could theoretically continue infinitely, so Rust can’t know how much space the value needs. Because boxes have a known size, we can enable recursive types by inserting a box in the recursive type definition.
 
-###### What is Cons List?
+###### 454. What is Cons List?
 
 A cons list is a data structure that comes from the Lisp programming language and is made up of nested pairs. Each item in a cons list contains two elements: the value of the current item and the next item. The last item in the list contains only a value called Nil without a next item.
 
@@ -6661,7 +6661,7 @@ For example, here’s a pseudocode representation of a cons list containing the 
 
 (1, (2, (3, Nil)))
 
-###### How Rust determine how much space to allocate for a Enum?
+###### 455. How Rust determine how much space to allocate for a Enum?
 
 Rust goes through each variant of the Enum to see which variant requires more space. Rust will use the larger size to store the Enum variants.
 
@@ -6674,7 +6674,7 @@ enum Message {
 }
 ```
 
-###### How to define Cons List by using Enum?
+###### 456. How to define Cons List by using Enum?
 
 We define Enum whit two variant: First for pair whit value and nested pair that implemented as Box type whit this Enum type, Second for Nil value.
 
@@ -6695,7 +6695,7 @@ fn main() {
 
 #### 15.2 Treating Smart Pointers Like Regular References with the Deref Trait
 
-###### What is Dereference operator?
+###### 457. What is Dereference operator?
 
 Dereference operator id depicted as "*", applying it to a reference, we obtain the value contained in that reference.
 
@@ -6710,7 +6710,7 @@ fn main() {
 }
 ```
 
-###### What types can we apply the dereference operator to?
+###### 458. What types can we apply the dereference operator to?
 
 We can apply the dereference operator to a regular reference and to types that implements Deref trait
 
@@ -6744,7 +6744,7 @@ fn main() {
 }
 ```
 
-###### How Rust dereference Deref implementing types?
+###### 459. How Rust dereference Deref implementing types?
 
 Rust substitutes the `*` operator with a call to the `deref` method and then a plain dereference so we don’t have to think about whether or not we need to call the deref method. This Rust feature lets us write code that functions identically whether we have a regular reference or a type that implements Deref.
 
@@ -6756,15 +6756,15 @@ fn main() {
 }
 ```
 
-###### Whether the '*' operator is applied recursively to values ​​returned from the `deref` method?
+###### 460. Whether the '*' operator is applied recursively to values ​​returned from the `deref` method?
 
 the `*` operator is replaced with a call to the `deref` method and then a call to the `*` operator just once, each time we use a `*` in our code. Substitution of the `*` operator does not recurse infinitely.
 
-###### What is 'Deref coercion'?
+###### 461. What is 'Deref coercion'?
 
 Deref coercion is conversion a reference to a type that implements the Deref trait into a reference to another type. For example, deref coercion can convert &String to &str because String implements the Deref trait such that it returns &str.
 
-###### Where used 'Deref coercion'?
+###### 462. Where used 'Deref coercion'?
 
 Deref coercion is a convenience Rust performs on arguments to functions and methods, and works only on types that implement the Deref trait. It happens automatically when we pass a reference to a particular type’s value as an argument to a function or method that doesn’t match the parameter type in the function or method definition. A sequence of calls to the deref method converts the type we provided into the type the parameter needs.
 
@@ -6783,34 +6783,34 @@ fn main() {
 
 When the Deref trait is defined for the types involved, Rust will analyze the types and use Deref::deref as many times as necessary to get a reference to match the parameter’s type.
 
-###### How we can override `*` operator on mutable reference?
+###### 463. How we can override `*` operator on mutable reference?
 
 We should implement DerefMut trait on type that value we are using whit the mut reference.
 
-###### What result type of Deref Coercion for &T?
+###### 464. What result type of Deref Coercion for &T?
 
 &U when &T: Deref<Target=U>
 
-###### What result type of Deref Coercion for mut& T?
+###### 465. What result type of Deref Coercion for mut& T?
 
 - &mut U if T: DerefMut<Target=U>
 - &U if T: Deref<Target=U>
 
 #### 15.3 Running Code on Cleanup with the Drop Trait
 
-###### For what to use Drop Trait?
+###### 466. For what to use Drop Trait?
 
 Drop Trait lets you customize what happens when a value is about to go out of scope. You can provide an implementation for the Drop trait on any type, and that code can be used to release resources like files or network connections. You specify the code to run when a value goes out of scope by implementing the Drop trait.
 
-###### what is required to implement Drop trait?
+###### 467. what is required to implement Drop trait?
 
 The Drop trait requires you to implement one method named `drop` that takes a mutable reference to `self`.
 
-###### How is the `drop` method of the Drop feature called?
+###### 468. How is the `drop` method of the Drop feature called?
 
 Rust automatically called `drop` for us when our instances went out of scope, calling the code we specified in.
 
-###### How can we manually drop a value?
+###### 469. How can we manually drop a value?
 
  you have to call the `std::mem::drop` function provided by the standard library if you want to force a value to be dropped before the end of its scope.
 
@@ -6828,23 +6828,23 @@ fn main() {
 
 #### 15.4 `Rc<T>`, the Reference Counted Smart Pointer
 
-###### when a single value might have multiple owners?
+###### 470. when a single value might have multiple owners?
 
  For example, in graph data structures, multiple edges might point to the same node, and that node is conceptually owned by all of the edges that point to it. A node shouldn’t be cleaned up unless it doesn’t have any edges pointing to it and so has no owners.
 
-###### How we can enable multiple ownership?
+###### 471. How we can enable multiple ownership?
 
 You have to enable multiple ownership explicitly by using the Rust type `Rc<T>`, which is an abbreviation for reference counting.
 
-###### What does `Rc<T>` type?
+###### 472. What does `Rc<T>` type?
 
 The `Rc<T>` type keeps track of the number of references to a value to determine whether or not the value is still in use. If there are zero references to a value, the value can be cleaned up without any references becoming invalid.
 
-###### Can we use `Rc<T>` in multi-threaded scenarios?
+###### 473. Can we use `Rc<T>` in multi-threaded scenarios?
 
 We can use `Rc<T>` only in single-threaded scenarios
 
-###### How we can use `Rc<T>` to Share Data?
+###### 474. How we can use `Rc<T>` to Share Data?
 
 We should use `Rc::new(Some_data)` and `Rc::clone(&ref)` methods  allowing a single value to have multiple owners, and ensures that the value remains valid as long as any of the owners still exist.
 
@@ -6887,40 +6887,40 @@ When b and then a go out of scope at the end of main, the count is then 0, and t
 
 #### RefCell<T> and the Interior Mutability Pattern
 
-###### What is 'Interior mutability'?
+###### 475. What is 'Interior mutability'?
 
 Interior mutability is a design pattern in Rust that allows you to mutate data even when there are immutable references to that data; normally, this action is disallowed by the borrowing rules.
 Mutating the value inside an immutable value is the interior mutability pattern.
 
-###### How implemented the Interior mutability pattern?
+###### 476. How implemented the Interior mutability pattern?
 
 To mutate data, the pattern uses unsafe code inside a data structure to bend Rust’s usual rules that govern mutation and borrowing.
 
-###### What is 'unsafe code'?
+###### 477. What is 'unsafe code'?
 
 Unsafe code indicates to the compiler that we’re checking the rules manually instead of relying on the compiler to check them for us
 
-###### When can we use Interior mutability pattern?
+###### 478. When can we use Interior mutability pattern?
 
 We can use types that use the interior mutability pattern only when we can ensure that the borrowing rules will be followed at runtime, even though the compiler can’t guarantee that. The unsafe code involved is then wrapped in a safe API, and the outer type is still immutable.
 
-###### What difference between references, `Box<T>` and `RefCell<T>`?
+###### 479. What difference between references, `Box<T>` and `RefCell<T>`?
 
 With references and `Box<T>`, the borrowing rules’ invariants are enforced at compile time. With `RefCell<T>`, these invariants are enforced at runtime. With references, if you break these rules, you’ll get a compiler error. With `RefCell<T>`, if you break these rules, your program will panic and exit.
 
-###### What could be the advantage of checking the borrowing rules at runtime?
+###### 480. What could be the advantage of checking the borrowing rules at runtime?
 
 The advantage of checking the borrowing rules at runtime is that certain memory-safe scenarios are then allowed, where they would’ve been disallowed by the compile-time checks. Static analysis, like the Rust compiler, is inherently conservative. Some properties of code are impossible to detect by analyzing the code.
 
-###### When the `RefCell<T>` type is useful?
+###### 481. When the `RefCell<T>` type is useful?
 
 The `RefCell<T>` type is useful when you’re sure your code follows the borrowing rules but the compiler is unable to understand and guarantee that. `RefCell<T>` allows mutable borrows checked at runtime, you can mutate the value inside the `RefCell<T>` even when the `RefCell<T>` is immutable.
 
-###### Can we use `RefCell<T>` type in multi-thread scenarios?
+###### 482. Can we use `RefCell<T>` type in multi-thread scenarios?
 
 Similar to `Rc<T>`, `RefCell<T>` is only for use in single-threaded scenarios and will give you a compile-time error if you try using it in a multithreaded context.
 
-###### How we can use `RefCell<T>` type to mutate immutable value.
+###### 483. How we can use `RefCell<T>` type to mutate immutable value.
 
 We must create a value of type `RefCell<T>` that contains a target value of some type. We can then use that value either by itself or as part of another value used in an immutable context, i.e. passed with the `&` sign. When we call `borrow_mut()` on a value of type `RefCell<T>`, we get a mutable reference to the value inside, when we call `borrow()` on a value of type `RefCell<T>`, we get an immutable reference to the value inside. We cannot violate the borrow rules when using references obtained through `RefCell<T>` value.
 
@@ -7001,7 +7001,7 @@ mod tests {
 }
 ```
 
-###### How `RefCell<T>` keeping Track of Borrows at Runtime?
+###### 484. How `RefCell<T>` keeping Track of Borrows at Runtime?
 
 When creating immutable and mutable references, we use the & and &mut syntax, respectively. With `RefCell<T>`, we use the borrow and borrow_mut methods, which are part of the safe API that belongs to `RefCell<T>`. The borrow method returns the smart pointer type `Ref<T>`, and borrow_mut returns the smart pointer type `RefMut<T>`. Both types implement Deref, so we can treat them like regular references.
 
@@ -7023,7 +7023,7 @@ If we try to violate these rules, rather than getting a compiler error as we wou
     }
 ```
 
-###### How get a value that can have multiple owners and that we can mutate?
+###### 485. How get a value that can have multiple owners and that we can mutate?
 
 `Rc<T>` lets you have multiple owners of some data, but it only gives immutable access to that data. If you have an `Rc<T>` that holds a `RefCell<T>`, you can get a value that can have multiple owners and that you can mutate.
 
@@ -7056,17 +7056,17 @@ fn main() {
 }
 ```
 
-###### what is the thread-safe version of `RefCell<T>`?
+###### 486. what is the thread-safe version of `RefCell<T>`?
 
 `RefCell<T>` does not work for multithreaded code! `Mutex<T>` is the thread-safe version of `RefCell<T>`
 
 #### 15.6 Reference Cycles Can Leak Memory
 
-###### What is `memory leak`?
+###### 487. What is `memory leak`?
 
 This is a situation in which a memory is created that is never cleaned up.
 
-###### What situation in Rust does create 'memory leak'?
+###### 488. What situation in Rust does create 'memory leak'?
 
 Rust allows memory leaks by using `Rc<T>` and `RefCell<T>`. Calling `Rc::clone` increases the `strong_count` of an `Rc<T>` instance, and an `Rc<T>` instance is only cleaned up if its `strong_count` is 0. It’s possible to create references where instance refer to each other in a cycle.  This creates memory leaks because the `strong_count` of each instance in the cycle will never reach 0, and the values will never be dropped.
 
@@ -7119,12 +7119,12 @@ fn main() {
 }
 ```
 
-###### How can we avoid memory leaks by using `Rc<T>` and `RefCell<T>`?
+###### 489. How can we avoid memory leaks by using `Rc<T>` and `RefCell<T>`?
 
 If you have `RefCell<T>` values that contain `Rc<T>` values or similar nested combinations of types with interior mutability and reference counting, you must ensure that you don’t create cycles; you can’t rely on Rust to catch them. Creating a reference cycle would be a logic bug in your program that you should use automated tests, code reviews, and other software development practices to minimize.
 Another solution for avoiding reference cycles is reorganizing your data structures so that some references express ownership and some references don’t. As a result, you can have cycles made up of some ownership relationships and some non-ownership relationships, and only the ownership relationships affect whether or not a value can be dropped.
 
-###### How we can organize our data structures that have reference cycles so avoid memory leaks?
+###### 490. How we can organize our data structures that have reference cycles so avoid memory leaks?
 
 Memory leaks with reference cycles occur when cycles are created by Strong references, that is, references that have ownership of the data they reference.
 
@@ -7165,36 +7165,36 @@ fn main() {
 }
 ```
 
-###### How we can access a value that a `Weak<T>` is pointing to?
+###### 491. How we can access a value that a `Weak<T>` is pointing to?
 
 Because the value that `Weak<T>` references might have been dropped, to do anything with the value that a `Weak<T>` is pointing to, you must make sure the value still exists. Do this by calling the `upgrade` method on a `Weak<T>` instance, which will return an `Option<Rc<T>>`. You’ll get a result of Some if the `Rc<T>` value has not been dropped yet and a result of None if the `Rc<T>` value has been dropped. Because upgrade returns an `Option<Rc<T>>`, Rust will ensure that the Some case and the None case are handled, and there won’t be an invalid pointer.
 
-###### Where get more information about to implement your own smart pointers?
+###### 492. Where get more information about to implement your own smart pointers?
 
  check out “[The Rustonomicon](https://doc.rust-lang.org/nomicon/index.html)” for more useful information.
 
 
 ### 16 Fearless Concurrency
 
-###### What is Concurrent programming?
+###### 493. What is Concurrent programming?
 
 Parallel programming is when different parts of a program are executed independently,
 
-###### What is Parallel programming?
+###### 494. What is Parallel programming?
 
 Parallel programming is when different parts of a program are executed simultaneously
 
 #### 16.1 Using Threads to Run Code Simultaneously
 
-###### What is threads?
+###### 495. What is threads?
 
 In most current operating systems, an executed program’s code is run in a process, and the operating system will manage multiple processes at once. Within a program, you can also have independent parts that run simultaneously. The features that run these independent parts are called threads
 
-###### What are the benefits of using multiple threads?
+###### 496. What are the benefits of using multiple threads?
 
 Splitting the computation in your program into multiple threads to run multiple tasks at the same time can improve performance.
 
-###### What are the problems of using multiple threads?
+###### 497. What are the problems of using multiple threads?
 
 - this adds complexity
 - because threads can run simultaneously, there’s no inherent guarantee about the order in which parts of your code on different threads will run
@@ -7202,15 +7202,15 @@ Splitting the computation in your program into multiple threads to run multiple 
 - Deadlocks, where two threads are waiting for each other, preventing both threads from continuing
 - Bugs that happen only in certain situations and are hard to reproduce and fix reliably
 
-###### What is Race conditions?
+###### 498. What is Race conditions?
 
 Situation where threads are accessing the same data or resources in an inconsistent order
 
-###### What is Deadlocks?
+###### 499. What is Deadlocks?
 
 Situation where two threads are waiting for each other, preventing both threads from continuing
 
-###### What create a new thread?
+###### 500. What create a new thread?
 
 To create a new thread, we call the `thread::spawn` function and pass it a closure containing the code we want to run in the new thread.
 
@@ -7234,11 +7234,11 @@ fn main() {
 }
 ```
 
-###### What happen whit spawned threads when main thread  completes?
+###### 501. What happen whit spawned threads when main thread  completes?
 
 When main thread of a Rust program completes, all spawned threads are shut down, whether or not they have finished running
 
-###### How can we guarantee that a spawned thread will completely finish its execution?
+###### 502. How can we guarantee that a spawned thread will completely finish its execution?
 
 We should save the return value of `thread::spawn` in a variable. The return type of `thread::spawn` is JoinHandle. A JoinHandle is an owned value that, when we call the join method on it, will wait for its thread to finish. Calling `join` on the handle blocks the thread currently running until the thread represented by the handle terminates.
 
@@ -7266,15 +7266,15 @@ fn main() {
 }
 ```
 
-###### What mean Blocking a thread?
+###### 503. What mean Blocking a thread?
 
 Blocking a thread means that thread is prevented from performing work or exiting
 
-###### How stop current thread execution for a short duration?
+###### 504. How stop current thread execution for a short duration?
 
 We need to call the `thread::sleep` function passing it the Duration
 
-###### How we should use any data from the main thread in the spawned thread’s code?
+###### 505. How we should use any data from the main thread in the spawned thread’s code?
 
 If we do use any data from the main thread in the spawned thread’s code we must point `move` keyword before a closure that run spawned thread 
 
@@ -7294,20 +7294,20 @@ fn main() {
 
 #### 16.2 Using Message Passing to Transfer Data Between Threads
 
-###### What is `Message Passing` concurrency?
+###### 506. What is `Message Passing` concurrency?
 
 This is approach to ensuring safe concurrency where threads or actors communicate by sending each other messages containing data
 
-###### How `Message Passing` implemented in Rust?
+###### 507. How `Message Passing` implemented in Rust?
 
 To accomplish message-passing concurrency, Rust’s standard library provides an implementation of channels. A channel is a general programming concept by which data is sent from one thread to another.
 
-###### What is 'Channels'?
+###### 508. What is 'Channels'?
 
 A channel is a general programming concept by which data is sent from one thread to another. By means Channels Rust accomplish message-sending concurrency.
 A channel has two halves: a transmitter and a receiver. One part of your code calls methods on the transmitter with the data you want to send, and another part checks the receiving end for arriving messages. A channel is said to be closed if either the transmitter or receiver half is dropped.
 
-###### How create Chanel for multiple producer and single consumer (mpsc)?
+###### 509. How create Chanel for multiple producer and single consumer (mpsc)?
 
 We must call `std::sync::mpsc::channel()` function. The `mpsc::channel` function returns a tuple, the first element of which is the sending end—the transmitter—and the second element is the receiving end—the receiver
 
@@ -7319,7 +7319,7 @@ fn main() {
 }
 ```
 
-###### How can we organize thread communication using mpsc Channel?
+###### 510. How can we organize thread communication using mpsc Channel?
 
 - By means `mpsc::channel()` function we should create sending end—the transmitter—and the receiving end—the receiver.
 - Using `thread::spawn` we create a new thread and then using `move` to move transmitter into the closure so the spawned thread owns transmitter. The spawned thread needs to own the transmitter to be able to send messages through the channel. The transmitter has a `send` method that takes the value we want to send. The send method returns a `Result<T, E>` type, so if the receiver has already been dropped and there’s nowhere to send a value, the send operation will return an error.
@@ -7344,11 +7344,11 @@ fn main() {
 }
 ```
 
-###### In Channel, is it possible to reuse a value in the sender code after it has been sent?
+###### 511. In Channel, is it possible to reuse a value in the sender code after it has been sent?
 
 The sending end `send` method of mpsc Cannel takes ownership of its parameter, and when the value is moved, the receiver takes ownership of it. This stops us from accidentally using the value again after sending it; the ownership system checks that everything is okay.
 
-###### How we can send multiple values in mpsc Channel?
+###### 512. How we can send multiple values in mpsc Channel?
 
 The spawned thread has a vector of strings that we want to send to the main thread by means sending end `send` method of mpsc Cannel. We iterate over them, sending each individually.
 In the main thread, we’re not calling the recv function explicitly anymore: instead, we’re treating receiving end of mpsc Cannel as an iterator. For each value received, we can perform some operations. When the channel is closed, iteration will end.
@@ -7383,7 +7383,7 @@ fn main() {
 }
 ```
 
-###### How we can use multiply produsers whit mpsc Cannel?
+###### 513. How we can use multiply produsers whit mpsc Cannel?
 
 - By means `mpsc::channel()` function we should create sending end—the transmitter—and the receiving end—the receiver.
 - Using `thread::spawn` we must create some new threads
@@ -7435,12 +7435,12 @@ Filename: src/main.rs
 
 #### 16.3 Shared-State Concurrency
 
-###### What is Mutex?
+###### 514. What is Mutex?
 
 Mutex is an abbreviation for mutual exclusion, as in, a mutex allows only one thread to access some data at any given time.
 Mutex is described as guarding the data it holds via the locking system.
 
-###### How create Mutex?
+###### 515. How create Mutex?
 
 We create a `Mutex<T>`  by calling the associated function `new` which we passing shared data
 
@@ -7459,12 +7459,12 @@ fn main() {
 }
 ```
 
-###### How Sharing a `Mutex<T>` Between Multiple Threads?
+###### 516. How Sharing a `Mutex<T>` Between Multiple Threads?
 
 - We must wrap Mutex value inside `Arc<T>` type.
 - Then we should clone Arc value and used cloned value inside thread code to access data inside a Mutex.
 
-###### How does a thread access data inside a Mutex?
+###### 517. How does a thread access data inside a Mutex?
 
 - To access the data inside the mutex, we use the `lock` method to acquire the lock.
 - If the mutex is locked by another thread, this call will block the current thread so that it cannot do any work until it is its turn to acquire the lock.
@@ -7528,55 +7528,55 @@ fn main() {
 }
 ```
 
-###### What is `Arc<T>`?
+###### 518. What is `Arc<T>`?
 
 `Arc<T>` is *atomically reference counted* type is using to enable multiple ownership value that it wrap. Unlike `Rc<T>`, `Arc<T>` used in multithreaded context.
 
-###### What is Atomics?
+###### 519. What is Atomics?
 
 Atomics are an additional kind of concurrency primitive that work like primitive types but are safe to share across threads.
 
 documentation for [std::sync::atomic](https://doc.rust-lang.org/std/sync/atomic/index.html) for more details.
 
-###### Way having immutable `Mutex<T>`  value we could get a mutable reference to the value inside it?
+###### 520. Way having immutable `Mutex<T>`  value we could get a mutable reference to the value inside it?
 
 This is because `Mutex<T>` provides interior mutability, as the `Cell` family does. In the same way we using `RefCell<T>`
 
-###### What is deadlock?
+###### 521. What is deadlock?
 
 These occur when an operation needs to lock two resources and two threads have each acquired one of the locks, causing them to wait for each other forever.
 
 #### 16.4 Extensible Concurrency with the Sync and Send Traits.
 
-###### For what used The Send marker trait?
+###### 522. For what used The Send marker trait?
 
 The Send marker trait indicates that ownership of values of the type implementing Send can be transferred between threads.
 
-###### Are `Rc<T>` is `Send`?
+###### 523. Are `Rc<T>` is `Send`?
 
 `Rc<T>` cannot be Send because if you cloned an `Rc<T>` value and tried to transfer ownership of the clone to another thread, both threads might update the reference count at the same time. For this reason, `Rc<T>` is implemented for use in single-threaded situations where you don’t want to pay the thread-safe performance penalty.
 
-###### Does we marked as Send Any type composed entirely of Send types?
+###### 524. Does we marked as Send Any type composed entirely of Send types?
 
 Any type composed entirely of Send types is automatically marked as Send as well.
 
-###### What primitive types are Send?
+###### 525. What primitive types are Send?
 
 Almost all primitive types are Send, aside from raw pointers
 
-###### For what used The Sync marker trait?
+###### 526. For what used The Sync marker trait?
 
 The Sync marker trait indicates that it is safe for the type implementing Sync to be referenced from multiple threads. In other words, any type T is Sync if &T (an immutable reference to T) is Send, meaning the reference can be sent safely to another thread.
 
-###### Does we marked as Sync Any type composed entirely of Sync types?
+###### 527. Does we marked as Sync Any type composed entirely of Sync types?
 
 Any type composed entirely of Sync types is automatically marked as Sync as well.
 
-###### What primitive types are Sync?
+###### 528. What primitive types are Sync?
 
 All primitive types are Sync
 
-###### How we can manually implement Send and Sync type?
+###### 529. How we can manually implement Send and Sync type?
 
 Manually implementing these traits involves implementing unsafe Rust code and so requires careful thought to uphold the safety guarantees.
 
@@ -7584,75 +7584,75 @@ Manually implementing these traits involves implementing unsafe Rust code and so
 
 **READ THIS [Async Rust in Three Parts](https://jacko.io/async_intro.html)**
 
-###### What techniques are for working on more than one operation at a time?
+###### 530. What techniques are for working on more than one operation at a time?
 
 Modern computers offer two techniques for working on more than one operation at a time: parallelism and concurrency.
 
-###### What is CPU-bound or compute-bound operation?
+###### 531. What is CPU-bound or compute-bound operation?
 
 CPU-bound operation is operation that limited by the computer’s potential data processing speed within the CPU or GPU, and how much of that speed it can dedicate to the operation.
 
-###### What is IO-bound operation?
+###### 532. What is IO-bound operation?
 
 Operation limited by the speed of the computer’s input and output?
 
-###### What is concurrency?
+###### 533. What is concurrency?
 
 When an individual works on several different tasks before any of them is complete, this is concurrency. Maybe you have two different projects checked out on your computer, and when you get bored or stuck on one project, you switch to the other. You’re just one person, so you can’t make progress on both tasks at the exact same time, but you can multi-task, making progress on one at a time by switching between them.
 
-###### What is parallelism?
+###### 534. What is parallelism?
 
 When the team splits up a group of tasks by having each member take one task and work on it alone, this is parallelism. Each person on the team can make progress at the exact same time
 
-###### What is serial?
+###### 535. What is serial?
 
 one of your own tasks depends on another of your tasks
 
 #### 17.1 Futures and the Async Syntax
 
-###### What is key elements of asynchronous programming in Rust?
+###### 536. What is key elements of asynchronous programming in Rust?
 
 The key elements of asynchronous programming in Rust are Future trait and Rust’s `async` and `await` keywords.
 
-###### What is Future in Rust asynchronous programming?
+###### 537. What is Future in Rust asynchronous programming?
 
 - Rust provides a Future trait as a building block so that different async operations can be implemented with different data structures but with a common interface.
 - A Future trait represent concept of future that is a value that may not be ready now but will become ready at some point in the future.
 - In Rust, futures are types that implement the Future trait.
 - Each future holds its own information about the progress that has been made and what “ready” means.
 
-###### How to use `async` keyword?
+###### 538. How to use `async` keyword?
 
 You can apply the async keyword to blocks and functions to specify that they can be interrupted and resumed.
 
-###### In what places of code async function or block can be paused and resumed.
+###### 539. In what places of code async function or block can be paused and resumed.
 
 Any point where you await a future within an async block or function is a potential spot for that async block or function to pause and resume.
 
-###### What called process of checking with a Future to see if its value is available yet?
+###### 540. What called process of checking with a Future to see if its value is available yet?
 
 The process of checking with a future to see if its value is available yet is called *polling*.
 
-###### How to use `await` keyword?
+###### 541. How to use `await` keyword?
 
 We must use `await` keyword only within an async block or async function.  We point `await` keyword  through the dot after call of async function to await a future (that is, wait for it to become ready).
 
-###### What is `trpl` crate?
+###### 542. What is `trpl` crate?
 
 - `trpl` is short for “The Rust Programming Language”
 - `trpl` was created to teach Rust async
 - It re-exports all the types, traits, and functions you’ll need, primarily from the [futures](https://crates.io/crates/futures) and [tokio](https://tokio.rs/) crates.
 - if you want to understand what the crate does, we encourage you to check out [its source code](https://github.com/rust-lang/book/tree/main/packages/trpl)
 
-###### What is `futures` crate?
+###### 543. What is `futures` crate?
 
 The futures crate is an official home for Rust experimentation for async code, and it’s actually where the Future trait was originally designed.
 
-###### What is Tokio in Rust ?
+###### 544. What is Tokio in Rust ?
 
 Tokio is the most widely used async runtime in Rust today, especially for web applications.
 
-###### How to define `async` function?
+###### 545. How to define `async` function?
 
 We define function and mark it with `async` keyword before function definition. Inside this function we can used calls of other async function whit `await` keyword.
 
@@ -7672,7 +7672,7 @@ async fn page_title(url: &str) -> Option<String> {
 }
 ```
 
-###### How Rust compile async function?
+###### 546. How Rust compile async function?
 
 - When Rust sees a function marked with `async`, it compiles it into a non-async function with body that return an `async` block whit code of that async function.
 - This `async` block Rust compile to a unique, anonymous data type that implements the Future trait.
@@ -7692,7 +7692,7 @@ fn page_title(url: &str) -> impl Future<Output = Option<String>> + '_ { // '_. B
 }
 ```
 
-###### What is required for run async code?
+###### 547. What is required for run async code?
 
 For running async code required Runtime. There are many different async runtimes available, each of which makes different tradeoffs suitable to the use case it targets. For example, a high-throughput web server with many CPU cores and a large amount of RAM has very different needs than a microcontroller with a single core, a small amount of RAM, and no heap allocation ability. The crates that provide those runtimes also often supply async versions of common functionality such as file or network I/O
 
@@ -7710,7 +7710,7 @@ fn main() {
 }
 ```
 
-###### What is Async Runtime?
+###### 548. What is Async Runtime?
 
 The runtime is an executor for a state machines that is automatically generated by the compiler based on the definition of asynchronous functions or blocks.
 In each async function or block each `await` point in a place where control is handed back to the runtime. To make that work, Rust needs to keep track of the state involved in the `async` block so that the runtime can kick off some other work and then come back when it’s ready to try advancing the first one again.
@@ -7768,7 +7768,7 @@ async fn page_title(url: &str) -> (&str, Option<String>) {
 
 #### 17.2 Applying Concurrency with Async
 
-###### How create a New async Task with `trpl::spawn_task`?
+###### 549. How create a New async Task with `trpl::spawn_task`?
 
 ```rust
 // Filename: src/main.rs
@@ -7793,7 +7793,7 @@ fn main() {
 }
 ```
 
-###### How create and run multiple async task? 
+###### 550. How create and run multiple async task? 
 
 ```rust
 // Filename: src/main.rs
@@ -7819,7 +7819,7 @@ fn main() {
 }
 ```
 
-###### How Passing Messages between Futures (async tasks)?
+###### 551. How Passing Messages between Futures (async tasks)?
 
 ```rust
 // Filename: src/main.rs
@@ -7876,15 +7876,15 @@ fn main() {
 }
 ```
 
-###### Can we use `for` loop over an asynchronous series of items?
+###### 552. Can we use `for` loop over an asynchronous series of items?
 
 We can not use `for` loop over an asynchronous series of items, instead we can use `while let` conditional loop.
 
-###### How we can iterate over asynchronous series of items?
+###### 553. How we can iterate over asynchronous series of items?
 
 We can use `while let` conditional loop. We can not use `for` loop.
 
-###### What is `while let` conditional loop?
+###### 554. What is `while let` conditional loop?
 
 This is the loop version of the `if let` construct. The loop will continue executing as long as the pattern it specifies continues to match the value.
 
@@ -7897,7 +7897,7 @@ This is the loop version of the `if let` construct. The loop will continue execu
 #### 17.3 Working with Any Number of Futures
 
 
-###### How we can run any number of async Task (Futures) the same type?
+###### 555. How we can run any number of async Task (Futures) the same type?
 
 ```rust
 // Filename: src/main.rs
@@ -7981,7 +7981,7 @@ fn main() {
 }
 ```
 
-###### Can we run any number of async Task (Futures) different types?
+###### 556. Can we run any number of async Task (Futures) different types?
 
 This is a fundamental tradeoff: we can either deal with a dynamic number of futures with join_all, as long as they all have the same type, or we can deal with a set number of futures with the join functions or the join! macro, even if they have different types.
 
@@ -8004,7 +8004,7 @@ fn main() {
 }
 ```
 
-###### How we can get only one future result from many futures?
+###### 557. How we can get only one future result from many futures?
 
 We can use `trpl::race` to run two futures.
 
@@ -8035,12 +8035,12 @@ fn main() {
 }
 ```
 
-###### In what order async runtime `race` run futures passed in as arguments?
+###### 558. In what order async runtime `race` run futures passed in as arguments?
 
 Order depend on implementations of `race`. Some implementations always runs the futures passed in as arguments in the order in which they’re passed. Other implementations are fair and will randomly choose which future to poll first.
 
 
-###### How we can yield control from a long-running task to the Runtime?
+###### 559. How we can yield control from a long-running task to the Runtime?
 
 We can use `trpl::sleep` calls with `await` points inside long-running code, but the best solution use `yield_now` function.
 
@@ -8088,11 +8088,11 @@ fn slow(name: &str, ms: u64) {
 
 #### 17.4 Streams: Futures in Sequence
 
-###### What is Streams in async Rust?
+###### 560. What is Streams in async Rust?
 
 A stream is like an asynchronous form of iteration.
 
-###### How we can create Stream from Iterator?
+###### 561. How we can create Stream from Iterator?
 
 We can use `trpl::stream_from_iter` function by passing it an iterator. Then we can using stream in `while let` loop whit `next().await`. We  need the StreamExt trait in scope to be able to use the next method. When we have StreamExt in scope, we can use all of its utility methods, just as with iterators, for example `filter` method.
 
@@ -8131,7 +8131,7 @@ fn main() {
 }
 ```
 
-###### How we can create stream of messages?
+###### 562. How we can create stream of messages?
 
 ```rust
 // Filename: src/main.rs
@@ -8168,7 +8168,7 @@ fn get_messages() -> impl Stream<Item = String> {
 }
 ```
 
-###### How we can merge streams?
+###### 563. How we can merge streams?
 
 
 ```rust
@@ -8235,7 +8235,7 @@ fn get_intervals() -> impl Stream<Item = u32> {
 
 #### 17.5 A Closer Look at the Traits for Async
 
-###### how Rust defines Future Trait?
+###### 564. how Rust defines Future Trait?
 
 ```rust
 use std::pin::Pin;
@@ -8248,23 +8248,23 @@ pub trait Future {
 }
 ```
 
-###### How named Future’s associated type?
+###### 565. How named Future’s associated type?
 
 Output
 
-###### What says Future’s associated type?
+###### 566. What says Future’s associated type?
 
 Future’s associated type Output says what the future resolves to.
 
-###### What method define Future Trait?
+###### 567. What method define Future Trait?
 
 Future trait define `poll` method.
 
-###### Which takes and return the `poll` method of Future Trait?
+###### 568. Which takes and return the `poll` method of Future Trait?
 
 `poll` method takes a special `Pin` reference for its `self` parameter and a mutable reference to a `Context` type, and returns `Poll<Self::Output>` type.
 
-###### how Rust defines Poll type?
+###### 569. how Rust defines Poll type?
 
 Rust define the Poll type as enum whit one variant that has a value, Ready(T), and one which does not, Pending. The Pending variant indicates that the future still has work to do, so the caller will need to check again later. The Ready variant indicates that the future has finished its work and the T value is available.
 
@@ -8275,11 +8275,11 @@ enum Poll<T> {
 }
 ```
 
-###### What happen if caller call `pull` again after the future has returned Ready?
+###### 570. What happen if caller call `pull` again after the future has returned Ready?
 
 Many futures will panic if polled again after becoming ready.
 
-###### How Rust compile code that uses `await`?
+###### 571. How Rust compile code that uses `await`?
 
  Rust compiles it under the hood to code that calls `poll` method
 
@@ -8306,40 +8306,40 @@ fn main() {
 }
 ```
 
-###### What should Rust do when the future is still Pending?
+###### 572. What should Rust do when the future is still Pending?
 
 Rust will call `pull` in loop again, and again, and again, until the future is finally ready. Rust makes sure that the loop can hand off control to Async Runtime that can pause work on this future to work on other futures and then check this one again later.
 
-###### What is self-referential data types?
+###### 573. What is self-referential data types?
 
 self-referential data types is types which objects hold reference on himself
 
-###### Way self-referential data types is unsafe?
+###### 574. Way self-referential data types is unsafe?
 
  If we move the self-referential structure to other location in memory, those internal self-references will be left pointing to the old location, that is become invalid.
 
-######  What is Unpin and !Unpin Traits?
+###### 575. What is Unpin and !Unpin Traits?
 
 Unpin Trait are a marker trait which informs the compiler that a given type does not need to uphold any guarantees about whether the value in question can be safely moved in memory. Compiler implements Unpin automatically for all types where it can prove it is safe. A special case is where Unpin is not implemented for a type. The notation for this is `impl !Unpin for SomeType`, where `SomeType` is the name of a type that does need to uphold those guarantees to be safe whenever a pointer to that type is used in a Pin. 
 In other words, there are two things to keep in mind about the relationship between Pin and Unpin. First, Unpin is the “normal” case, and !Unpin is the special case. Second, whether a type implements Unpin or !Unpin only matters when you’re using a pinned pointer to that type like Pin<&mut SomeType>.
 
-###### What is Pin type?
+###### 576. What is Pin type?
 
 `Pin` is a wrapper for pointer-like types such as `&`, `&mut`, `Box`, and `Rc`. `Pin` is not a pointer itself and doesn’t have any behavior of its own like `R`c and `Arc` do with reference counting; it’s purely a tool the compiler use to enforce that data referenced by wrapped pointer can not be moved in memory. Type of this data must be marked by !Unpin trait. If Type of this data must be marked by !Unpin trait
 
-###### What does it affect Pin type?
+###### 577. What does it affect Pin type?
 
 If Pin type wraps pointer-like type such as `&`, `&mut`, `Box`, and `Rc`, that refers to a value of type marked with `!Unpin trait` the compiler enforce that data referenced by the wrapped pointer can not be moved in memory. If data type marked by Unpin trait - Pin type not affect.
 
-###### Why we must wraps to Pin type a pointer-like types of Future for using it?
+###### 578. Why we must wraps to Pin type a pointer-like types of Future for using it?
 
 Rust compiles an asynchronous function into a state machine structure that implements Future. This structure can contain a reference to itself, i.e. it is a self-referencing type. Since self-referencing types are unsafe, since when moving their objects in memory the reference will become invalid - the object must be passed for use wrapped in Box and Pin, which provides protection against moving in memory.
 
-###### Should we `pin` directly awaiting future?
+###### 579. Should we `pin` directly awaiting future?
 
 Directly awaiting a `future` with await pins the `future` implicitly. That’s why we don’t need to use pin! everywhere we want to await futures.
 
-###### What is Stream trait?
+###### 580. What is Stream trait?
 
  Stream trait merge together Iterator idea of a sequence: `its` next method provides an `Option<Self::Item>` and Future idea of readiness over time: its poll method provides a `Poll<Self::Output>`. To represent a sequence of items that become ready over time, we define a Stream trait that puts those features together:
 
@@ -8357,20 +8357,20 @@ trait Stream {
 }
 ```
 
-###### How named Stream’s associated type?
+###### 581. How named Stream’s associated type?
 
 The Stream trait defines an associated type called Item for the type of the items produced by the stream.
 
-###### Which method define Stream?
+###### 582. Which method define Stream?
 
 `poll_next`, name of the method it clear that it polls in the same way `Future::poll` does and produces a sequence of items in the same way `Iterator::next` does. 
 
-###### What type return `poll_next` method of Stream? 
+###### 583. What type return `poll_next` method of Stream? 
 
 `Poll<Option<Self::Item>>`. Its return type combines `Poll` with `Option`. The outer type is `Poll`, because it has to be checked for readiness, just as a future does. The inner type is `Option`, because it needs to signal whether there are more messages, just as an iterator does.
 
 
-###### What is StreamExt trait?
+###### 584. What is StreamExt trait?
 
 - StreamExt trait is wrapper for Stream which utils  `poll_next` method of Stream
 - StreamExt trait allow working whit Stream on async mode using `await`
@@ -8389,7 +8389,7 @@ trait StreamExt: Stream {
 
 #### 17.6  Putting It All Together: Futures, Tasks, and Threads
 
-###### what rules should be followed when choosing between Async model and Treads?
+###### 585. what rules should be followed when choosing between Async model and Treads?
 
 - If the work is very parallelizable, such as processing a bunch of data where each part can be processed separately, threads are a better choice.
 - If the work is very concurrent, such as handling messages from a bunch of different sources that may come in at different intervals or different rates, async is a better choice.
@@ -8420,7 +8420,7 @@ fn main() {
 
 #### 18.1 Characteristics of Object-Oriented Languages
 
-###### Which Characteristics of Object-Oriented Languages?
+###### 586. Which Characteristics of Object-Oriented Languages?
 
 OOP languages share certain common characteristics, namely:
 
@@ -8429,20 +8429,20 @@ OOP languages share certain common characteristics, namely:
 - inheritance.
 - polymorphism
 
-###### What is objects in OOP?
+###### 587. What is objects in OOP?
 
 An object packages both data and the procedures that operate on that data. The procedures are typically called methods or operations.
 
-###### How Rust implement OOP objects?
+###### 588. How Rust implement OOP objects?
 
 Rust implement objects by structs and enums that has data and impl blocks that provides methods on structs and enums.
 
-###### What is encapsulation?
+###### 589. What is encapsulation?
 
 - encapsulation means that the implementation details of an object aren’t accessible to code using that object. Therefore, the only way to interact with an object is through its public API; 
 - code using the object shouldn’t be able to reach into the object’s internals and change data or behavior directly. This enables the programmer to change and refactor an object’s internals without needing to change the code that uses the object.
 
-###### How Rust implements encapsulation?
+###### 590. How Rust implements encapsulation?
 
 Rust implements encapsulation by the `pub` keyword that define which modules, types, functions, and methods in our code are public, and by default everything else is private.
 
@@ -8487,33 +8487,33 @@ impl AveragedCollection { // The public methods add, remove, and average are the
 }
 ```
 
-###### What is inheritance?
+###### 591. What is inheritance?
 
 Inheritance is a mechanism whereby an object can inherit elements from another object’s definition, thus gaining the parent object’s data and behavior without you having to define them again.
 
-###### How Rust implements inheritance?
+###### 592. How Rust implements inheritance?
 
 Rust do not implements inheritance. There is no way to define a struct that inherits the parent struct’s fields and method implementations without using a macro.
 
-###### How we can implement code reusing in Rust?
+###### 593. How we can implement code reusing in Rust?
 
 You can do this in a limited way in Rust code using default trait method implementations. This is similar to a parent class having an implementation of a method and an inheriting child class also having the implementation of the method. We can also override the default implementation of default method when implement trait, which is similar to a child class overriding the implementation of a method inherited from a parent class.
 
-###### What is Polymorphism?
+###### 594. What is Polymorphism?
 
 Polymorphism is general concept that refers to code that can work with data of multiple types, which is being implemented, among other things by inheritance.
 
-###### How Rust implements Polymorphism?
+###### 595. How Rust implements Polymorphism?
 
 Rust uses generics to abstract over different possible types and trait bounds to impose constraints on what those types must provide. This is sometimes called bounded parametric polymorphism.
 
 #### 18.2 Using Trait Objects That Allow for Values of Different Types
 
-###### How create vector that store different types?
+###### 596. How create vector that store different types?
 
 We need to define an Enum and bind the variants to the types that we will store in the vector. Then we can store the Enum variants in the vector with the value of the types that are bound to these variants.
 
-###### How implement common behavior (polymorphism) in Rust?
+###### 597. How implement common behavior (polymorphism) in Rust?
 
 Common behavior in Rust can be implemented by trait object.
 
@@ -8613,12 +8613,12 @@ fn main() {
 }
 ```
 
-###### What is trait object?
+###### 598. What is trait object?
 
 We create a trait object by specifying some sort of pointer, such as a `&` reference or a `Box<T>` smart pointer, then the `dyn` keyword, and then specifying the relevant trait. A trait object points to both an instance of a type implementing our specified trait and a table used to look up trait methods on that type at runtime. We can use trait objects in place of a generic or concrete type. Wherever we use a trait object, Rust’s type system will ensure at compile time that any value used in that context will implement the trait object’s trait. Consequently, we don’t need to know all the possible types at compile time.
 Specific purpose of trait object is to allow abstraction across common behavior. We can’t add data to a trait object
 
-###### what is the difference in usage trait objects in place of a generic or concrete type?
+###### 599. what is the difference in usage trait objects in place of a generic or concrete type?
 
 Wherever we use a trait object, Rust’s type system will ensure at compile time that any value used in that context will implement the trait object’s trait. Consequently, we don’t need to know all the possible types at compile time.
 
@@ -8650,18 +8650,18 @@ This restricts us to a Screen instance that has a list of components all of type
 
 On the other hand, with the method using trait objects, one Screen instance can hold a `Vec<T>` that contains a `Box<Button>` as well as a `Box<TextField>`. Let’s look at how this works, and then we’ll talk about the runtime performance implications.
 
-###### What happen if we use values that don’t implement the traits that the trait objects need?
+###### 600. What happen if we use values that don’t implement the traits that the trait objects need?
 
 Rust won’t compile our code
 
 #### 18.3 Implementing an Object-Oriented Design Pattern
 
-###### What is state pattern?
+###### 601. What is state pattern?
 
 The state pattern is an object-oriented design pattern. The crux of the pattern is that we define a set of states a value can have internally and the value’s behavior changes based on its state.
 The value that holds a state object knows nothing about the different behavior of the states or when to transition between states.
 
-###### What is advantage of using state pattern?
+###### 602. What is advantage of using state pattern?
 
 The advantage of using the state pattern is that, when the business requirements of the program change, we won’t need to change the code of the value holding the state or the code that uses the value. We’ll only need to update the code inside one of the state objects to change its rules or perhaps add more state objects.
 
@@ -8776,7 +8776,7 @@ impl State for Published {
 
 ### 19 Patterns and Matching
 
-###### What is Patterns?
+###### 603. What is Patterns?
 
 - Patterns are a special syntax in Rust for matching against the structure of types.
 - To use a pattern, we compare it to some value to determine whether it has the correct shape of data to continue running a particular piece of code.
@@ -8784,7 +8784,7 @@ impl State for Published {
 
 #### 19.1 All the Places Patterns Can Be Used
 
-###### Where are used Patterns?
+###### 604. Where are used Patterns?
 
 - match Arms
 - Conditional if let Expressions
@@ -8793,7 +8793,7 @@ impl State for Published {
 - let Statements
 - Function Parameters
 
-###### How using Pattern in match Arms?
+###### 605. How using Pattern in match Arms?
 
 match expressions are defined as the keyword match, a value to match on, and one or more match arms that consist of a pattern and an expression to run if the value matches that arm’s pattern
 
@@ -8812,23 +8812,23 @@ match x {
 }
 ```
 
-###### what is the mandatory requirement when using match Arms?
+###### 606. what is the mandatory requirement when using match Arms?
 
 One requirement for match expressions is that they need to be exhaustive in the sense that all possibilities for the value in the match expression must be accounted for.
 
-###### What method are for make exhaustive requirement for match expressions?
+###### 607. What method are for make exhaustive requirement for match expressions?
 
 The  pattern `_` will match anything, so it’s often used in the last match arm for make exhaustive requirement.
 
-###### Which pattern can match anything?
+###### 608. Which pattern can match anything?
 
 The particular pattern `_` will match anything, but it never binds to a variable
 
-###### What pattern can be used for ignore  any value not specified?
+###### 609. What pattern can be used for ignore  any value not specified?
 
 The particular pattern `_` will match anything, but it never binds to a variable, so it can be useful when you want to ignore any value not specified.
 
-###### For what used `if let` Expressions?
+###### 610. For what used `if let` Expressions?
 
 `if let` expressions mainly as a shorter way to write the equivalent of a `match` that only matches one case. Optionally, `if let` can have a corresponding `else` containing code to run if the pattern in the `if let` doesn’t match. It’s also possible to mix and match `if let`, `else if`, and `else if let` expressions.
 
@@ -8855,11 +8855,11 @@ fn main() {
 }
 ```
 
-###### What are downside of using `if let` expressions?
+###### 611. What are downside of using `if let` expressions?
 
 The downside of using `if let` expressions is that the compiler doesn’t check for exhaustiveness, whereas with `match` expressions it does.
 
-###### For what used `while let` Conditional Loops?
+###### 612. For what used `while let` Conditional Loops?
 
 `while let` conditional loop used for loop to run for as long as a pattern continues to match.
 
@@ -8876,7 +8876,7 @@ The downside of using `if let` expressions is that the compiler doesn’t check 
     }
 ```
 
-###### How to used a pattern in `for` Loops?
+###### 613. How to used a pattern in `for` Loops?
 
 In a for loop, the value that directly follows the keyword `for` is a pattern. For example, in `for x in y` the x is the pattern.
 
@@ -8890,7 +8890,7 @@ In a for loop, the value that directly follows the keyword `for` is a pattern. F
     }
 ```
 
-###### How used pattern whit `let` Statements whit binging value?
+###### 614. How used pattern whit `let` Statements whit binging value?
 
 Every time we are using a let statement we are using patterns.
 
@@ -8905,7 +8905,7 @@ Whit a variable binding statements (for example let x = 5) left side is a patter
     let (x, y) = (1, 2, 3); // error[E0308]: mismatched types
 ```
 
-###### How is used patterns whit Function parameters?
+###### 615. How is used patterns whit Function parameters?
 
 Part of function signature that corresponds to parameters list declaration is pattern that can be matched whit passed arguments. We can also use patterns in closure parameter lists in the same way as in function parameter lists
 
@@ -8924,19 +8924,19 @@ fn main() {
 
 #### 19.2 Refutability: Whether a Pattern Might Fail to Match
 
-###### When patterns are irrefutable?
+###### 616. When patterns are irrefutable?
 
 Patterns that will match for any possible value passed are irrefutable. An example would be x in the statement `let x = 5;` because x matches anything and therefore cannot fail to match.
 
-###### When patterns are refutable?
+###### 617. When patterns are refutable?
 
 Patterns that can fail to match for some possible value are refutable.
 
-###### Which type of pattern can accept function parameters, `let` statements, and `for` loops?
+###### 618. Which type of pattern can accept function parameters, `let` statements, and `for` loops?
 
 Function parameters, let statements, and for loops can only accept irrefutable patterns, because the program cannot do anything meaningful when values don’t match. 
 
-###### Which type of pattern can accept `if let`, `while let` expressions and the `let-else` statement?
+###### 619. Which type of pattern can accept `if let`, `while let` expressions and the `let-else` statement?
 
 The `if let` and `while let` expressions and the `let-else` statement accept refutable and irrefutable patterns.
 
@@ -8946,7 +8946,7 @@ The `if let` and `while let` expressions and the `let-else` statement accept ref
     //If some_option_value was a None value, it would fail to match the pattern Some(x), meaning the pattern is refutable. However, the let statement can only accept an irrefutable pattern because there is nothing valid the code can do with a None value. At compile time, Rust will complain that we’ve tried to use a refutable pattern where an irrefutable pattern is required:
 ```
 
-###### Why a compiler warns against irrefutable patterns in `if let`, `while let` expressions and the `let-else` statement?
+###### 620. Why a compiler warns against irrefutable patterns in `if let`, `while let` expressions and the `let-else` statement?
 
 compiler well warns because by definition `if let`, `while let` expressions and the `let-else` statement intended to handle possible failure: the functionality of a conditional is in its ability to perform differently depending on success or failure.
 
@@ -8956,7 +8956,7 @@ compiler well warns because by definition `if let`, `while let` expressions and 
     };
 ```
 
-###### How we can fix situation when we have a refutable pattern where an irrefutable pattern is needed?
+###### 621. How we can fix situation when we have a refutable pattern where an irrefutable pattern is needed?
 
 If we have a refutable pattern where an irrefutable pattern is needed, we can fix it by changing the code that uses the pattern: instead of using `let`, we can use `if let`. Then if the pattern doesn’t match, the code will just skip the code in the curly brackets, giving it a way to continue validly.
 
@@ -8971,7 +8971,7 @@ If we have a refutable pattern where an irrefutable pattern is needed, we can fi
 
 #### 19.3 Pattern Syntax
 
-###### How we can directly maths patterns match patterns against literals?
+###### 622. How we can directly maths patterns match patterns against literals?
 
 We can use literals in pattern to match it directly whit value
 
@@ -8986,7 +8986,7 @@ We can use literals in pattern to match it directly whit value
     }
 ```
 
-###### How we can use named variables in patterns to match values?
+###### 623. How we can use named variables in patterns to match values?
 
 Named variables are irrefutable patterns that match any value. There is a complication when we use its in `match`, `if let`, or `while let` expressions, because each of these kinds of expression starts a new scope, variables declared as part of a pattern inside the expression will shadow those with the same name outside, as is the case with all variables.
 
@@ -9003,7 +9003,7 @@ Named variables are irrefutable patterns that match any value. There is a compli
     println!("at the end: x = {x:?}, y = {y}");
 ```
 
-###### How we can match multiple patterns inside one match arm?
+###### 624. How we can match multiple patterns inside one match arm?
 
 We can match multiple patterns using the | syntax, which is the pattern or operator.
 
@@ -9017,11 +9017,11 @@ We can match multiple patterns using the | syntax, which is the pattern or opera
     }
 ```
 
-###### What is pattern 'or' operator?
+###### 625. What is pattern 'or' operator?
 
 Pattern or operator is used for matching multiple patterns and is denoted as `|`.
 
-###### How we can Matching Ranges of Values?
+###### 626. How we can Matching Ranges of Values?
 
 The `..=` syntax allows us to match to an inclusive range of values. Ranges are only allowed with numeric or char values.
 
@@ -9042,7 +9042,7 @@ The `..=` syntax allows us to match to an inclusive range of values. Ranges are 
     }
 ```
 
-###### How to destructure Struct?
+###### 627. How to destructure Struct?
 
 ```rust
 // Filename: src/main.rs
@@ -9091,7 +9091,7 @@ fn main() {
 }
 ```
 
-###### How to destructure Enum?
+###### 628. How to destructure Enum?
 
 ```rust
 Filename: src/main.rs
@@ -9125,7 +9125,7 @@ fn main() {
 }
 ```
 
-###### How to destructure Nested Structs and Enums?
+###### 629. How to destructure Nested Structs and Enums?
 
 ```rust
 enum Color {
@@ -9155,7 +9155,7 @@ fn main() {
 }
 ```
 
-###### How to destructure mix of Structs and Tuples?
+###### 630. How to destructure mix of Structs and Tuples?
 
 ```rust
     let ((feet, inches), Point { x, y }) = ((3, 10), Point { x: 3, y: -10 });
@@ -9163,19 +9163,19 @@ fn main() {
 
 ##### Ignoring Values in a Pattern
 
-###### Why is it sometimes necessary to ignore values ​​in a pattern?
+###### 631. Why is it sometimes necessary to ignore values ​​in a pattern?
 
 it’s sometimes useful to ignore values in a pattern, such as in the last arm of a match, to get a catchall that doesn’t actually do anything but does account for all remaining possible values.
 
-###### How to ignore entire value in a pattern?
+###### 632. How to ignore entire value in a pattern?
 
 We’ve used the underscore `_` as a wildcard pattern that will match any value but not bind to the value.
 
-###### In which cases we can ignoring entire value in a pattern?
+###### 633. In which cases we can ignoring entire value in a pattern?
 
 This is especially useful as the last arm in a match expression, but we can also use it in any pattern, including function parameters,
 
-###### Why might we need to ignore a value in a function?
+###### 634. Why might we need to ignore a value in a function?
 
 In most cases when you no longer need a particular function parameter, you would change the signature so it doesn’t include the unused parameter. Ignoring a function parameter can be especially useful in cases when, for example, you’re implementing a trait when you need a certain type signature but the function body in your implementation doesn’t need one of the parameters. You then avoid getting a compiler warning about unused function parameters, as you would if you used a name instead.
 
@@ -9190,7 +9190,7 @@ fn main() {
 }
 ```
 
-###### How to ignore part of a value in patterns?
+###### 635. How to ignore part of a value in patterns?
 
 We can use _ inside another pattern to ignore just part of a value. We can also use underscores in multiple places within one pattern to ignore particular values.
 
@@ -9221,11 +9221,11 @@ We can use _ inside another pattern to ignore just part of a value. We can also 
     }
 ```
 
-###### Why might we need to ignore a unused Variable?
+###### 636. Why might we need to ignore a unused Variable?
 
 If you create a variable but don’t use it anywhere, Rust will usually issue a warning because an unused variable could be a bug. However, sometimes it’s useful to be able to create a variable you won’t use yet, such as when you’re prototyping or just starting a project. In this situation, you can tell Rust not to warn you about the unused variable by starting the name of the variable with an underscore.
 
-###### How we can ignore a unused Variable?
+###### 637. How we can ignore a unused Variable?
 
 starting the name of the variable with an underscore `_`.
 
@@ -9237,7 +9237,7 @@ fn main() {
 }
 ```
 
-###### What difference between using underscore `_` and underscore whit variable name `_x`?
+###### 638. What difference between using underscore `_` and underscore whit variable name `_x`?
 
 The syntax `_x` binds a matched value to the variable `_x`, whereas `_` doesn’t bind at all. So following using value that was moved to _x well cause compile error.
 
@@ -9261,7 +9261,7 @@ The syntax `_x` binds a matched value to the variable `_x`, whereas `_` doesn’
     println!("{s:?}"); //  will compile without any errors because s doesn’t get moved into _.
 ```
 
-###### How can we ignore Remaining Parts of a Value?
+###### 639. How can we ignore Remaining Parts of a Value?
 
 With values that have many parts, we can use the `..` syntax to use specific parts and ignore the rest, avoiding the need to list underscores for each ignored value. The `..` pattern ignores any parts of a value that we haven’t explicitly matched in the rest of the pattern. The syntax .. is expanded to as many values as it needs to be, so we can use it in any part of  named variables list of pattern. However, using .. must not be unambiguous.
 
@@ -9283,7 +9283,7 @@ fn main() {
 
 ##### Extra Conditionals with Match Guards
 
-###### What is *match guard*?
+###### 640. What is *match guard*?
 
 A match guard is an additional `if` condition, specified after the pattern in a match arm, that must also match for that arm to be chosen. The condition can use variables created in the pattern.
 
@@ -9297,11 +9297,11 @@ A match guard is an additional `if` condition, specified after the pattern in a 
     }
 ```
 
-###### When allowed *match guard*?
+###### 641. When allowed *match guard*?
 
 They are only available in `match` expressions, not in `if let` or `while let` expressions.
 
-###### How we can use match guards to solve pattern-shadowing problem?
+###### 642. How we can use match guards to solve pattern-shadowing problem?
 
 ```rust
 // Filename: src/main.rs
@@ -9319,7 +9319,7 @@ fn main() {
 }
 ```
 
-###### How we can use match guards whit 'or' operator `|`?
+###### 643. How we can use match guards whit 'or' operator `|`?
 
 ```rust
     let x = 4;
@@ -9333,7 +9333,7 @@ fn main() {
 
 ##### @ Bindings
 
-###### For what used *at* `@` Bindings operator in patterns?
+###### 644. For what used *at* `@` Bindings operator in patterns?
 
 The *at* operator `@` lets us create a variable that holds a value at the same time as we’re testing that value for a pattern match.
 
@@ -9360,15 +9360,15 @@ The *at* operator `@` lets us create a variable that holds a value at the same t
 
 #### 20.1 Unsafe Rust
 
-###### What is Unsafe Rust?
+###### 645. What is Unsafe Rust?
 
 Regular rust code had Rust’s memory safety guarantees enforced at compile time.  However, Rust has a second language hidden inside it that doesn’t enforce these memory safety guarantees: it’s called unsafe Rust and gives us extra superpowers.
 
-###### What is Unsafe Rust for?
+###### 646. What is Unsafe Rust for?
 
 unsafe Rust gives us extra superpowers.
 
-###### Why exists Unsafe Rust?
+###### 647. Why exists Unsafe Rust?
 
 Unsafe Rust exists because, by nature, static analysis is conservative. When the compiler tries to determine whether or not code upholds the guarantees, it’s better for it to reject some valid programs than to accept some invalid programs. Although the code might be okay, if the Rust compiler doesn’t have enough information to be confident, it will reject the code. In these cases, you can use unsafe code to tell the compiler, “Trust me, I know what I’m doing.”
 
@@ -9376,19 +9376,19 @@ Another reason Rust has an unsafe alter ego is that the underlying computer hard
 
 ##### Unsafe Superpowers
 
-###### How switch to unsafe Rust?
+###### 648. How switch to unsafe Rust?
 
 To switch to unsafe Rust, use the unsafe keyword and then start a new block that holds the unsafe code.
 
-###### There is the borrow checking in unsafe Rust?
+###### 649. There is the borrow checking in unsafe Rust?
 
 `unsafe` doesn’t turn off the borrow checker or disable any other of Rust’s safety checks: if you use a reference in unsafe code, it will still be checked. The unsafe keyword only gives you access to  'unsafe superpowers' five features that are then not checked by the compiler for memory safety.
 
-###### What is intent of 'unsafe' block?
+###### 650. What is intent of 'unsafe' block?
 
 the intent is that as the programmer, will ensure the code inside an unsafe block will access memory in a valid way. By requiring five unsafe operations to be inside blocks annotated with `unsafe` the programmer will know that any errors related to memory safety must be within an unsafe block.
 
-###### What we call unsafe superpowers?
+###### 651. What we call unsafe superpowers?
 
 Those superpowers include the ability to:
 
@@ -9398,29 +9398,29 @@ Those superpowers include the ability to:
 - Implement an unsafe trait
 - Access fields of a `union`
 
-###### What is Safe API?
+###### 652. What is Safe API?
 
 Safe API is a safe abstraction over unsafe code.
 
 ##### Dereferencing a Raw Pointer
 
-###### What is Raw Pointers?
+###### 653. What is Raw Pointers?
 
 Raw Pointers are Unsafe Rust types that are similar to references and allows executes unsafe operations on the values they point to.
 
-###### What are the raw pointers?
+###### 654. What are the raw pointers?
 
 raw pointers can be immutable or mutable
 
-###### How raw pointers are written?
+###### 655. How raw pointers are written?
 
 Raw pointers written as `*const T` and `*mut T`, respectively. The asterisk isn’t the dereference operator; it’s part of the type name.
 
-###### What means 'immutable' in the context of raw pointers?
+###### 656. What means 'immutable' in the context of raw pointers?
 
 In the context of raw pointers, immutable means that the pointer can’t be directly assigned to after being dereferenced.
 
-###### What different raw pointers from references and smart pointers? 
+###### 657. What different raw pointers from references and smart pointers? 
 
 raw pointers:
 
@@ -9429,7 +9429,7 @@ raw pointers:
 ` Are allowed to be null
 ` Don’t implement any automatic cleanup
 
-###### Can we create raw pointers outside `unsafe` block in safe code?
+###### 658. Can we create raw pointers outside `unsafe` block in safe code?
 
 We can create raw pointers in safe code; we just can’t dereference raw pointers outside an unsafe block.
 
@@ -9440,11 +9440,11 @@ We can create raw pointers in safe code; we just can’t dereference raw pointer
     let r2 = &raw mut num; //  mutable
 ```
 
-###### What restrictions of using raw pointers in safe code?
+###### 659. What restrictions of using raw pointers in safe code?
 
 We can create raw pointers in safe code; we just can’t dereference raw pointers outside an unsafe block.
 
-###### How create raw pointer?
+###### 660. How create raw pointer?
 
 We’ve created raw pointers by using the `raw` borrow operators: `&raw const var_name_of_type_T` creates a '*const T' immutable raw pointer, and `&raw mut var_name_of_type_T` creates a '*mut T' mutable raw pointer.
 
@@ -9455,16 +9455,16 @@ We’ve created raw pointers by using the `raw` borrow operators: `&raw const va
     let r2 = &raw mut num; //  mutable
 ```
 
-###### What is the danger of using raw pointers?
+###### 661. What is the danger of using raw pointers?
 
 With raw pointers, we can create a mutable pointer and an immutable pointer to the same location and change data through the mutable pointer, potentially creating a data race
 
-###### Why would ever use raw pointers?
+###### 662. Why would ever use raw pointers?
 
 - One major use case is when interfacing with C code
 - Another case is when building up safe abstractions that the borrow checker doesn’t understand.
 
-###### What we can dereference raw pointers?
+###### 663. What we can dereference raw pointers?
 
 We use the dereference operator `*` on a raw pointer that located inside unsafe block.
 
@@ -9482,23 +9482,23 @@ We use the dereference operator `*` on a raw pointer that located inside unsafe 
 
 ##### Calling an Unsafe Function or Method
 
-###### What is Unsafe Function?
+###### 664. What is Unsafe Function?
 
 Unsafe Function is function that has requirements we need to uphold when we call this function, because Rust can’t guarantee we’ve met these requirements. By calling an unsafe function within an unsafe block, we’re saying that we’ve read this function’s documentation and take responsibility for upholding the function’s contracts.
 
-###### How is an unsafe function indicated?
+###### 665. How is an unsafe function indicated?
 
 Unsafe functions and methods look exactly like regular functions and methods, but they have an extra `unsafe` before the rest of the definition.
 
-###### How call Unsafe Function?
+###### 666. How call Unsafe Function?
 
 We must call an Unsafe Function within a separate `unsafe` block. If we try to call Unsafe Functions without the unsafe block, we’ll get an error.
 
-###### How we must perform unsafe operations in the body of an unsafe function?
+###### 667. How we must perform unsafe operations in the body of an unsafe function?
 
 To perform unsafe operations in the body of an unsafe function, you still need to use an `unsafe` block just as within a regular function, and the compiler will warn you if you forget. This helps to keep `unsafe` blocks as small as possible, as unsafe operations may not be needed across the whole function body.
 
-###### Is the function unsafe if it contain unsafe code?
+###### 668. Is the function unsafe if it contain unsafe code?
 
 Just because a function contains unsafe code doesn’t mean we need to mark the entire function as unsafe. In fact, wrapping unsafe code in a safe function is a common abstraction
 
@@ -9536,11 +9536,11 @@ fn main() {
 }
 ```
 
-###### What is FFI?
+###### 669. What is FFI?
 
 FFI is an abbreviation of Foreign Function Interface is a way for a programming language to define functions and enable a different (foreign) programming language to call those functions.
 
-###### What is the `extern` Rust keyword used for?
+###### 670. What is the `extern` Rust keyword used for?
 
 `extern` keyword facilitates the creation and use of a Foreign Function Interface (FFI).
 
@@ -9557,11 +9557,11 @@ fn main() {
 }
 ```
 
-###### Way need declare `extern` block by `unsafe` keyword?
+###### 671. Way need declare `extern` block by `unsafe` keyword?
 
 Functions declared within `extern` blocks are usually unsafe to call from Rust code, so they must also be marked `unsafe`. The reason is that other languages don’t enforce Rust’s rules and guarantees, and Rust can’t check them, so responsibility falls on the programmer to ensure safety.
 
-###### How to define an extern function defined in another language?
+###### 672. How to define an extern function defined in another language?
 
 Within the `unsafe extern "C" {}` block, we list the names and signatures of external functions from another language we want to call. The "C" part defines which application binary interface (ABI) the external function uses: the ABI defines how to call the function at the assembly level. The "C" ABI is the most common and follows the C programming language’s ABI.
 If we know that particular function does not have any memory safety considerations, we can use the `safe` keyword to say that this specific function is safe to call even though it is in an unsafe extern block.
@@ -9577,7 +9577,7 @@ fn main() {
 }
 ```
 
-###### How to call an extern function defined in another language?
+###### 673. How to call an extern function defined in another language?
 
 - first we must define an extern function.
 - next, if we define this function whit `safe` keyword, that is, we believe that this function does not have any memory safety considerations,  we can call this function as ordinary safe Rust function.
@@ -9595,7 +9595,7 @@ fn main() {
 }
 ```
 
-###### How call Rust Functions from Other Languages?
+###### 674. How call Rust Functions from Other Languages?
 
 We should create an interface that allows other languages to call Rust functions. We add the extern keyword and specify the ABI to use just before the `fn` keyword for the relevant function. We also need to add a `#[unsafe(no_mangle)]` annotation to tell the Rust compiler not to mangle the name of this function.
 
@@ -9608,13 +9608,13 @@ pub extern "C" fn call_from_c() {
 }
 ```
 
-###### What is *Mangling*?
+###### 675. What is *Mangling*?
 
 Mangling is when a compiler changes the name we’ve given a function to a different name that contains more information for other parts of the compilation process to consume but is less human readable.
 
 ##### Accessing or Modifying a Mutable Static Variable.
 
-###### How create static variable?
+###### 676. How create static variable?
 
 We point `static` keyword followed name in SCREAMING_SNAKE_CASE naming convention to which binding value of type: reference with the 'static lifetime.
 
@@ -9627,32 +9627,32 @@ fn main() {
 }
 ```
 
-###### What is Static Variables?
+###### 677. What is Static Variables?
 
 A Static Variables is a Global variables, that is they are available from all places of program.
 
-###### Way convention of naming static variables?
+###### 678. Way convention of naming static variables?
 
 SCREAMING_SNAKE_CASE
 
-###### What value can store static variable?
+###### 679. What value can store static variable?
 
 Static variables can only store references with the 'static lifetime, which means the Rust compiler can figure out the lifetime and we aren’t required to annotate it explicitly. Accessing an immutable static variable is safe.
 
-###### What is differences static variables from constants?
+###### 680. What is differences static variables from constants?
 
 - Values in a static variable have a fixed address in memory. Using the value will always access the same data. Constants, on the other hand, are allowed to duplicate their data whenever they’re used. 
 - Another difference is that static variables can be mutable.
 
-###### Is it safe accessing and modifying mutable static variables?
+###### 681. Is it safe accessing and modifying mutable static variables?
 
 Accessing and modifying mutable static variables is unsafe.
 
-###### What is unsafe using mutable static variables?
+###### 682. What is unsafe using mutable static variables?
 
 If two threads are accessing the same mutable global variable, it can cause a data race.
 
-###### How we must access a mutable static variables?
+###### 683. How we must access a mutable static variables?
 
 So accessing and modifying mutable static variables is unsafe we must access it in `unsafe` block.
 
@@ -9678,25 +9678,25 @@ fn main() {
 }
 ```
 
-###### How we should comment unsafe function?
+###### 684. How we should comment unsafe function?
 
 Whenever we write an unsafe function, it is idiomatic to write a comment starting with `SAFETY` and explaining what the caller needs to do to call the function safely.
 
-###### How we should comment unsafe operation?
+###### 685. How we should comment unsafe operation?
 
 whenever we perform an unsafe operation, it is idiomatic to write a comment starting with SAFETY to explain how the safety rules are upheld.
 
-###### How create reference to static mutable variable?
+###### 686. How create reference to static mutable variable?
 
 The compiler will not allow you to create references to a mutable static variable. You can only access it via a raw pointer, created with one of the raw borrow operators. That includes in cases where the reference is created invisibly, as when it is used in the println!. The requirement that references to static mutable variables can only be created via raw pointers helps make the safety requirements for using them more obvious.
 
 ##### Implementing an Unsafe Trait
 
-###### When Trait is unsafe?
+###### 687. When Trait is unsafe?
 
 A trait is unsafe when at least one of its methods has some invariant that the compiler can’t verify. We declare that a trait is unsafe by adding the `unsafe` keyword before trait and marking the implementation of the trait as `unsafe` too.
 
-###### How declare unsafe Trait?
+###### 688. How declare unsafe Trait?
 
 We declare that a trait is unsafe by adding the `unsafe` keyword before trait and marking the implementation of the trait as `unsafe` too.
 
@@ -9714,38 +9714,38 @@ fn main() {}
 
 ##### Accessing Fields of a Union
 
-###### What is Union?
+###### 689. What is Union?
 
 A union is similar to a struct, but only one declared field is used in a particular instance at one time. Unions are primarily used to interface with unions in C code. You can learn more about unions in the [Rust Reference](https://doc.rust-lang.org/reference/items/unions.html).
 
-###### How to access a Union fields?
+###### 690. How to access a Union fields?
 
 Accessing union fields is unsafe because Rust can’t guarantee the type of the data currently being stored in the union instance, so accessing fields of a union can only in `unsafe` block.
 
 ##### Using Miri to check unsafe code
 
-###### What is Miri?
+###### 691. What is Miri?
 
 When writing unsafe code, you might want to check that what you have written actually is safe and correct. One of the best ways to do that is to use [Miri](https://github.com/rust-lang/miri), an official Rust tool for detecting undefined behavior.
 
-###### How Miri check unsafe code?
+###### 692. How Miri check unsafe code?
 
 Whereas the borrow checker is a static tool which works at compile time, Miri is a dynamic tool which works at runtime. It checks your code by running your program, or its test suite, and detecting when you violate the rules it understands about how Rust should work. 
 Miri doesn’t catch everything you might get wrong when writing unsafe code. For one thing, since it is a dynamic check, it only catches problems with code that actually gets run. That means you will need to use it in conjunction with good testing techniques to increase your confidence about the unsafe code you have written. For another thing, it does not cover every possible way your code can be unsound. If Miri does catch a problem, you know there’s a bug, but just because Miri doesn’t catch a bug doesn’t mean there isn’t a problem. Miri can catch a lot, though. 
 
-###### What is required to use Miri?
+###### 693. What is required to use Miri?
 
 Using Miri requires a nightly build of Rust.
 
-###### How install Miri?
+###### 694. How install Miri?
 
 You can install both a nightly version of Rust and the Miri tool by typing `rustup +nightly component add miri`
 
-###### How run Miri?
+###### 695. How run Miri?
 
 You can run Miri on a project by typing cargo +nightly miri run or `cargo +nightly miri test`.
 
-###### Where deeper exploration of how to work effectively with unsafe Rust?
+###### 696. Where deeper exploration of how to work effectively with unsafe Rust?
 
 [Rustonomicon](https://doc.rust-lang.org/nomicon/)
 
@@ -9753,15 +9753,15 @@ You can run Miri on a project by typing cargo +nightly miri run or `cargo +night
 
 ##### Specifying Placeholder Types in Trait Definitions with Associated Types
 
-###### What is Trait whit associated type?
+###### 697. What is Trait whit associated type?
 
 This is a trait that point type placeholder for associated types as some name that trait then is using in method definitions. Implementors of the trait must provide a type to stand in for the associated type placeholder.
 
-###### What is used Trait whit associated type for?
+###### 698. What is used Trait whit associated type for?
 
 By using definition of Trait whit associated type we can define a trait that uses some types without needing to know exactly what those types are until the trait is implemented.
 
-###### How to define Trait whit associated type?
+###### 699. How to define Trait whit associated type?
 
 We point `type` keyword followed name of type TYPE_NAME that is associated types placeholder, then we can use type placeholder in trait method definitions as `Self::TYPE_NAME`
 
@@ -9773,7 +9773,7 @@ pub trait Iterator {
 }
 ```
 
-###### How implement Trait whit associated type?
+###### 700. How implement Trait whit associated type?
 
 The implementor of a trait will specify the concrete type to be used instead of the placeholder type for the particular implementation.
 
@@ -9787,11 +9787,11 @@ impl Iterator for Counter {
 
 ##### Default Generic Type Parameters and Operator Overloading
 
-###### Why can we specify a specific default type for a generic type?
+###### 701. Why can we specify a specific default type for a generic type?
 
 This eliminates the need for implementors of the trait to specify a concrete type if the default type works.
 
-###### How specify a default type when declaring a generic type?
+###### 702. How specify a default type when declaring a generic type?
 
 You specify a default type when declaring a generic type with the `<PlaceholderType=ConcreteType>` syntax.
 
@@ -9851,7 +9851,7 @@ impl Add<Meters> for Millimeters { // To add Millimeters and Meters, we specify 
 
 ##### Fully Qualified Syntax for Disambiguation: Calling Methods with the Same Name
 
-###### How we can call method that have the same name in different trait that is implemented by  type or in self implementation?
+###### 703. How we can call method that have the same name in different trait that is implemented by  type or in self implementation?
 
 If we will call trait method we must used Fully Qualified Syntax, that is we specify the trait name before the method name. We also can use Fully Qualified Syntax for types method, but this is not obligatory, ordinary method call will by default call type method.
 
@@ -9896,7 +9896,7 @@ fn main() {
 }
 ```
 
-###### How we can call non-method function that have the same name in different implemented trait or in self implementation?
+###### 704. How we can call non-method function that have the same name in different implemented trait or in self implementation?
 
 When there are multiple types or traits that define non-method functions with the same function name we need to use fully qualified syntax. We must provide Rust with a type annotation within the angle brackets with following definitions: Type name, `as` keyword, name of Trait which function we will call. After this type annotation we does call to target function past two colon.
 
@@ -9924,17 +9924,17 @@ fn main() {
 }
 ```
 
-###### Which is general fully qualified syntax?
+###### 705. Which is general fully qualified syntax?
 
 `<Type as Trait>::function(receiver_if_method, next_arg, ...);`
 
 ##### Using Supertraits to Require One Trait’s Functionality Within Another Trait
 
-###### What is Supertrait?
+###### 706. What is Supertrait?
 
 Sometimes, you might write a trait definition that depends on another trait: for a type to implement the first trait, you want to require that type to also implement the second trait. You would do this so that your trait definition can make use of the associated items of the second trait. The trait your trait definition is relying on is called a supertrait of your trait.
 
-###### How to define Supertrait?
+###### 707. How to define Supertrait?
 
 We can do that in the trait definition by specifying supertrait name after defined trait name past colon `:`. When implement trait for type we must provide implementation supertrait for that type.
 
@@ -9971,11 +9971,11 @@ impl fmt::Display for Point { // implement supertrait
 
 ##### Using the Newtype Pattern to Implement External Traits on External Types
 
-###### What is Newtype pattern used for?
+###### 708. What is Newtype pattern used for?
 
 When implementing trait on a type we must follows 'orphan rule' that states we’re only allowed to implement a trait on a type if either the trait or the type are local to our crate. To get around this restriction is used the 'newtype pattern', which involves creating a new type in a tuple struct.
 
-###### How use Newtype pattern for Implement External Traits on External Types?
+###### 709. How use Newtype pattern for Implement External Traits on External Types?
 
 We must wrap External Type to tuple struct with one field, that is the wrapper type is local to our crate, and then we can implement the trait on the wrapper, implementing the required trait functionality for the wrapped type inside the wrapper.
 
@@ -10000,7 +10000,7 @@ fn main() {
 
 ##### Using the Newtype Pattern for Type Safety and Abstraction.
 
-###### What are the possibilities of using the Newtype pattern?
+###### 710. What are the possibilities of using the Newtype pattern?
 
 - Implement External Traits on External Types
 - use the newtype pattern to abstract away some implementation details of a type: the new type can expose a public API that is different from the API of the private inner type
@@ -10008,9 +10008,9 @@ fn main() {
 
 ##### Creating Type Synonyms with Type Aliases.
 
-###### How create Type Synonyms?
+###### 711. How create Type Synonyms?
 
-###### What is Type Alias?
+###### 712. What is Type Alias?
 
 Type Alias a mean to give an existing type another name. A type alias makes this code more manageable by reducing the repetition.
 
@@ -10045,11 +10045,11 @@ pub trait Write {
 
 ##### The Never Type that Never Returns.
 
-###### What is Never Type?
+###### 713. What is Never Type?
 
 Never Type is type that has no values.
 
-###### How denoted Never Type?
+###### 714. How denoted Never Type?
 
 Never Type denoted by `!` (exclamation mark). It stands in the place of the return type when a function will never return.
 
@@ -10059,11 +10059,11 @@ fn bar() -> ! {
 }
 ```
 
-###### What is *diverging functions*?
+###### 715. What is *diverging functions*?
 
 Functions that return *never* are called *diverging functions*. We can’t create values of the type `!` so function can never possibly return.
 
-###### What use is a type you can never create values for?
+###### 716. What use is a type you can never create values for?
 
 Expressions of type ! can be coerced into any other type. So there is some situations when Never Type useful:
 
@@ -10101,23 +10101,23 @@ impl<T> Option<T> {
 
 ##### Dynamically Sized Types and the Sized Trait
 
-###### What is DST?
+###### 717. What is DST?
 
 Rust needs to know certain details about its types, such as how much space to allocate for a value of a particular type. DST is abbreviation from "dynamically sized types", that denotes types that let us write code using values whose size we can know only at runtime.
 
-###### What is "unsized type"?
+###### 718. What is "unsized type"?
 
 "Unsized type" is synonym to "dynamically sized types".
 
-###### What DSTs are there in Rust?
+###### 719. What DSTs are there in Rust?
 
  Slices and trait objects (`dyn Trait`).
 
-###### How we can use DST?
+###### 720. How we can use DST?
 
 We can use DST only in combination with some type of Pointer: `&[T]`, `Box<[T]>`, `Rc<[T]>`, `&dyn Trait`, `Box<dyn Trait>` `Rc<dyn Trait>` etc.
 
-###### What is `Sized` trait?
+###### 721. What is `Sized` trait?
 
 To work with DSTs, Rust provides the `Sized` trait to determine whether or not a type’s size is known at compile time. This trait is automatically implemented for everything whose size is known at compile time. In addition, Rust implicitly adds a bound on `Sized` to every generic function.
 
@@ -10133,7 +10133,7 @@ fn generic<T: Sized>(t: T) {
 }
 ```
 
-###### How we can provide DST as type arguments to generic type parameters?
+###### 722. How we can provide DST as type arguments to generic type parameters?
 
 DSTs can be provided as type arguments to generic type parameters having the special `?Sized` bound. They can also be used for associated type definitions when the corresponding associated type declaration has a `?Sized` bound. By default, any type parameter or associated type has a `Sized` bound, unless it is relaxed using `?Sized`.
 
@@ -10143,11 +10143,11 @@ fn generic<T: ?Sized>(t: &T) {
 }
 ```
 
-###### Can we implement Trait for DSTs?
+###### 723. Can we implement Trait for DSTs?
 
 Traits may be implemented for DSTs. Unlike with generic type parameters, Self: ?Sized is the default in trait definitions.
 
-###### Can a struct contain a DST?
+###### 724. Can a struct contain a DST?
 
 Structs may contain a DST as the last field; this makes the struct itself a DST.
 
@@ -10155,11 +10155,11 @@ Structs may contain a DST as the last field; this makes the struct itself a DST.
 
 ##### Function Pointers
 
-###### Can you pass a function to a function?
+###### 725. Can you pass a function to a function?
 
 We can pass regular functions to functions.
 
-###### What is Function pointer type?
+###### 726. What is Function pointer type?
 
 Function pointer is pointer that refer to a function whose identity is not necessarily known at compile-time. They can be created via a coercion to the type `fn` from both function items and non-capturing, non-async closures.
 
@@ -10175,7 +10175,7 @@ let bo: Binop = add; // pointer
 x = bo(5,7);
 ```
 
-###### How we can pass a function to a function?
+###### 727. How we can pass a function to a function?
 
 We can pass function by function pointer type `fn`. They can be created via a coercion to the type `fn` from a function.
 
@@ -10195,11 +10195,11 @@ fn main() {
 }
 ```
 
-###### Can we specify `fn` as the parameter type directly?
+###### 728. Can we specify `fn` as the parameter type directly?
 
 Unlike closures, fn is a type rather than a trait, so we specify fn as the parameter type directly rather than declaring a generic type parameter with one of the Fn traits as a trait bound.
 
-###### Can we pass function pointer as an argument for a function that expects a closure?
+###### 729. Can we pass function pointer as an argument for a function that expects a closure?
 
 Function pointers implement all three of the closure traits (Fn, FnMut, and FnOnce), meaning you can always pass a function pointer as an argument for a function that expects a closure. It’s best to write functions using a generic type and one of the closure traits so your functions can accept either functions or closures. That said, one example of where you would want to only accept fn and not closures is when interfacing with external code that doesn’t have closures: C functions can accept functions as arguments, but C doesn’t have closures.
 
@@ -10210,7 +10210,7 @@ Function pointers implement all three of the closure traits (Fn, FnMut, and FnOn
         list_of_numbers.iter().map(ToString::to_string).collect(); // passing fn
 ```
 
-###### Can we used name of enum variant as closure to pass in to function?
+###### 730. Can we used name of enum variant as closure to pass in to function?
 
 name of each enum variant becomes an initializer function. We can use these initializer functions as function pointers that implement the closure traits, which means we can specify the initializer functions as arguments for methods that take closures.
 
@@ -10225,11 +10225,11 @@ name of each enum variant becomes an initializer function. We can use these init
 
 ##### Returning Closures
 
-###### Can we return Closure directly?
+###### 731. Can we return Closure directly?
 
 Closures are represented by traits, in most cases where you might want to return a trait, you can instead use the concrete type that implements the trait as the return value of the function. However, you can’t do that with closures because they don’t have a concrete type that is returnable - which means you can’t return closures directly.
 
-###### How we can return Closure from function?
+###### 732. How we can return Closure from function?
 
 We can’t return closures directly. Instead, we will normally use the `impl Trait` syntax. You can return any function type, using `Fn`, `FnOnce` and `FnMut`.
 
@@ -10261,11 +10261,11 @@ fn returns_initialized_closure(init: i32) -> Box<dyn Fn(i32) -> i32> {
 
 #### 20.5 Macros
 
-###### What read about how to write macros?
+###### 733. What read about how to write macros?
 
 [“The Little Book of Rust Macros”](https://veykril.github.io/tlborm/)
 
-###### What is macros?
+###### 734. What is macros?
 
 Fundamentally, macros are a way of writing code that writes other code, which is known as metaprogramming.
 
@@ -10275,9 +10275,9 @@ The term macro refers to a family of features in Rust: declarative macros with m
 - Attribute-like macros that define custom attributes usable on any item
 - Function-like macros that look like function calls but operate on the tokens specified as their argument
 
-###### The Difference Between Macros and Functions
+###### 735. The Difference Between Macros and Functions
 
-###### What difference between Macros and Function?
+###### 736. What difference between Macros and Function?
 
 - Macros is called at compile time before compiler interprets the meaning of the code and is used for write code that will executed at runtime. Function is executable code and executed at runtime.
 - A function signature must declare the number and type of parameters the function has. Macros, on the other hand, can take a variable number of parameters
@@ -10286,11 +10286,11 @@ The term macro refers to a family of features in Rust: declarative macros with m
 
 ##### Declarative Macros with macro_rules! for General Metaprogramming
 
-###### What is Declarative Macros?
+###### 737. What is Declarative Macros?
 
 Declarative Macros is most widely used form of macros in Rust. These are also sometimes referred to as “macros by example,” “macro_rules! macros,” or just plain “macros.” At their core, declarative macros allow you to write something similar to a Rust match expression. In case of macros the value is the literal Rust source code passed to the macro; the patterns are compared with the structure of that source code; and the code associated with each pattern, when matched, replaces the code passed to the macro. This all happens during compilation.
 
-###### How define a Declarative Macros?
+###### 738. How define a Declarative Macros?
 
 To define a macro, you use the `macro_rules!` construct.
 
@@ -10339,17 +10339,17 @@ Now let’s look at the patter
 
 ##### Procedural Macros for Generating Code from Attributes
 
-###### What is Procedural Macro?
+###### 739. What is Procedural Macro?
 
 Procedural macros accept some code as an input, operate on that code, and produce some code as an output rather than matching against patterns and replacing the code with other code as declarative macros do.
 
-###### How is kinds of procedural macros?
+###### 740. How is kinds of procedural macros?
 
 - custom derive
 - attribute-like
 - function-like
 
-###### How create procedural macros?
+###### 741. How create procedural macros?
 
 When creating procedural macros, the definitions must reside in their own crate with a special crate type.
 
@@ -10368,11 +10368,11 @@ pub fn some_name(input: TokenStream) -> TokenStream {
 
 ##### How to Write a Custom derive Macro
 
-###### For what using derive Macro?
+###### 742. For what using derive Macro?
 
 Derive Macro using with struct and enum for generating code for the derive attribute.
 
-###### How to Write a Custom derive Macro?
+###### 743. How to Write a Custom derive Macro?
 
 - create a new project directory
   `mkdir new-project`
@@ -10490,25 +10490,25 @@ Derive Macro using with struct and enum for generating code for the derive attri
     }
     ```
 
-###### For what is used `proc_macro` crate?
+###### 744. For what is used `proc_macro` crate?
 
 The `proc_macro` crate is the compiler’s API that allows us to read and manipulate Rust code from our code. The `proc_macro` crate comes with Rust, so we didn’t need to add that to the dependencies in Cargo.toml.
 
-###### For what is used `syn` crate?
+###### 745. For what is used `syn` crate?
 
 The `syn` crate parses Rust code from a string into a data structure that we can perform operations on.
 
-###### For what is used `quote` crate?
+###### 746. For what is used `quote` crate?
 
 The `quote` crate turns syn data structures back into Rust code.
 
 ##### Attribute-like macros
 
-###### What is Attribute-like macros
+###### 747. What is Attribute-like macros
 
 Attribute-like macros are similar to custom derive macros, but instead of generating code for the derive attribute, they allow you to create new attributes. They’re also more flexible: derive only works for structs and enums; attributes can be applied to other items as well, such as functions.
 
-###### How define and use Attribute-like macros?
+###### 748. How define and use Attribute-like macros?
 
 ```rust
 #[route(GET, "/")]
@@ -10524,7 +10524,7 @@ pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
 
 ##### Function-like macros
 
-###### How define and use Function-like macros?
+###### 749. How define and use Function-like macros?
 
 Function-like macros define macros that look like function calls. Similarly to macro_rules! macros, they’re more flexible than functions; for example, they can take an unknown number of arguments. However, macro_rules! macros can be defined only using the match-like syntax. Function-like macros take a TokenStream parameter and their definition manipulates that TokenStream using Rust code as the other two types of procedural macros do.
 

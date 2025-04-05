@@ -966,3 +966,133 @@ describe("pda-account", () => {
 
 ### Cross Program Invocation (CPI)
 
+###### What is CPI?
+
+A Cross Program Invocation (CPI) refers to when one program invokes the instructions of another program.
+
+You can think of instructions as API endpoints that a program exposes to the network and a CPI as one API internally invoking another API.
+
+###### What happen whit signer privileges under CPI?
+
+The signer privileges from the initial transaction invoking the caller program (A) extend to the callee (B) program
+
+###### What maximum depth of CPI call?
+
+The callee (B) program can make further CPIs to other programs, up to a maximum depth of 4 (ex. B->C, C->D)
+
+###### Can programs "sihg" on behalf of a PDA?
+
+The programs can "sign" on behalf of the PDAs derived from its program ID
+
+###### What must specify each CPI instruction?
+
+each CPI instruction must specify the following information:
+
+- Program address: Specifies the program being invoked
+- Accounts: Lists every account the instruction reads from or writes to, including other programs
+- Instruction Data: Specifies which instruction on the program to invoke, plus any additional data required by the instruction (function arguments)
+
+###### What instructions is used programs to execute CPIs?
+
+Programs then execute CPIs using either one of the following functions from the solana_program crate:
+
+- `invoke` - used when there are no PDA signers
+- `invoke_signed` - used when the caller program needs to sign with a PDA derived from its program ID
+
+###### What crate define instruction for execute CPIs?
+
+there may be crates available with helper functions for building the CPIs instruction, each then execute under the hood to execute CPI `invoke` or `invoke_signed` functions from the `solana_program` crate.
+
+###### In what cases used `solana_program` `invoke` function?
+
+`invoke` function used for execute CPIs when making a CPI that does not require PDA signers. When making CPIs, signers provided to the caller program automatically extend to the callee program.
+
+```rust
+pub fn invoke(
+    instruction: &Instruction,
+    account_infos: &[AccountInfo<'_>]
+) -> Result<(), ProgramError>
+```
+
+```rust
+// src/lib.rs
+
+use anchor_lang::prelude::*;
+use anchor_lang::solana_program::{program::invoke, system_instruction};
+
+declare_id!("55xRZZnhSk1aN6seNTj75mThJEjZkBRYPQJ8qvKVh1eC");
+
+#[program]
+pub mod cpi_invoke {
+    use super::*;
+
+    pub fn sol_transfer(ctx: Context<SolTransfer>, amount: u64) -> Result<()> {
+        let from_pubkey = ctx.accounts.sender.to_account_info();
+        let to_pubkey = ctx.accounts.recipient.to_account_info();
+        let program_id = ctx.accounts.system_program.to_account_info();
+
+        let instruction =
+            &system_instruction::transfer(&from_pubkey.key(), &to_pubkey.key(), amount);
+
+        invoke(instruction, &[from_pubkey, to_pubkey, program_id])?;
+        Ok(())
+    }
+}
+
+#[derive(Accounts)]
+pub struct SolTransfer<'info> {
+    #[account(mut)]
+    sender: Signer<'info>,
+    #[account(mut)]
+    recipient: SystemAccount<'info>,
+    system_program: Program<'info, System>,
+}
+```
+
+```ts
+// tests/cpi-invoke.test.ts
+
+import * as anchor from "@coral-xyz/anchor";
+import { BN, Program } from "@coral-xyz/anchor";
+import { CpiInvoke } from "../target/types/cpi_invoke";
+import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
+
+describe("cpi-invoke", () => {
+  const provider = anchor.AnchorProvider.env();
+  anchor.setProvider(provider);
+
+  const program = anchor.workspace.CpiInvoke as Program<CpiInvoke>;
+
+  const sender = provider.wallet as anchor.Wallet;
+  const recipient = new Keypair();
+
+  const transferAmount = 0.01 * LAMPORTS_PER_SOL;
+
+  it("SOL Transfer Anchor", async () => {
+    const transactionSignature = await program.methods
+      .solTransfer(new BN(transferAmount))
+      .accounts({
+        sender: sender.publicKey,
+        recipient: recipient.publicKey,
+      })
+      .rpc();
+
+    console.log(
+      `\nTransaction Signature: https://solana.fm/tx/${transactionSignature}?cluster=devnet-solana`
+    );
+  });
+});
+```
+
+
+###### In what cases used `solana_program` `invoke_signed` function?
+
+The `invoke_signed` function is used when making a CPI that requires PDA signers. The seeds used to derive the signer PDAs are passed into the `invoke_signed` function as `signer_seeds`.
+
+```rust
+pub fn invoke_signed(
+    instruction: &Instruction,
+    account_infos: &[AccountInfo<'_>],
+    signers_seeds: &[&[&[u8]]]
+) -> Result<(), ProgramError>
+```
