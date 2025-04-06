@@ -980,7 +980,7 @@ The signer privileges from the initial transaction invoking the caller program (
 
 The callee (B) program can make further CPIs to other programs, up to a maximum depth of 4 (ex. B->C, C->D)
 
-###### Can programs "sihg" on behalf of a PDA?
+###### Can programs "sing" on behalf of a PDA?
 
 The programs can "sign" on behalf of the PDAs derived from its program ID
 
@@ -994,7 +994,7 @@ each CPI instruction must specify the following information:
 
 ###### What instructions is used programs to execute CPIs?
 
-Programs then execute CPIs using either one of the following functions from the solana_program crate:
+Programs then execute CPIs using either one of the following functions from the `solana_program` crate:
 
 - `invoke` - used when there are no PDA signers
 - `invoke_signed` - used when the caller program needs to sign with a PDA derived from its program ID
@@ -1095,4 +1095,301 @@ pub fn invoke_signed(
     account_infos: &[AccountInfo<'_>],
     signers_seeds: &[&[&[u8]]]
 ) -> Result<(), ProgramError>
+```
+
+```rust
+// src/lib.rs
+
+use anchor_lang::prelude::*;
+use anchor_lang::solana_program::{program::invoke_signed, system_instruction};
+
+declare_id!("EyxvVL2akUZZHx4DXzYzCroKLmigPrS2WgpSetKzM9wh");
+
+#[program]
+pub mod cpi_invoke_signed {
+    use super::*;
+
+    pub fn sol_transfer(ctx: Context<SolTransfer>, amount: u64) -> Result<()> {
+        let from_pubkey = ctx.accounts.pda_account.to_account_info();
+        let to_pubkey = ctx.accounts.recipient.to_account_info();
+        let program_id = ctx.accounts.system_program.to_account_info();
+
+        let seed = to_pubkey.key();
+        let bump_seed = ctx.bumps.pda_account;
+        let signer_seeds: &[&[&[u8]]] = &[&[b"pda", seed.as_ref(), &[bump_seed]]];
+
+        let instruction =
+            &system_instruction::transfer(&from_pubkey.key(), &to_pubkey.key(), amount);
+
+        invoke_signed(
+            instruction,
+            &[from_pubkey, to_pubkey, program_id],
+            signer_seeds,
+        )?;
+        Ok(())
+    }
+}
+
+#[derive(Accounts)]
+pub struct SolTransfer<'info> {
+    #[account(
+        mut,
+        seeds = [b"pda", recipient.key().as_ref()], 
+        bump, 
+    )]
+    pda_account: SystemAccount<'info>,
+    #[account(mut)]
+    recipient: SystemAccount<'info>,
+    system_program: Program<'info, System>,
+}
+```
+
+```ts
+// tests/cpi-invoke-signed.test.ts
+
+import * as anchor from "@coral-xyz/anchor";
+import { BN, Program } from "@coral-xyz/anchor";
+import { CpiInvokeSigned } from "../target/types/cpi_invoke_signed";
+import {
+  PublicKey,
+  SystemProgram,
+  LAMPORTS_PER_SOL,
+  Transaction,
+  sendAndConfirmTransaction,
+} from "@solana/web3.js";
+
+describe("cpi-invoke-signed", () => {
+  const provider = anchor.AnchorProvider.env();
+  anchor.setProvider(provider);
+
+  const program = anchor.workspace.CpiInvokeSigned as Program<CpiInvokeSigned>;
+
+  const connection = program.provider.connection;
+
+  const wallet = provider.wallet as anchor.Wallet;
+  const [PDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from("pda"), wallet.publicKey.toBuffer()],
+    program.programId
+  );
+
+  const transferAmount = 0.1 * LAMPORTS_PER_SOL;
+
+  it("Fund PDA with SOL", async () => {
+    const transferInstruction = SystemProgram.transfer({
+      fromPubkey: wallet.publicKey,
+      toPubkey: PDA,
+      lamports: transferAmount,
+    });
+
+    const transaction = new Transaction().add(transferInstruction);
+
+    const transactionSignature = await sendAndConfirmTransaction(
+      connection,
+      transaction,
+      [wallet.payer] // signer
+    );
+
+    console.log(
+      `\nTransaction Signature: https://solana.fm/tx/${transactionSignature}?cluster=devnet-solana`
+    );
+  });
+
+  it("PDA SOL Transfer invoke_signed", async () => {
+    const transactionSignature = await program.methods
+      .solTransfer(new BN(transferAmount))
+      .accounts({
+        pdaAccount: PDA,
+        recipient: wallet.publicKey,
+      })
+      .rpc();
+
+    console.log(
+      `\nTransaction Signature: https://solana.fm/tx/${transactionSignature}?cluster=devnet-solana`
+    );
+  });
+});
+```
+
+### Tokens on Solana
+
+###### What is Token?
+
+Tokens are digital assets that represent ownership over diverse categories of assets.
+
+###### what is achieved with tokenization?
+
+Tokenization enables the digitalization of property rights, serving as a fundamental component for managing both fungible and non-fungible assets.
+
+###### What is Fungible Tokens?
+
+Fungible Tokens represent interchangeable and divisible assets of the same type and value (ex. USDC).
+
+###### What is Non-fungible Tokens (NFT)?
+
+Non-fungible Tokens (NFT) represent ownership of indivisible assets (e.g. artwork).
+
+###### What is Token Program?
+
+The Token Program contains all the instruction logic for interacting with tokens on the network (both fungible and non-fungible). All tokens on Solana are effectively data accounts owned by the Token Program.
+
+###### What is Mint Account?
+
+A Mint Account represents a specific type of token and stores global metadata about the token such as the total supply and mint authority (address authorized to create new units of a token).
+
+Tokens on Solana are uniquely identified by the address of a Mint Account owned by the Token Program. This account is effectively a global counter for a specific token
+
+###### What is Token Account?
+
+A Token Account keeps track of individual ownership of how many units of a specific type of token (mint account) are owned by a specific address.
+
+###### What is Token Extensions Program (Token2022)?
+
+There are currently two versions of the Token Program. The original Token Program and the Token Extensions Program (Token2022). The Token Extensions Program functions the same as the original Token Program, but with additional features and improvements. The Token Extensions Program is the recommended version to use for creating new tokens (mint accounts)
+
+###### What is Associated Token Account?
+
+Associated Token Account is a Token Account created with an address derived from the owner's and mint account's addresses.
+
+#### Token Program
+
+You can find the full list of Token Program instructions [here](https://github.com/solana-labs/solana-program-library/blob/b1c44c171bc95e6ee74af12365cb9cbab68be76c/token/program/src/instruction.rs).
+
+###### What there are Token Program commonly used instructions?
+
+- `InitializeMint`: Create a new mint account to represent a new type of token.
+- `InitializeAccount`: Create a new token account to hold units of a specific type of token (mint).
+- `MintTo`: Create new units of a specific type of token and add them to a token account. This increases the supply of the token and can only be done by the mint authority of the mint account.
+`- Transfer`: Transfer units of a specific type of token from one token account to another.
+
+###### What is `InitializeMint` Token Program instruction used for?
+
+`InitializeMint`: Create a new mint account to represent a new type of token.
+
+###### What is `InitializeAccount` Token Program instruction used for?
+
+`InitializeAccount`: Create a new token account to hold units of a specific type of token (mint).
+
+###### What is `MintTo` Token Program instruction used for?
+
+`MintTo`: Create new units of a specific type of token and add them to a token account. This increases the supply of the token and can only be done by the mint authority of the mint account.
+
+###### What is `Transfer` Token Program instruction used for?
+
+`Transfer`: Transfer units of a specific type of token from one token account to another.
+
+##### Mint Account
+
+###### Which data stores Mint Account?
+
+- Supply: Total supply of the token
+- Decimals: Decimal precision of the token
+- Mint authority: The account authorized to create new units of the token, thus increasing the supply
+- Freeze authority: The account authorized to freeze tokens from being transferred from "token accounts"
+
+```rust
+pub struct Mint {
+    /// Optional authority used to mint new tokens. The mint authority may only
+    /// be provided during mint creation. If no mint authority is present
+    /// then the mint has a fixed supply and no further tokens may be
+    /// minted.
+    pub mint_authority: COption<Pubkey>,
+    /// Total supply of tokens.
+    pub supply: u64,
+    /// Number of base 10 digits to the right of the decimal place.
+    pub decimals: u8,
+    /// Is `true` if this structure has been initialized
+    pub is_initialized: bool,
+    /// Optional authority to freeze token accounts.
+    pub freeze_authority: COption<Pubkey>,
+}
+```
+
+##### Token Account
+
+###### What data stores Token Account?
+
+The most commonly referenced data stored on the Token Account include the following:
+
+- Mint: The type of token the Token Account holds units of
+- Owner: The account authorized to transfer tokens out of the Token Account
+- Amount: Units of the token the Token Account currently holds
+
+```rust
+pub struct Account {
+    /// The mint associated with this account
+    pub mint: Pubkey,
+    /// The owner of this account.
+    pub owner: Pubkey,
+    /// The amount of tokens this account holds.
+    pub amount: u64,
+    /// If `delegate` is `Some` then `delegated_amount` represents
+    /// the amount authorized by the delegate
+    pub delegate: COption<Pubkey>,
+    /// The account's state
+    pub state: AccountState,
+    /// If is_native.is_some, this is a native token, and the value logs the
+    /// rent-exempt reserve. An Account is required to be rent-exempt, so
+    /// the value is used by the Processor to ensure that wrapped SOL
+    /// accounts do not drop below this threshold.
+    pub is_native: COption<u64>,
+    /// The amount delegated
+    pub delegated_amount: u64,
+    /// Optional authority to close the account.
+    pub close_authority: COption<Pubkey>,
+}
+```
+
+###### What needs For a wallet to own units of a certain token?
+
+For a wallet to own units of a certain token, it needs to create a token account for a specific type of token (mint) that designates the wallet as the owner of the token account.
+
+###### How many token accounts of the same type can a wallet have?
+
+A wallet can create multiple token accounts for the same type of token, but each token account can only be owned by one wallet and hold units of one type of token.
+
+##### Associated Token Account
+
+###### What is Associated Token Account?
+
+An Associated Token Account is a token account whose address is deterministically derived using the owner's address and the mint account's address. You can think of the Associated Token Account as the "default" token account for a specific mint and owner.
+
+
+
+###### Is a Associated Token Account a different type of token account?
+
+It's important to understand that an Associated Token Account isn't a different type of token account. It's just a token account with a specific address.
+
+###### What are Associated Token Accounts is used for?
+
+To simplify the process of locating a token account's address for a specific mint and owner, we often use Associated Token Accounts.
+
+```ts
+// client/client.ts
+
+import { PublicKey } from "@solana/web3.js";
+import {
+  TOKEN_PROGRAM_ID,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+} from "@solana/spl-token";
+
+const USDC_MINT_ADDRESS = new PublicKey(
+  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+);
+const OWNER_ADDRESS = new PublicKey(
+  "3jkL1nGA2vin3Radry1D4UGf4Wp9aTwu9HjoUick9tHA"
+);
+
+const [PDA, bump] = PublicKey.findProgramAddressSync(
+  [
+    OWNER_ADDRESS.toBuffer(),
+    TOKEN_PROGRAM_ID.toBuffer(),
+    USDC_MINT_ADDRESS.toBuffer(),
+  ],
+  ASSOCIATED_TOKEN_PROGRAM_ID
+);
+
+console.log(
+  "Associated Token Account:",
+  `https://explorer.solana.com/address/${PDA.toString()}`
+);
 ```
