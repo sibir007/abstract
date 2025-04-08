@@ -1,5 +1,325 @@
 # SOLANA
 
+## Installation
+
+<https://solana.com/docs/intro/installation>
+
+###### How install all dependancies?
+
+```sh
+curl --proto '=https' --tlsv1.2 -sSfL https://solana-install.solana.workers.dev | bash
+
+Installed Versions:
+Rust: rustc 1.85.0 (4d91de4e4 2025-02-17)
+Solana CLI: solana-cli 2.1.14 (src:3ad46824; feat:3271415109, client:Agave)
+Anchor CLI: anchor-cli 0.30.1
+Node.js: v23.8.0
+Yarn: 1.22.1
+```
+
+### Install Dependencies
+
+###### How to install dependencies one by one?
+
+1. install Anchor CLI dependencies
+
+   ```sh
+   sudo apt-get update
+   sudo apt-get install -y \
+       build-essential \
+       pkg-config \
+       libudev-dev llvm libclang-dev \
+       protobuf-compiler libssl-dev
+   ```
+
+2. Install Rust
+
+   ```sh
+   # 1. Install Rust with rustup
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+   # 2. reload PATH environment variable to include Cargo s bin directory
+   . "$HOME/.cargo/env"
+
+   # 3. Verify the installation succeeded, check the Rust version.
+   rustc --version
+   ```
+
+3. Install the Solana CLI
+
+   ```sh
+   # 1. Install the Solana CLI tool suite using the official install command
+   sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
+
+
+   # You can replace stable with the release tag matching the software version of your desired release (i.e. v2.0.3), or use one of the three symbolic channel names: stable, beta, or edge
+
+   # 2. add a PATH environment variable For Bash (bashrc):
+   echo 'export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"' >> ~/.bashrc
+   source ~/.bashrc
+
+   # 3. refresh the terminal session or restart your terminal
+   source ~/.bashrc
+
+   # 4. verify that the installation succeeded, check the Solana CLI version
+   solana --version
+
+   # You can view all available versions on the Agave Github repo
+
+   # 5. To later update the Solana CLI to the latest version, you can use the following command
+   agave-install update
+   ```
+
+4. Install Anchor CLI using Anchor Version Manager (AVM) - Recommended installation method
+
+```sh
+# 1. Install AVM with the following command:
+cargo install --git https://github.com/coral-xyz/anchor avm --force
+
+# 2. Confirm that AVM installed successfully:
+avm --version
+
+# 3. Install the latest version of Anchor CLI using AVM:
+avm install latest
+avm use latest
+
+# You can install a specific version of Anchor CLI by specifying the version number:
+avm install 0.30.1
+avm use 0.30.1
+
+# 4. verify that the installation succeeded, check the Anchor CLI version:
+anchor --version
+anchor-cli 0.30.1
+```
+
+5. Node.js and Yarn installation
+The default Anchor project test file (TypeScript) created with the `anchor init` command requires Node.js and Yarn. (Rust test template is available using `anchor init --test-template rust`)
+
+   1. Node Installation
+
+      ```sh
+      # Install nvm using the following command:
+      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash
+
+      # Restart your terminal and confirm that the nvm command runs successfully:
+      command -v nvm
+
+      # install node:
+      nvm install node
+
+      # To verify that the installation succeeded, check the Node version:
+      node --version
+      v23.7.0
+      ```
+
+   2. Yarn Installation
+
+      ```sh
+      # Install Yarn:
+      npm install --global yarn
+
+      # To verify that the installation succeeded, check the Yarn version:
+      yarn --version
+      1.22.1
+      ```
+
+## Solana CLI Basics
+
+### Solana Config
+
+###### How to get current config?
+
+```sh
+solana config get
+
+Config File: /Users/test/.config/solana/cli/config.yml
+RPC URL: https://api.mainnet-beta.solana.com
+WebSocket URL: wss://api.mainnet-beta.solana.com/ (computed)
+Keypair Path: /Users/test/.config/solana/id.json
+Commitment: confirmed
+```
+
+###### What specify the RPC URL and Websocket URL solana cli config?
+
+The RPC URL and Websocket URL specify the Solana cluster the CLI makes requests to
+
+###### What Solana Cli configs types exists?
+
+- mainnet-beta
+- devnet
+- localhost
+- testnet
+
+
+###### How change Solana Cli type config?
+
+```sh
+solana config set --url mainnet-beta
+solana config set --url devnet
+solana config set --url localhost
+solana config set --url testnet
+
+# You can also use the following short options:
+solana config set -um    # For mainnet-beta
+solana config set -ud    # For devnet
+solana config set -ul    # For localhost
+solana config set -ut    # For testnet
+```
+
+###### What specify the Keypair Path solana cli config?
+
+The Keypair Path points to the default Solana wallet (keypair) used by the Solana CLI to pay transaction fees and deploy programs. By default, this file is stored at ~/.config/solana/id.json.
+
+### Create Wallet
+
+######  What need To send transactions using the Solana CLI?
+
+To send transactions using the Solana CLI, you need a Solana wallet funded with SOL.
+
+###### How to generate a keypair at the default Keypair Path?
+
+```sh
+solana-keygen new
+
+# If you already have a file system wallet saved at the default location, this command doesn't override it unless you explicitly force override using the --force flag.
+```
+
+```txt
+Generating a new keypair
+
+For added security, enter a BIP39 passphrase
+
+NOTE! This passphrase improves security of the recovery seed phrase NOT the
+keypair file itself, which is stored as insecure plain text
+
+BIP39 Passphrase (empty for none):
+
+Wrote new keypair to /Users/test/.config/solana/id.json
+===========================================================================
+pubkey: 8dBTPrjnkXyuQK3KDt9wrZBfizEZijmmUQXVHpFbVwGT
+===========================================================================
+Save this seed phrase and your BIP39 passphrase to recover your new keypair:
+cream bleak tortoise ocean nasty game gift forget fancy salon mimic amazing
+===========================================================================
+```
+
+###### How to To view your wallet's address (public key)?
+
+```sh
+solana address
+```
+
+###### How to Request an airdrop of SOL?
+
+```sh
+# Set your cluster to the devnet:
+solana config set -ud
+
+# Then request an airdrop of devnet SOL:
+solana airdrop 2
+
+# Devnet airdrops limit requests to 5 SOL per request. If you hit rate limits or encounter errors, try using the Web Faucet instead.
+
+# To check your wallet's SOL balance, run the following command:
+solana balance
+```
+
+###### How to Local Validator?
+
+The Solana CLI includes a built-in test validator for local development.
+
+```sh
+# In a separate terminal, run the following command to start a local validator:
+solana-test-validator
+
+# update your CLI to use localhost before running Solana CLI commands:
+solana config set -ul
+```
+
+###### What Advantages of Local Validator?
+
+<https://docs.anza.xyz/cli/examples/test-validator>
+
+- No RPC rate-limits
+- No airdrop limits
+- Direct on-chain program deployment (--bpf-program ...)
+- Clone accounts from a public cluster, including programs (--clone ...)
+- Load accounts from files
+- Configurable transaction history retention (--limit-ledger-size ...)
+- Configurable epoch length (--slots-per-epoch ...)
+- Jump to an arbitrary slot (--warp-slot ...)
+
+###### How install Local Validator?
+
+The `solana-test-validator` binary ships with the Solana CLI Tool Suite. Install before continuing.
+
+###### How Running Local Validator?
+
+```sh
+# First take a look at the configuration options
+
+solana-test-validator --help
+
+# Next start the test validator
+
+solana-test-validator
+
+# By default, basic status information is printed while the process is running. See Appendix I for details
+
+Ledger location: test-ledger
+Log: test-ledger/validator.log
+Identity: EPhgPANa5Rh2wa4V2jxt7YbtWa3Uyw4sTeZ13cQjDDB8
+Genesis Hash: 4754oPEMhAKy14CZc8GzQUP93CB4ouELyaTs4P8ittYn
+Version: 1.6.7
+Shred Version: 13286
+Gossip Address: 127.0.0.1:1024
+TPU Address: 127.0.0.1:1027
+JSON RPC URL: http://127.0.0.1:8899
+⠈ 00:36:02 | Processed Slot: 5142 | Confirmed Slot: 5142 | Finalized Slot: 5110 | Snapshot Slot: 5100 | Transactions: 5142 | ◎499.974295000
+
+
+# Leave solana-test-validator running in its own terminal. When it is no longer needed, it can be stopped with ctrl-c.
+
+# By default, the test validator runs with all runtime features activated.
+
+# You can verify this using the Solana command-line tools:
+
+solana feature status -ul
+
+# Since this may not always be desired, especially when testing programs meant for deployment to mainnet, the CLI provides an option to deactivate specific features:
+
+solana-test-validator --deactivate-feature <FEATURE_PUBKEY_1> --deactivate-feature <FEATURE_PUBKEY_2>
+```
+
+###### How Interacting whit Local Validator?
+
+```sh
+# Open a new terminal to interact with a running solana-test-validator instance using other binaries from the Solana CLI Tool Suite or your own client software.
+
+# Configure the CLI Tool Suite to target a local cluster by default
+solana config set --url http://127.0.0.1:8899
+
+# Verify the CLI Tool Suite configuration
+solana genesis-hash
+
+# NOTE: The result should match the Genesis Hash: field in the solana-test-validator status output
+
+# Check the wallet balance
+solana balance
+
+# NOTE: Error: No such file or directory (os error 2) means that the default wallet does not yet exist. Create it with solana-keygen new.
+# NOTE: If the wallet has a zero SOL balance, airdrop some localnet SOL with solana airdrop 10
+
+# Perform a basic transfer transaction
+solana transfer EPhgPANa5Rh2wa4V2jxt7YbtWa3Uyw4sTeZ13cQjDDB8 1
+
+
+# Monitor msg!() output from on-chain programs
+solana logs
+
+# NOTE: This command needs to be running when the target transaction is executed. Run it in its own terminal
+```
+
 ## Core Concepts
 
 ### Solana Account Model
