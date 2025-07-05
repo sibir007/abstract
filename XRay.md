@@ -16,7 +16,7 @@
 #### руками:
 
 ```sh
-wget https://github.com/XTLS/Xray-core/releases/download/v25.1.30/Xray-linux-64.zip # поменять v1.8.1 на актуальную версию
+wget https://github.com/XTLS/Xray-core/releases/download/v25.5.16/Xray-linux-64.zip # поменять v1.8.1 на актуальную версию
 mkdir /opt/xray
 unzip ./Xray-linux-64.zip -d /opt/xray
 chmod +x /opt/xray/xray
