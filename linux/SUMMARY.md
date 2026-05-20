@@ -4698,7 +4698,7 @@ PubkeyAuthentication yes
 
 ```sh
 # server
-sudo systemctl restart sshd
+sudo systemctl restart ssh
 ```
 
 Итоговый /etc/ssh/sshd_config
@@ -5372,4 +5372,41 @@ curl icanhazip.com
 curl ipecho.net/plain
 curl ident.me
 curl api.ipify.org
+```
+
+## nohup 
+
+`nohup COMMAND [ARGS]`
+
+
+```sh
+# Running command in the foreground
+
+root@kedar:/# MYCOMMAND="echo 'My name is Kedar.'"
+
+root@kedar:/# nohup $MYCOMMAND
+nohup: ignoring input and appending output to 'nohup.out'
+
+root@kedar:/# cat nohup.out 
+'My name is Kedar'
+```
+
+```sh
+# Running command in the background. 
+
+root@kedar:/# MYCOMMAND="echo 'My name is Kedar.'"
+root@kedar:/# nohup $MYCOMMAND &
+[1] 24
+root@kedar:/# nohup: ignoring input and appending output to 'nohup.out'
+
+root@kedar:/# kill -9 24 # kill
+```
+
+```sh
+# redirect the standard output and standard error to the mycommand.out
+nohup mycommand > mycommand.out 2>&1 &
+
+
+#To redirect the standard output and standard error to different files:
+nohup mycommand > mycommand.out 2> mycommand.err &
 ```
