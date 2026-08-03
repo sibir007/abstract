@@ -4,6 +4,7 @@
 
 ### Структура кода
 
+```js
     alert('Привет'); alert('Мир');
     alert('Привет')
     alert('Мир')
@@ -17,62 +18,87 @@
     for(;;) {
       // после цикла точка с запятой также необязательна
     }
-
+```
 ### Строгий режим — "use strict"
 
+```js
     "use strict";
 
+```
+
 #### Консоль браузера
+```js
 
 `'use strict';`
 `Shift+Enter` для перехода на новую строку>
+```
+
 
 ### Переменные
-
+```js
     let user = 'John', age = 25, message = 'Hello';
 
     var user // это устаревший способ объявления.
 
-#### Константы
+```
 
+
+#### Константы
+```js
     const COLOR_RED = "#F00";
+
+```
+
 
 ### Типы данных
 
 #### number
-
+```js
     let n = 123;
     n = 12.345;
     alert( Infinity ); // Infinity
 
     alert( "не число" / 2 ); // NaN, такое деление является ошибкой любая математическая операция с NaN возвращает NaN
 
+```
+
+
 #### BigInt
+```js
 
     // символ "n" в конце означает, что это BigInt
     const bigInt = 1234567890123456789012345678901234567890n;
 
-#### string
+```
 
-    let str = "Привет";
-    let str2 = 'Одинарные кавычки тоже подойдут';
-    let phrase = `Обратные кавычки позволяют встраивать переменные ${str}`;
+#### string
+```js
+let str = "Привет";
+let str2 = 'Одинарные кавычки тоже подойдут';
+let phrase = `Обратные кавычки позволяют встраивать переменные ${str}`;
+```
 
 #### boolean
+```js
+let nameFieldChecked = true; // да, поле отмечено
+let ageFieldChecked = false; // нет, поле не отмечено
+```
 
-    let nameFieldChecked = true; // да, поле отмечено
-    let ageFieldChecked = false; // нет, поле не отмечено
 
 #### null
+```js
+let age = null; // специальное значение, которое представляет собой «ничего», «пусто» или «значение неизвестно»
+```
 
-    let age = null; // специальное значение, которое представляет собой «ничего», «пусто» или «значение неизвестно»
 
 #### undefined
-
-    let age;
-    alert(age); // выведет "undefined"
-    name = undefined; // не рекомендуется
+```js
+let age;
+alert(age); // выведет "undefined"
+name = undefined; // не рекомендуется
 null используется для присвоения переменной «пустого» или «неизвестного» значения, а undefined – для проверок, была ли переменная назначена.
+```
+
 
 #### object
 
@@ -81,205 +107,233 @@ null используется для присвоения переменной �
 используется для создания уникальных идентификаторов в объектах
 
 #### Оператор typeof
+```js
+// Обычный синтаксис
+typeof 5 // Выведет "number"
+// Синтаксис, напоминающий вызов функции (встречается реже)
+typeof(5) // Также выведет "number"
 
-    // Обычный синтаксис
-    typeof 5 // Выведет "number"
-    // Синтаксис, напоминающий вызов функции (встречается реже)
-    typeof(5) // Также выведет "number"
+typeof undefined // "undefined"
+typeof 0 // "number"
+typeof 10n // "bigint"
+typeof true // "boolean"
+typeof "foo" // "string"
+typeof Symbol("id") // "symbol"
+typeof Math // "object"  (1)
+typeof null // "object"  (2)
+typeof alert // "function"  (3)
 
-    typeof undefined // "undefined"
-    typeof 0 // "number"
-    typeof 10n // "bigint"
-    typeof true // "boolean"
-    typeof "foo" // "string"
-    typeof Symbol("id") // "symbol"
-    typeof Math // "object"  (1)
-    typeof null // "object"  (2)
-    typeof alert // "function"  (3)
-
-    typeof null == "object" // ошибка в языке
-    typeof function(){} == "function" // именно для функций
+typeof null == "object" // ошибка в языке
+typeof function(){} == "function" // именно для функций
+```
 
 ### Взаимодействие: alert, prompt, confirm
+```js
+alert("Hello");
+result = prompt(title, [default]);
+result = confirm(question); // true, folse
+```
 
-    alert("Hello");
-    result = prompt(title, [default]);
-    result = confirm(question); // true, folse
 
 ### Преобразование типов
 
 #### Строковое преобразование
+```js
+let value = true;
+alert(typeof value); // boolean
+value = String(value); // теперь value это строка "true"
+alert(typeof value); // string
+```
 
-    let value = true;
-    alert(typeof value); // boolean
-    value = String(value); // теперь value это строка "true"
-    alert(typeof value); // string
 
 #### Численное преобразование
+```js
+alert( "6" / "2" ); // 3, строки преобразуются в числа
 
-    alert( "6" / "2" ); // 3, строки преобразуются в числа
+let str = "123";
+alert(typeof str); // string
+let num = Number(str); // становится числом 123
+alert(typeof num); // number
 
-    let str = "123";
-    alert(typeof str); // string
-    let num = Number(str); // становится числом 123
-    alert(typeof num); // number
+let age = Number("Любая строка вместо числа");
+alert(age); // NaN, преобразование не удалось
 
-    let age = Number("Любая строка вместо числа");
-    alert(age); // NaN, преобразование не удалось
+undefined NaN
+null 0
+true / false 1 / 0
+// string Пробельные символы (пробелы, знаки табуляции \t, знаки новой строки \n и т. п.) по краям обрезаются. Далее, если остаётся пустая строка, то получаем 0, иначе из непустой строки «считывается» число. При ошибке результат NaN.
+```
 
-    undefined NaN
-    null 0
-    true / false 1 / 0
-    string Пробельные символы (пробелы, знаки табуляции \t, знаки новой строки \n и т. п.) по краям обрезаются. Далее, если остаётся пустая строка, то получаем 0, иначе из непустой строки «считывается» число. При ошибке результат NaN.
 
 #### Логическое преобразование
 
-false Значения, которые интуитивно «пустые», вроде 0, пустой строки, null, undefined и NaN.
-true Все остальные значения становятся
+- false Значения, которые интуитивно «пустые», вроде 0, пустой строки, null, undefined и NaN.
+- true Все остальные значения становятся
 
 ### Базовые операторы, математика
 
-Сложение +,
-Вычитание -,
-Умножение *,
-Деление /,
-Взятие остатка от деления %,
-Возведение в степень **.
+- Сложение +,
+- Вычитание -,
+- Умножение *,
+- Деление /,
+- Взятие остатка от деления %,
+- Возведение в степень **.
 
 #### Сложение строк при помощи бинарного +
+```js
+let s = "моя" + "строка";
+alert(s); // моястрока
 
-    let s = "моя" + "строка";
-    alert(s); // моястрока
+alert(2 + 2 + '1' ); // будет "41", а не "221"
 
-    alert(2 + 2 + '1' ); // будет "41", а не "221"
-
-    alert( 6 - '2' ); // 4, '2' приводится к числу
-    alert( '6' / '2' ); // 3, оба операнда приводятся к числам
+alert( 6 - '2' ); // 4, '2' приводится к числу
+alert( '6' / '2' ); // 3, оба операнда приводятся к числам
+```
 
 #### Приведение к числу, унарный +
+```js
 
-    // Не влияет на числа
-    let x = 1;
-    alert( +x ); // 1
-    let y = -2;
-    alert( +y ); // -2
+// Не влияет на числа
+let x = 1;
+alert( +x ); // 1
+let y = -2;
+alert( +y ); // -2
 
-    // Преобразует не числа в числа
-    alert( +true ); // 1
-    alert( +"" );   // 0
+// Преобразует не числа в числа
+alert( +true ); // 1
+alert( +"" );   // 0
 
-    let apples = "2";
-    let oranges = "3";
-    alert( apples + oranges ); // "23", так как бинарный плюс объединяет строки
+let apples = "2";
+let oranges = "3";
+alert( apples + oranges ); // "23", так как бинарный плюс объединяет строки
 
-    // оба операнда предварительно преобразованы в числа
-    alert( +apples + +oranges ); // 5
+// оба операнда предварительно преобразованы в числа
+alert( +apples + +oranges ); // 5
+
+```
 
 #### Приоритет операторов
 
-15 унарный плюс +
-15 унарный минус -
-14 возведение в степень **
-13 умножение *
-13 деление /
-12 сложение +
-12 вычитание -
-2 присваивание =
+- 15 унарный плюс +
+- 15 унарный минус -
+- 14 возведение в степень **
+- 13 умножение *
+- 13 деление /
+- 12 сложение +
+- 12 вычитание -
+- 2 присваивание =
 
 #### Сокращённая арифметика с присваиванием
-
-    let n = 2;
-    n += 5; // теперь n = 7 (работает как n = n + 5)
-    n *= 2; // теперь n = 14 (работает как n = n * 2)
-    alert( n ); // 14
+```js
+let n = 2;
+n += 5; // теперь n = 7 (работает как n = n + 5)
+n *= 2; // теперь n = 14 (работает как n = n * 2)
+alert( n ); // 14
+```
 
 #### Инкремент/декремент
+```js
+let counter = 1;
+let a = ++counter; // (*)
+alert(a); // 2
 
-    let counter = 1;
-    let a = ++counter; // (*)
-    alert(a); // 2
+let counter = 1;
+let a = counter++; // (*) меняем ++counter на counter++
+alert(a); // 1
+alert(counter); // 2
+```
 
-    let counter = 1;
-    let a = counter++; // (*) меняем ++counter на counter++
-    alert(a); // 1
-    alert(counter); // 2
 
-#### Побитовые операторы}
+#### Побитовые операторы
 
-AND(и) ( & )
-OR(или) ( | )
-XOR(побитовое исключающее или) ( ^ )
-NOT(не) ( ~ )
-LEFT SHIFT(левый сдвиг) ( << )
-RIGHT SHIFT(правый сдвиг) ( >> )
-ZERO-FILL RIGHT SHIFT(правый сдвиг с заполнением нулями) ( >>> )
+- AND(и) ( & )
+- OR(или) ( | )
+- XOR(побитовое исключающее или) ( ^ )
+- NOT(не) ( ~ )
+- LEFT SHIFT(левый сдвиг) ( << )
+- RIGHT SHIFT(правый сдвиг) ( >> )
+- ZERO-FILL RIGHT SHIFT(правый сдвиг с заполнением нулями) ( >>> )
 
 ##### Оператор «запятая»
+```js
+let a = (1 + 2, 3 + 4);
+alert( a ); // 7 (результат вычисления 3 + 4)
+// первое выражение 1 + 2 выполняется, а результат отбрасывается. Затем идёт 3 + 4, выражение выполняется и возвращается результат.
 
-    let a = (1 + 2, 3 + 4);
-    alert( a ); // 7 (результат вычисления 3 + 4)
-первое выражение 1 + 2 выполняется, а результат отбрасывается. Затем идёт 3 + 4, выражение выполняется и возвращается результат.
-
-    a = 1 + 2, 3 + 4;
-    alert(a); // 3
+a = 1 + 2, 3 + 4;
+alert(a); // 3
+```
 
 ### Операторы сравнения
+```js
+alert( 2 > 1 );  // true (верно)
+alert( 2 == 1 ); // false (неверно)
+alert( 2 != 1 ); // true (верно)
 
-    alert( 2 > 1 );  // true (верно)
-    alert( 2 == 1 ); // false (неверно)
-    alert( 2 != 1 ); // true (верно)
+let result = 5 > 4; // результат сравнения присваивается переменной result
+alert( result ); // true
+```
 
-    let result = 5 > 4; // результат сравнения присваивается переменной result
-    alert( result ); // true
 
 #### Сравнение строк
 
 Используется кодировка Unicode, а не настоящий алфавит
-    alert( 'Я' > 'А' ); // true
-    alert( 'Коты' > 'Кода' ); // true
-    alert( 'Сонный' > 'Сон' ); // true
+```js
+alert( 'Я' > 'А' ); // true
+alert( 'Коты' > 'Кода' ); // true
+alert( 'Сонный' > 'Сон' ); // true
+```
 
 #### Сравнение разных типов
 
 При сравнении значений разных типов JavaScript приводит каждое из них к числу.
-    alert( '2' > 1 ); // true, строка '2' становится числом 2
-    alert( '01' == 1 ); // true, строка '01' становится числом 1
+```js
+alert( '2' > 1 ); // true, строка '2' становится числом 2
+alert( '01' == 1 ); // true, строка '01' становится числом 1
 
-    alert( true == 1 ); // true
-    alert( false == 0 ); // true
+alert( true == 1 ); // true
+alert( false == 0 ); // true
 
-    let a = 0;
-    alert( Boolean(a) ); // false
-    let b = "0";
-    alert( Boolean(b) ); // true
-    alert(a == b); // true!
+let a = 0;
+alert( Boolean(a) ); // false
+let b = "0";
+alert( Boolean(b) ); // true
+alert(a == b); // true!
+```
 
 #### Строгое сравнение
-
-    alert( 0 == false ); // true
-    alert( '' == false ); // true
-    alert( 0 === false ); // false, так как сравниваются разные типы
+```js
+alert( 0 == false ); // true
+alert( '' == false ); // true
+alert( 0 === false ); // false, так как сравниваются разные типы
+```
 
 #### Сравнение с null и undefined
+```js
+alert( null === undefined ); // false
+alert( null == undefined ); // true
+```
 
-    alert( null === undefined ); // false
-    alert( null == undefined ); // true
 
 При использовании математических операторов и других операторов сравнения < > <= >= значения null/undefined преобразуются к числам: null становится 0, а undefined – NaN.
 
 Странный результат сравнения null и 0
-    alert( null > 0 );  // (1) false
-    alert( null == 0 ); // (2) false
-    alert( null >= 0 ); // (3) true
+```js
+alert( null > 0 );  // (1) false
+alert( null == 0 ); // (2) false
+alert( null >= 0 ); // (3) true
+```
 для нестрогого равенства == значений undefined и null действует особое правило: эти значения ни к чему не приводятся, они равны друг другу и не равны ничему другому. Поэтому (2) null == 0 ложно.
 
 #### Несравненное значение undefined
 
 Значение undefined несравнимо с другими значениями:
-    alert( undefined > 0 ); // false (1)
-    alert( undefined < 0 ); // false (2)
-    alert( undefined == 0 ); // false (3)
-    alert( undefined == false); // false (4)
+```js
+alert( undefined > 0 ); // false (1)
+alert( undefined < 0 ); // false (2)
+alert( undefined == 0 ); // false (3)
+alert( undefined == false); // false (4)
+```
 
 #### Как избежать проблем
 
@@ -289,527 +343,571 @@ ZERO-FILL RIGHT SHIFT(правый сдвиг с заполнением нуля
 ### Условное ветвление: if, '?'
 
 #### Инструкция «if»
+```js
+if (year == 2015) alert( 'Вы правы!' );
 
-    if (year == 2015) alert( 'Вы правы!' );
-
-    let year = prompt('В каком году была опубликована спецификация ECMAScript-2015?', '');
-    if (year < 2015) {
+let year = prompt('В каком году была опубликована спецификация ECMAScript-2015?', '');
+if (year < 2015) {
   alert( 'Это слишком рано...' );
-    } else if (year > 2015) {
+} else if (year > 2015) {
   alert( 'Это поздновато' );
-    } else {
+} else {
   alert( 'Верно!' );
-    }
+}
+```
+
 
 #### Условный оператор „?“
+```js
+let accessAllowed = (age > 18) ? true : false;
+// то же самое
+let accessAllowed = age > 18 ? true : false;
+let accessAllowed = age > 18;
 
-    let accessAllowed = (age > 18) ? true : false;
-    // то же самое
-    let accessAllowed = age > 18 ? true : false;
-    let accessAllowed = age > 18;
+let message = (age < 3) ? 'Здравствуй, малыш!' : (age < 18) ? 'Привет!' : (age < 100) ? 'Здравствуйте!' : 'Какой необычный возраст!';
 
-    let message = (age < 3) ? 'Здравствуй, малыш!' :
-  (age < 18) ? 'Привет!' :
-  (age < 100) ? 'Здравствуйте!' :
-  'Какой необычный возраст!';
+// не рекомендуется
+let company = prompt('Какая компания создала JavaScript?', '');
+(company == 'Netscape') ? alert('Верно!') : alert('Неправильно.');
+```
 
-не рекомендуется
-    let company = prompt('Какая компания создала JavaScript?', '');
-    (company == 'Netscape') ?
-   alert('Верно!') : alert('Неправильно.');
 
 ### Логические операторы
 
 #### || (ИЛИ)
+```js
+// ИЛИ "||" находит первое истинное значение, если все операнды являются ложными (false), возвращает последний из них
+alert( true || true );   // true
+alert( false || true );  // true
+alert( true || false );  // true
+alert( false || false ); // false
 
-ИЛИ "||" находит первое истинное значение, если все операнды являются ложными (false), возвращает последний из них
-    alert( true || true );   // true
-    alert( false || true );  // true
-    alert( true || false );  // true
-    alert( false || false ); // false
+alert( 1 || 0 ); // 1 (1 - истинное значение)
+alert( true || 'какая-то строка' ); // true
+alert( null || 1 ); // 1 (первое истинное значение)
+alert( null || 0 || 1 ); // 1 (первое истинное значение)
+alert( undefined || null || 0 ); // 0 (поскольку все ложно, возвращается последнее значение)
+```
 
-    alert( 1 || 0 ); // 1 (1 - истинное значение)
-    alert( true || 'какая-то строка' ); // true
-    alert( null || 1 ); // 1 (первое истинное значение)
-    alert( null || 0 || 1 ); // 1 (первое истинное значение)
-    alert( undefined || null || 0 ); // 0 (поскольку все ложно, возвращается последнее значение)
 
 ##### Получение первого истинного значения из списка переменных или выражений
+```js
+let firstName = "";
+let lastName = "";
+let nickName = "Суперкодер";
 
-    let firstName = "";
-    let lastName = "";
-    let nickName = "Суперкодер";
+alert( firstName || lastName || nickName || "Аноним"); // Суперкодер
+```
 
-    alert( firstName || lastName || nickName || "Аноним"); // Суперкодер
 
 ##### Сокращённое вычисление
+```js
+true || alert("никогда не сработает");
+false || alert("сработает");
+```
 
-    true || alert("никогда не сработает");
-    false || alert("сработает");
 
 #### ||= (Логическое присваивание ИЛИ)
+```js
+a ||= b;
+a || (a = b);
+```
 
-    a ||= b;
-    a || (a = b);
 
 #### && (И)
+```js
+alert( true && true );   // true
+alert( false && true );  // false
+alert( true && false );  // false
+alert( false && false ); // false
+// И «&&» находит первое ложное значение, если все операнды были истинными, возвращается последний
+result = value1 && value2 && value3;
 
-    alert( true && true );   // true
-    alert( false && true );  // false
-    alert( true && false );  // false
-    alert( false && false ); // false
+alert( 1 && 2 && null && 3 ); // null
+alert( 1 && 2 && 3 ); // 3
 
-И «&&» находит первое ложное значение, если все операнды были истинными, возвращается последний
-    result = value1 && value2 && value3;
+// Приоритет оператора && больше, чем у ||
+```
 
-    alert( 1 && 2 && null && 3 ); // null
-    alert( 1 && 2 && 3 ); // 3
 
-Приоритет оператора && больше, чем у ||
 
 #### &&= (Логическое присваивание И)
+```js
+a &&= b;
+a && (a = b);
 
-    a &&= b;
-    a && (a = b);
+let greeting = "Привет"; // строка непустая, поэтому будет преобразована к логическому значению true оператором &&=
+greeting &&= greeting + ", пользователь!"; // то же самое, что true && (greeting = greeting + "...")
+alert( greeting ) // "Привет, пользователь!"
+```
 
-    let greeting = "Привет"; // строка непустая, поэтому будет преобразована к логическому значению true оператором &&=
-    greeting &&= greeting + ", пользователь!"; // то же самое, что true && (greeting = greeting + "...")
-    alert( greeting ) // "Привет, пользователь!"
 
 #### ! (НЕ)
+```js
+alert( !true ); // false
+alert( !0 ); // true
 
-    alert( !true ); // false
-    alert( !0 ); // true
+alert( !!"непустая строка" ); // true
+alert( !!null ); // false
+```
 
-    alert( !!"непустая строка" ); // true
-    alert( !!null ); // false
 
 ### Операторы нулевого слияния и присваивания: '??', '??='
 
 #### Оператор нулевого слияния (??)
-
-    result = a ?? b
-
+```js
+result = a ?? b
+```
 Результат выражения a ?? b будет следующим:
 если a определено, то a,
 если a не определено, то b.
 
 тоже самое
-    result = (a !== null && a !== undefined) ? a : b;
+```js
+result = (a !== null && a !== undefined) ? a : b;
 
-    let user;
-    alert(user ?? "Аноним"); // Аноним (user не существует)
+let user;
+alert(user ?? "Аноним"); // Аноним (user не существует)
 
-    let user = "Иван";
-    alert(user ?? "Аноним"); // Иван (user существует)
+let user = "Иван";
+alert(user ?? "Аноним"); // Иван (user существует)
 
-    let firstName = null;
-    let lastName = null;
-    let nickName = "Суперкодер";
-    // показывает первое значение, которое определено:
-    alert(firstName ?? lastName ?? nickName ?? "Аноним");
+let firstName = null;
+let lastName = null;
+let nickName = "Суперкодер";
+// показывает первое значение, которое определено:
+alert(firstName ?? lastName ?? nickName ?? "Аноним");
+```
 
 ##### Использование ?? вместе с && или ||
+```js
+let x = 1 && 2 ?? 3; // Синтаксическая ошибка
+let x = (1 && 2) ?? 3; // Работает без ошибок
+alert(x); // 2
+```
 
-    let x = 1 && 2 ?? 3; // Синтаксическая ошибка
-    let x = (1 && 2) ?? 3; // Работает без ошибок
-    alert(x); // 2
 
 ##### Оператор нулевого присваивания (??=)
+x ??= y
+```js
 
-    x ??= y
+let userAge = null;
+userAge ??= 18;
+alert(userAge) // 18
+```
 
-    let userAge = null;
-    userAge ??= 18;
-    alert(userAge) // 18
 
 ### Циклы while и for
 
 #### Цикл «while»
+```js
+let i = 0;
+while (i < 3) { // выводит 0, затем 1, затем 2
+  alert( i );
+  i++;
+}
 
-    let i = 0;
-    while (i < 3) { // выводит 0, затем 1, затем 2
-      alert( i );
-      i++;
-    }
+let i = 3;
+while (i) { // когда i будет равно 0, условие станет ложным, и цикл остановится
+  alert( i );
+  i--;
+}
 
-    let i = 3;
-    while (i) { // когда i будет равно 0, условие станет ложным, и цикл остановится
-      alert( i );
-      i--;
-    }
+let i = 3;
+while (i) alert(i--);
+```
 
-    let i = 3;
-    while (i) alert(i--);
 
 #### Цикл «do…while»
-
+```js
     let i = 0;
     do {
       alert( i );
       i++;
     } while (i < 3);
+```
 
 #### Цикл «for»
+```js
+for (let i = 0; i < 3; i++) { // выведет 0, затем 1, затем 2
+  alert(i);
+}
 
-    for (let i = 0; i < 3; i++) { // выведет 0, затем 1, затем 2
-      alert(i);
-    }
+for (let i = 0; i < 3; i++) {
+  alert(i); // 0, 1, 2
+}
+alert(i); // ошибка, нет такой переменной
+let i = 0;
 
-    for (let i = 0; i < 3; i++) {
-      alert(i); // 0, 1, 2
-    }
-    alert(i); // ошибка, нет такой переменной
-    let i = 0;
-
-    for (i = 0; i < 3; i++) { // используем существующую переменную
-      alert(i); // 0, 1, 2
-    }
-    alert(i); // 3, переменная доступна, т.к. была объявлена снаружи цикла
+for (i = 0; i < 3; i++) { // используем существующую переменную
+  alert(i); // 0, 1, 2
+}
+alert(i); // 3, переменная доступна, т.к. была объявлена снаружи цикла
+```
 
 ##### Пропуск частей «for»
+```js
+let i = 0; // мы уже имеем объявленную i с присвоенным значением
 
-    let i = 0; // мы уже имеем объявленную i с присвоенным значением
+for (; i < 3; i++) { // нет необходимости в "начале"
+  alert( i ); // 0, 1, 2
+}
 
-    for (; i < 3; i++) { // нет необходимости в "начале"
-      alert( i ); // 0, 1, 2
-    }
+for (; i < 3;) {
+  alert( i++ );
+}
 
-    for (; i < 3;) {
-      alert( i++ );
-    }
-
-    for (;;) {
-      // будет выполняться вечно
-    }
+for (;;) {
+  // будет выполняться вечно
+}
+```
 
 #### Прерывание цикла: «break»
-
-    let sum = 0
-    while (true) {
-      let value = +prompt("Введите число", '');
-      if (!value) break; // (*)
-      sum += value;
-    }
-    alert( 'Сумма: ' + sum );
+```js
+let sum = 0
+while (true) {
+  let value = +prompt("Введите число", '');
+  if (!value) break; // (*)
+  sum += value;
+}
+alert( 'Сумма: ' + sum );
+```
 
 #### Переход к следующей итерации: continue
+```js
+for(let i = 0; i<10; i++){
+    if(i % 2 == 0) continue;
+    alert(i);
+};
 
-    for(let i = 0; i<10; i++){
-        if(i % 2 == 0) continue;
-        alert(i);
-    };
-
-    (i > 5) ? alert(i) : continue; // continue здесь приведёт к ошибке
+(i > 5) ? alert(i) : continue; // continue здесь приведёт к ошибке
+```
 
 #### Метки для break/continue
+```js
+outer: for (let i = 0; i < 3; i++) {
+  for (let j = 0; j < 3; j++) {
+    let input = prompt(`Значение на координатах (${i},${j})`, '');
+    // если пустая строка или Отмена, то выйти из обоих циклов
+    if (!input) break outer; // (*)
+    // сделать что-нибудь со значениями...
+  }
+}
+alert('Готово!');
 
-    outer: for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 3; j++) {
-        let input = prompt(`Значение на координатах (${i},${j})`, '');
-        // если пустая строка или Отмена, то выйти из обоих циклов
-        if (!input) break outer; // (*)
-        // сделать что-нибудь со значениями...
-      }
-    }
-    alert('Готово!');
+outer:
+for (let i = 0; i < 3; i++) { ... }
 
-    outer:
-    for (let i = 0; i < 3; i++) { ... }
-
-    break label; // не прыгает к метке ниже
-    label: for (...)
+break label; // не прыгает к метке ниже
+label: for (...)
+```
 
 ### Конструкция "switch"
+```js
+let a = 2 + 2;
+switch (a) {
+  case 3:
+    alert( 'Маловато' );
+    break;
+  case 4:
+    alert( 'В точку!' );
+    break;
+  case 5:
+    alert( 'Перебор' );
+    break;
+  default:
+    alert( "Нет таких значений" );
+}
+// Если break нет, то выполнение пойдёт ниже по следующим case, при этом остальные проверки игнорируются.
+let a = 2 + 2;
+switch (a) {
+  case 3:
+    alert( 'Маловато' );
+  case 4:
+    alert( 'В точку!' ); //выполница
+  case 5:
+    alert( 'Перебор' ); //выполница
+  default:
+    alert( "Нет таких значений" ); //выполница
+}
 
-    let a = 2 + 2;
-    switch (a) {
-      case 3:
-        alert( 'Маловато' );
-        break;
-      case 4:
-        alert( 'В точку!' );
-        break;
-      case 5:
-        alert( 'Перебор' );
-        break;
-      default:
-        alert( "Нет таких значений" );
-    }
+let a = "1";
+let b = 0;
+switch (+a) {
+  case b + 1:
+    alert("Выполнится, т.к. значением +a будет 1, что в точности равно b+1");
+    break;
+  default:
+    alert("Это не выполнится");
+}
 
-Если break нет, то выполнение пойдёт ниже по следующим case, при этом остальные проверки игнорируются.
-    let a = 2 + 2;
-    switch (a) {
-      case 3:
-        alert( 'Маловато' );
-      case 4:
-        alert( 'В точку!' ); //выполница
-      case 5:
-        alert( 'Перебор' ); //выполница
-      default:
-        alert( "Нет таких значений" ); //выполница
-    }
+let a = 3;
+switch (a) {
+  case 4:
+    alert('Правильно!');
+    break;
+  case 3: // (*) группируем оба case
+  case 5: // 3 и 5 выводят одно сообщение.
+    alert('Неправильно!');
+    alert("Может вам посетить урок математики?");
+    break;
+  default:
+    alert('Результат выглядит странновато. Честно.');
+}
+// проверка на равенство всегда строгая, значения должны быть одного типа, чтобы выполнялось равенство
+let arg = prompt("Введите число?");
+switch (arg) {
+  case '0':
+  case '1':
+    alert( 'Один или ноль' );
+    break;
+  case '2':
+    alert( 'Два' );
+    break;
+  case 3:
+    alert( 'Никогда не выполнится!' );
+    break;
+  default:
+    alert( 'Неизвестное значение' );
+}
+```
 
-    let a = "1";
-    let b = 0;
-    switch (+a) {
-      case b + 1:
-        alert("Выполнится, т.к. значением +a будет 1, что в точности равно b+1");
-        break;
-      default:
-        alert("Это не выполнится");
-    }
-
-    let a = 3;
-    switch (a) {
-      case 4:
-        alert('Правильно!');
-        break;
-      case 3: // (*) группируем оба case
-      case 5: // 3 и 5 выводят одно сообщение.
-        alert('Неправильно!');
-        alert("Может вам посетить урок математики?");
-        break;
-      default:
-        alert('Результат выглядит странновато. Честно.');
-    }
-проверка на равенство всегда строгая, значения должны быть одного типа, чтобы выполнялось равенство
-    let arg = prompt("Введите число?");
-    switch (arg) {
-      case '0':
-      case '1':
-        alert( 'Один или ноль' );
-        break;
-      case '2':
-        alert( 'Два' );
-        break;
-      case 3:
-        alert( 'Никогда не выполнится!' );
-        break;
-      default:
-        alert( 'Неизвестное значение' );
-    }
 
 ### Функции
+```js
+let userName = 'Вася';
 
-    let userName = 'Вася';
+function showMessage() {
+  userName = "Петя"; // (1) изменяем значение внешней переменной
+  let message = 'Привет, ' + userName;
+  alert(message);
+}
+alert( userName ); // Вася перед вызовом функции
+showMessage();
+alert( userName ); // Петя, значение внешней переменной было изменено функцией
 
-    function showMessage() {
-      userName = "Петя"; // (1) изменяем значение внешней переменной
-      let message = 'Привет, ' + userName;
-      alert(message);
-    }
-    alert( userName ); // Вася перед вызовом функции
-    showMessage();
-    alert( userName ); // Петя, значение внешней переменной было изменено функцией
+let userName = 'Вася';
 
-    let userName = 'Вася';
+function showMessage() {
+  let userName = "Петя"; // объявляем локальную переменную
+  let message = 'Привет, ' + userName; // Петя
+  alert(message);
+}
+// функция создаст и будет использовать свою собственную локальную переменную userName
+showMessage();
+alert( userName ); // Вася, не изменилась, функция не трогала внешнюю переменную
 
-    function showMessage() {
-      let userName = "Петя"; // объявляем локальную переменную
-      let message = 'Привет, ' + userName; // Петя
-      alert(message);
-    }
-    // функция создаст и будет использовать свою собственную локальную переменную userName
-    showMessage();
-    alert( userName ); // Вася, не изменилась, функция не трогала внешнюю переменную
+function showMessage(from, text) {
+  from = '*' + from + '*'; // немного украсим "from"
+  alert( from + ': ' + text );
+}
+let from = "Аня";
+showMessage(from, "Привет"); // *Аня*: Привет
+// значение "from" осталось прежним, функция изменила значение локальной переменной
+alert( from ); // Аня
 
-    function showMessage(from, text) {
-      from = '*' + from + '*'; // немного украсим "from"
-      alert( from + ': ' + text );
-    }
-    let from = "Аня";
-    showMessage(from, "Привет"); // *Аня*: Привет
-    // значение "from" осталось прежним, функция изменила значение локальной переменной
-    alert( from ); // Аня
+// Если при вызове функции аргумент не был указан, то его значением становится undefined.
 
-    // Если при вызове функции аргумент не был указан, то его значением становится undefined.
+showMessage("Аня"); //"*Аня*: undefined"
 
-    showMessage("Аня"); //"*Аня*: undefined"
+function showMessage(from, text = "текст не добавлен") { // значение по умолчанию
+  alert( from + ": " + text );
+}
+showMessage("Аня"); // Аня: текст не добавлен
 
-    function showMessage(from, text = "текст не добавлен") { // значение по умолчанию
-      alert( from + ": " + text );
-    }
-    showMessage("Аня"); // Аня: текст не добавлен
+function showMessage(from, text = anotherFunction()) {
+  // anotherFunction() выполнится только если не передан text
+  // результатом будет значение text
+}
 
-    function showMessage(from, text = anotherFunction()) {
-      // anotherFunction() выполнится только если не передан text
-      // результатом будет значение text
-    }
+function showMessage(text) {
+  // ...
+  if (text === undefined) { // если параметр отсутствует
+    text = 'пустое сообщение';
+  }
+  alert(text);
+}
+showMessage(); // пустое сообщение
 
-    function showMessage(text) {
-      // ...
-      if (text === undefined) { // если параметр отсутствует
-        text = 'пустое сообщение';
-      }
-      alert(text);
-    }
-    showMessage(); // пустое сообщение
+function showMessage(text) {
+  // если значение text ложно или равняется undefined, тогда присвоить text значение 'пусто'
+  text = text || 'пусто';
+  ...
+}
 
-    function showMessage(text) {
-      // если значение text ложно или равняется undefined, тогда присвоить text значение 'пусто'
-      text = text || 'пусто';
-      ...
-    }
+function showCount(count) {
+  // если count равен undefined или null, показать "неизвестно"
+  alert(count ?? "неизвестно");
+}
+showCount(0); // 0
+showCount(null); // неизвестно
+showCount(); // неизвестно
 
-    function showCount(count) {
-      // если count равен undefined или null, показать "неизвестно"
-      alert(count ?? "неизвестно");
-    }
-    showCount(0); // 0
-    showCount(null); // неизвестно
-    showCount(); // неизвестно
+function checkAge(age) {
+  if (age >= 18) {
+    return true;
+  } else {
+    return confirm('А родители разрешили?');
+  }
+}
+let age = prompt('Сколько вам лет?', 18);
+if ( checkAge(age) ) {
+  alert( 'Доступ получен' );
+} else {
+  alert( 'Доступ закрыт' );
+}
 
-    function checkAge(age) {
-      if (age >= 18) {
-        return true;
-      } else {
-        return confirm('А родители разрешили?');
-      }
-    }
-    let age = prompt('Сколько вам лет?', 18);
-    if ( checkAge(age) ) {
-      alert( 'Доступ получен' );
-    } else {
-      alert( 'Доступ закрыт' );
-    }
+function showMovie(age) {
+  if ( !checkAge(age) ) {
+    return;
+  }
+  alert( "Вам показывается кино" ); // (*)
+  // ...
+}
 
-    function showMovie(age) {
-      if ( !checkAge(age) ) {
-        return;
-      }
-      alert( "Вам показывается кино" ); // (*)
-      // ...
-    }
+function doNothing() { /* пусто */ }
+alert( doNothing() === undefined ); // true
 
-    function doNothing() { /* пусто */ }
-    alert( doNothing() === undefined ); // true
-
-    return (
-      some + long + expression
-      + or +
-      whatever * f(a) + f(b)
-      )
+return (
+  some + long + expression
+  + or +
+  whatever * f(a) + f(b)
+  )
+```
 
 ### Function Expression
 
-    function sayHi() {
-      alert( "Привет" );
-    }
+```js
+function sayHi() {
+  alert( "Привет" );
+}
 
-    let sayHi = function() {
-      alert( "Привет" );
-    };
+let sayHi = function() {
+  alert( "Привет" );
+};
 
-    alert( sayHi ); // выведет код функции
+alert( sayHi ); // выведет код функции
 
-    let func = sayHi;    // (2) копируем
-    func(); // Привет     // (3) вызываем копию (работает)!
+let func = sayHi;    // (2) копируем
+func(); // Привет     // (3) вызываем копию (работает)!
+```
 
 Function Expression ставится точка с запятой ; на конце, а в Function Declaration нет
 
 Функции-«колбэки»
 
-    function ask(question, yes, no) {
-      if (confirm(question)) yes()
-      else no();
-    }
+```js
+function ask(question, yes, no) {
+  if (confirm(question)) yes()
+  else no();
+}
 
-    function showOk() {
-      alert( "Вы согласны." );
-    }
+function showOk() {
+  alert( "Вы согласны." );
+}
 
-    function showCancel() {
-      alert( "Вы отменили выполнение." );
-    }
+function showCancel() {
+  alert( "Вы отменили выполнение." );
+}
 
-    // использование: функции showOk, showCancel передаются в качестве аргументов ask
-    ask("Вы согласны?", showOk, showCancel);
+// использование: функции showOk, showCancel передаются в качестве аргументов ask
+ask("Вы согласны?", showOk, showCancel);
 
-    ask(
-      "Вы согласны?",
-      function() { alert("Вы согласились."); },
-      function() { alert("Вы отменили выполнение."); }
-    );
+ask(
+  "Вы согласны?",
+  function() { alert("Вы согласились."); },
+  function() { alert("Вы отменили выполнение."); }
+);
+```
 
 Function Expression создаётся, когда выполнение доходит до него, и затем уже может использоваться.
 
 Function Declaration может быть вызвана раньше, чем она объявлена.
 
-    sayHi("Вася"); // Привет, Вася
-    function sayHi(name) {
-      alert( `Привет, ${name}` );
-    }
+```js
+sayHi("Вася"); // Привет, Вася
+function sayHi(name) {
+  alert( `Привет, ${name}` );
+}
+```
 
 В строгом режиме, когда Function Declaration находится в блоке {...}, функция доступна везде внутри блока. Но не снаружи него.
 
-    let age = prompt("Сколько Вам лет?", 18);
-    // в зависимости от условия объявляем функцию
-    if (age < 18) {
-      function welcome() {
-        alert("Привет!");
-      }
-    } else {
-      function welcome() {
-        alert("Здравствуйте!");
-      }
-    }
-    // ...не работает
-    welcome(); // Error: welcome is not defined
+```js
+let age = prompt("Сколько Вам лет?", 18);
+// в зависимости от условия объявляем функцию
+if (age < 18) {
+  function welcome() {
+    alert("Привет!");
+  }
+} else {
+  function welcome() {
+    alert("Здравствуйте!");
+  }
+}
+// ...не работает
+welcome(); // Error: welcome is not defined
 
-    let age = 16; // возьмём для примера 16
-    if (age < 18) {
-      welcome();               // \   (выполнится)
-      function welcome() {     //  |
-        alert("Привет!");      //  |  Function Declaration доступно
-      }                        //  |  во всём блоке кода, в котором объявлено
-      welcome();               // /   (выполнится)
-    } else {
-      function welcome() {
-        alert("Здравствуйте!");
-      }
-    }
-    // здесь фигурная скобка закрывается,
-    // поэтому Function Declaration, созданные внутри блока кода выше -- недоступны отсюда.
-    welcome(); // Ошибка: welcome is not defined
+let age = 16; // возьмём для примера 16
+if (age < 18) {
+  welcome();               // \   (выполнится)
+  function welcome() {     //  |
+    alert("Привет!");      //  |  Function Declaration доступно
+  }                        //  |  во всём блоке кода, в котором объявлено
+  welcome();               // /   (выполнится)
+} else {
+  function welcome() {
+    alert("Здравствуйте!");
+  }
+}
+// здесь фигурная скобка закрывается,
+// поэтому Function Declaration, созданные внутри блока кода выше -- недоступны отсюда.
+welcome(); // Ошибка: welcome is not defined
+```
 
 Function Expression
 
-    let age = prompt("Сколько Вам лет?", 18);
-    let welcome;
-    if (age < 18) {
-      welcome = function() {
-        alert("Привет!");
-      };
-    } else {
+```js
+let age = prompt("Сколько Вам лет?", 18);
+let welcome;
+if (age < 18) {
+  welcome = function() {
+    alert("Привет!");
+  };
+} else {
 
-      welcome = function() {
-        alert("Здравствуйте!");
-      };
-    }
-    welcome(); // теперь всё в порядке
+  welcome = function() {
+    alert("Здравствуйте!");
+  };
+}
+welcome(); // теперь всё в порядке
+```
 
 используя условный оператор ?:
 
-    let age = prompt("Сколько Вам лет?", 18);
-    let welcome = (age < 18) ?
-      function() { alert("Привет!"); } :
-      function() { alert("Здравствуйте!"); };
-    welcome(); // теперь всё в порядке
+```js
+let age = prompt("Сколько Вам лет?", 18);
+let welcome = (age < 18) ?
+  function() { alert("Привет!"); } :
+  function() { alert("Здравствуйте!"); };
+welcome(); // теперь всё в порядке
+```
 
 ### Стрелочные функции, основы
 
-    let age = prompt("Сколько Вам лет?", 18);
-    let welcome = (age < 18) ?
-      () => alert('Привет!') :
-      () => alert("Здравствуйте!");
-    welcome();
+```js
+let age = prompt("Сколько Вам лет?", 18);
+let welcome = (age < 18) ?
+  () => alert('Привет!') :
+  () => alert("Здравствуйте!");
+welcome();
 
-    let sum = (a, b) => {  // фигурная скобка, открывающая тело многострочной функции
-      let result = a + b;
-      return result; // если мы используем фигурные скобки, то нам нужно явно указать "return"
-    };
-    alert( sum(1, 2) ); // 3
+let sum = (a, b) => {  // фигурная скобка, открывающая тело многострочной функции
+  let result = a + b;
+  return result; // если мы используем фигурные скобки, то нам нужно явно указать "return"
+};
+alert( sum(1, 2) ); // 3
+```
 
 ## Качество кода
 
@@ -817,142 +915,164 @@ Function Expression
 
 однострочный
 
-        // однострочный
+```js
+// однострочный
+```
 
 многострочный
 
-        /* 
-        многострочный 
-        многострочный 
-        многострочный 
-        многострочный 
-        */
+```js
+/* 
+многострочный 
+многострочный 
+многострочный 
+многострочный 
+*/
+```
 
 документирование
 
-        /**
-        * Возвращает x, возведённое в n-ную степень.
-        *
-        * @param {number} x Возводимое в степень число.
-        * @param {number} n Степень, должна быть натуральным числом.
-        * @return {number} x, возведённое в n-ную степень.
-        */
-        function pow(x, n) {
-          ...
-        }
+```js
+/**
+* Возвращает x, возведённое в n-ную степень.
+*
+* @param {number} x Возводимое в степень число.
+* @param {number} n Степень, должна быть натуральным числом.
+* @return {number} x, возведённое в n-ную степень.
+*/
+function pow(x, n) {
+  ...
+}
+```
 
 ## Объекты: основы
 
 ### Литералы и свойства
 
-        let user = new Object(); // синтаксис "конструктор объекта"
-        let user = {};  // синтаксис "литерал объекта"
+```js
+let user = new Object(); // синтаксис "конструктор объекта"
+let user = {};  // синтаксис "литерал объекта"
 
-        let user = {
-          name: "John",
-          age: 30,
-          "likes birds": true,  // имя свойства из нескольких слов должно быть в кавычках
-        };
-        // получаем свойства объекта:
-        alert( user.name ); // John
-        alert( user.age ); // 30
+let user = {
+  name: "John",
+  age: 30,
+  "likes birds": true,  // имя свойства из нескольких слов должно быть в кавычках
+};
+// получаем свойства объекта:
+alert( user.name ); // John
+alert( user.age ); // 30
+```
 
 можно добавить свойство после создания
 
-        user.isAdmin = true;
-        
-        delete user.age;
+```js
+user.isAdmin = true;
+
+delete user.age;
+```
 
 Квадратные скобки
 
-        // присваивание значения свойству
-        user["likes birds"] = true;
+```js
+// присваивание значения свойству
+user["likes birds"] = true;
 
-        // получение значения свойства
-        alert(user["likes birds"]); // true
+// получение значения свойства
+alert(user["likes birds"]); // true
 
-        // удаление свойства
-        delete user["likes birds"];
+// удаление свойства
+delete user["likes birds"];
 
-        
-        let key = prompt("Что вы хотите узнать о пользователе?", "name");
 
-        // доступ к свойству через переменную
-        alert( user[key] ); // John (если ввели "name")
+let key = prompt("Что вы хотите узнать о пользователе?", "name");
 
-        alert( user.key ); // undefined
+// доступ к свойству через переменную
+alert( user[key] ); // John (если ввели "name")
 
-        let fruit = prompt("Какой фрукт купить?", "apple");
+alert( user.key ); // undefined
+
+let fruit = prompt("Какой фрукт купить?", "apple");
+```
 
 Вычисляемые свойства
 
-        let bag = {
-          [fruit]: 5, // имя свойства будет взято из переменной fruit
-        };
-        alert( bag.apple ); // 5, если fruit="apple"
+```js
+let bag = {
+  [fruit]: 5, // имя свойства будет взято из переменной fruit
+};
+alert( bag.apple ); // 5, если fruit="apple"
 
-        let fruit = 'apple';
-        let bag = {
-          [fruit + 'Computers']: 5 // bag.appleComputers = 5
-        };
+let fruit = 'apple';
+let bag = {
+  [fruit + 'Computers']: 5 // bag.appleComputers = 5
+};
+```
 
 Свойство из переменной
 
-        function makeUser(name, age) {
-          return {
-            name: name,
-            age: age
-            // ...другие свойства
-          };
-        }
-        let user = makeUser("John", 30);
-        alert(user.name); // John
+```js
+function makeUser(name, age) {
+  return {
+    name: name,
+    age: age
+    // ...другие свойства
+  };
+}
+let user = makeUser("John", 30);
+alert(user.name); // John
 
-        function makeUser(name, age) {
-          return {
-            name, // то же самое, что и name: name
-            age   // то же самое, что и age: age
-            // ...
-          };
-        }
+function makeUser(name, age) {
+  return {
+    name, // то же самое, что и name: name
+    age   // то же самое, что и age: age
+    // ...
+  };
+}
+```
 
 Ограничения на имена свойств
 
-        // эти имена свойств допустимы
-        let obj = {
-          for: 1,
-          let: 2,
-          return: 3
-        };
-        alert( obj.for + obj.let + obj.return );  // 6
+```js
+// эти имена свойств допустимы
+let obj = {
+  for: 1,
+  let: 2,
+  return: 3
+};
+alert( obj.for + obj.let + obj.return );  // 6
 
-        let obj = {
-          0: "Тест" // то же самое что и "0": "Тест", преобразуется в строку
-        };
-        // обе функции alert выведут одно и то же свойство (число 0 преобразуется в строку "0")
-        alert( obj["0"] ); // Тест
-        alert( obj[0] ); // Тест (то же свойство)
+let obj = {
+  0: "Тест" // то же самое что и "0": "Тест", преобразуется в строку
+};
+// обе функции alert выведут одно и то же свойство (число 0 преобразуется в строку "0")
+alert( obj["0"] ); // Тест
+alert( obj[0] ); // Тест (то же свойство)
 
-        let obj = {};
-        obj.__proto__ = 5; // присвоим число
-        alert(obj.__proto__); // [object Object], значение - это объект, т.е. не то, что мы ожидали
+let obj = {};
+obj.__proto__ = 5; // присвоим число
+alert(obj.__proto__); // [object Object], значение - это объект, т.е. не то, что мы ожидали
+```
 
 ### Проверка существования свойства, оператор «in»
 
-        let user = {};
-        alert( user.noSuchProperty === undefined ); // true означает "свойства нет"
+```js
+let user = {};
+alert( user.noSuchProperty === undefined ); // true означает "свойства нет"
 
-        let user = { name: "John", age: 30 };
-        alert( "age" in user ); // true, user.age существует
-        alert( "blabla" in user ); // false, user.blabla не существует
+let user = { name: "John", age: 30 };
+alert( "age" in user ); // true, user.age существует
+alert( "blabla" in user ); // false, user.blabla не существует
 
-        let obj = {
-          test: undefined
-        };
-        alert( obj.test ); //  выведет undefined, значит свойство не существует?
-        alert( "test" in obj ); // true, свойство существует!
+let obj = {
+  test: undefined
+};
+
+alert( obj.test ); //  выведет undefined, значит свойство не существует?
+alert( "test" in obj ); // true, свойство существует!
+```
 
 ### Цикл "for..in"
+
 ```js
 let user = {
   name: "John",
@@ -1111,23 +1231,23 @@ admin['f'](); // Admin (нет разницы между использован�
 В нестрогом режиме значением this в таком случае будет глобальный объект .
 
 ```js
-    function sayHi() {
-      alert(this);
-    }
-    sayHi(); // undefined
+function sayHi() {
+  alert(this);
+}
+sayHi(); // undefined
 ```
 
 #### У стрелочных функций нет «this»
 
 ```js
-    let user = {
-      firstName: "Ilya",
-      sayHi() {
-        let arrow = () => alert(this.firstName);
-        arrow();
-      }
-    };
-    user.sayHi(); // Ilya
+let user = {
+  firstName: "Ilya",
+  sayHi() {
+    let arrow = () => alert(this.firstName);
+    arrow();
+  }
+};
+user.sayHi(); // Ilya
 ```
 
 Функции, которые находятся в свойствах объекта, называются «методами».
@@ -1144,9 +1264,9 @@ admin['f'](); // Admin (нет разницы между использован�
 ### Конструктор, оператор "new"
 
 ```js
-    let user = new User; // <-- без скобок
-    // то же, что и
-    let user = new User();
+let user = new User; // <-- без скобок
+// то же, что и
+let user = new User();
 ```
 
 #### Функция-конструктор
@@ -1640,20 +1760,20 @@ alert(user + 500); // toString -> John500
 #### Дальнейшие преобразования
 
 ```js
-      let obj = {
-        // toString обрабатывает все преобразования в случае отсутствия других методов
-        toString() {
-          return "2";
-        }
-      };
-      alert(obj * 2); // 4, объект был преобразован к примитиву "2", затем умножение сделало его числом
+let obj = {
+  // toString обрабатывает все преобразования в случае отсутствия других методов
+  toString() {
+    return "2";
+  }
+};
+alert(obj * 2); // 4, объект был преобразован к примитиву "2", затем умножение сделало его числом
 
-      let obj = {
-        toString() {
-          return "2";
-        }
-      };
-      alert(obj + 2); // "22" ("2" + 2), преобразование к примитиву вернуло строку => конкатенация
+let obj = {
+  toString() {
+    return "2";
+  }
+};
+alert(obj + 2); // "22" ("2" + 2), преобразование к примитиву вернуло строку => конкатенация
 ```
 
 ## Типы данных
@@ -1939,14 +2059,14 @@ World`;
 alert(str1 == str2); // true
 ```
 
-|Символ| 	Описание|
-|:-:|:-:|
-|\n| 	Перевод строки|
-|\r| 	В текстовых файлах Windows для перевода строки используется комбинация символов \r\n, а на других ОС это просто \n. Это так по историческим причинам, ПО под Windows обычно понимает и просто \n.|
-|\', \", \`| 	Кавычки|
-|\\ | 	Обратный слеш|
-|\t | 	Знак табуляции
-|\b, \f, \v| 	Backspace, Form Feed и Vertical Tab — оставлены для обратной совместимости, сейчас не используются.
+|   Символ   |                                                                                             Описание                                                                                              |
+| :--------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|     \n     |                                                                                          Перевод строки                                                                                           |
+|     \r     | В текстовых файлах Windows для перевода строки используется комбинация символов \r\n, а на других ОС это просто \n. Это так по историческим причинам, ПО под Windows обычно понимает и просто \n. |
+| \', \", \` |                                                                                              Кавычки                                                                                              |
+|     \\     |                                                                                           Обратный слеш                                                                                           |
+|     \t     |                                                                                          Знак табуляции                                                                                           |
+| \b, \f, \v |                                                Backspace, Form Feed и Vertical Tab — оставлены для обратной совместимости, сейчас не используются.                                                |
 
 #### Длина строки
 
@@ -7705,11 +7825,11 @@ async/await отлично работает с Promise.all
 
 Вот небольшая шпаргалка:
 
-наименование | Итераторы | Асинхронные итераторы
-:---:|:---:|:---:
-Метод для создания итерируемого объекта	Symbol. |iterator |	Symbol.asyncIterator
-next() возвращает |	любое значение|	промис
-для цикла используйте |	for..of	| for await..of
+|                  наименование                   |   Итераторы    | Асинхронные итераторы |
+| :---------------------------------------------: | :------------: | :-------------------: |
+| Метод для создания итерируемого объекта	Symbol. |    iterator    | Symbol.asyncIterator  |
+|                next() возвращает                | любое значение |        промис         |
+|              для цикла используйте              |    for..of     |     for await..of     |
 
 Оператор расширения ... не работает асинхронно
 Функции, которые требуют обычных синхронных итераторов, не работают с асинхронными.

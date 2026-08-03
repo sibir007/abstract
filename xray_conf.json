@@ -1,0 +1,105 @@
+{
+    "log": {
+        "loglevel": "info" // Content from least to most: "none", "error", "warn>
+        // ,"access": "/home/xray_log/access.log", // Access record
+        // "error": "/home/xray_log/access.log" // Error record
+    },
+    // 2_DNS settings
+    "dns": {
+        "servers": [
+            "https+local://1.1.1.1/dns-query", // Prefer 1.1.1.1 DoH query, sacr>
+            "localhost"
+        ]
+    },
+    // 3*Diversion settings
+    "routing": {
+        "domainStrategy": "IPIfNonMatch",
+        "rules": [
+            // 3.1 Prevent local server flow problems: such as intranet attacks >
+            {
+                "type": "field",
+                "ip": [
+                    "geoip:private" // Diversion condition: In the geoip file, t>
+                ],
+                "outboundTag": "block" // Diversion strategy: Hand over to the o>
+            },
+            {
+                // 3.2 Prevent the server from connecting directly to Russia
+                "type": "field",
+                "ip": [
+                    "geoip:ru"
+                ],
+                "outboundTag": "block"
+            },
+            // 3.3 Block ads
+            {
+                "type": "field",
+                "domain": [
+                    "geosite:category-ads-all" // Diversion conditions: In the g>
+                ],
+                "outboundTag": "block" // Diversion strategy: Hand it over to th>
+            }
+        ]
+    },
+    "inbounds": [
+        {
+            "port": 23,
+            "tag": "ss",
+            "protocol": "shadowsocks",
+            "settings": {
+                "method": "2022-blake3-aes-128-gcm",
+                "password": "aaaaaaaaaaaaaaaabbbbbbbbbbbbbbbb",
+                "network": "tcp,udp"
+            },
+            "streamSettings": {
+                "network": "tcp"
+            }
+        },
+        {
+            "port": 443,
+            "protocol": "vless",
+            "tag": "vless_tls",
+            "settings": {
+                "clients": [
+                    {
+                        "id": "6cce90c0-f96c-4d19-af2d-5cf2c656abc3",
+                        "email": "sibiriakoff2006@yandex.ru",
+                        "flow": "xtls-rprx-vision"
+                    }
+                ],
+                "decryption": "none"
+            },
+            "streamSettings": {
+                "network": "tcp",
+                "security": "reality",
+                "realitySettings": {
+                    "dest": "twitch.tv:443",
+                    "serverNames": [
+                        "www.twitch.tv"
+                    ],
+                    "privateKey": "GJIVnZvdAnLVC0ae4bTwQo595aFZpOhsPKRxX5orA>",
+                    "shortIds": [
+                        "5f8fe80e1e6034db"
+                    ]
+                }
+            },
+            "sniffing": {
+                "enabled": true,
+                "destOverride": [
+                    "http",
+                    "tls"
+                ]
+            }
+        }
+    ],
+    "outbounds": [
+        {
+            "protocol": "freedom",
+            "tag": "direct"
+        },
+        {
+            "protocol": "blackhole",
+            "tag": "block"
+        }
+    ]
+}
